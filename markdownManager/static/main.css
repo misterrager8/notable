@@ -1,0 +1,104 @@
+:root, html[data-theme="dark"] {
+   --navbar-bg: white;
+   --navbar-txt: #1a1a1a;
+   --body-bg: #1a1a1a;
+   --body-txt: white;
+}
+
+html[data-theme="light"] {
+   --navbar-bg: #1a1a1a;
+   --navbar-txt: white;
+   --body-bg: white;
+   --body-txt: #1a1a1a;
+}
+
+html[data-theme="blue"] {
+    --navbar-bg: #C9CAF8;
+    --navbar-txt: #3D348B;
+    --body-bg: #3D348B;
+    --body-txt: #C9CAF8;
+}
+
+html[data-theme="brown"] {
+    --navbar-bg: #A19E91;
+    --navbar-txt: #230903;
+    --body-bg: #230903;
+    --body-txt: #A19E91;
+}
+
+html[data-theme="vanilla"] {
+    --navbar-bg: #F5FFD6;
+    --navbar-txt: #A6A670;
+    --body-bg: #A6A670;
+    --body-txt: #F5FFD6;
+}
+
+html[data-theme="purple"] {
+    --navbar-bg: #AF9AB2;
+    --navbar-txt: #672A4E;
+    --body-bg: #672A4E;
+    --body-txt: #AF9AB2;
+}
+
+html[data-theme="green"] {
+    --navbar-bg: #94A187;
+    --navbar-txt: #29524A;
+    --body-bg: #29524A;
+    --body-txt: #94A187;
+}
+
+.font-custom, .dropdown-item, .btn-custom, .badge-custom, ::placeholder {
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.border-custom, .btn-custom, .input-custom, .badge-custom, .card-body {
+    border: 1px solid var(--body-txt);
+    border-radius: 5px;
+}
+
+.card { border: 0;}
+.card-body { margin-bottom: 25px;}
+
+a, a:hover {
+    color: inherit !important;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+body, .card, .input-custom, .btn-custom:hover, .modal-content, .badge-custom, .page-link, .dropdown-menu {
+    background-color: var(--body-bg);
+    color: var(--body-txt) !important;
+}
+
+.navbar, .btn-custom, .page-link:hover, .dropdown-item:hover, .list-group-item-action:hover {
+    background-color: var(--navbar-bg);
+    color: var(--navbar-txt) !important;
+}
+
+.btn-custom {
+    padding: 5px 10px;
+    transition: background-color .5s, color .5s;
+}
+
+.input-custom {
+    padding: 5px 10px;
+}
+
+.dropdown-item, .list-group-item-action {
+    transition: background-color .5s, color .5s;
+}
+
+.badge-custom {
+    font-size: 0.8em;
+    padding: 3px 15px;
+    transition: background-color .5s, color .5s;
+}
+
+label { cursor: pointer; }
+
+::placeholder {
+    color: currentColor;
+    opacity: 25%;
+}

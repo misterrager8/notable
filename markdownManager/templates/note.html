@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block body %}
+<title>{{ note_.title }}</title>
+<div class="row">
+    <div class="col-xl-6" id="preview" style="white-space:pre-wrap">{{ md | safe }}</div>
+    <form action="{{ url_for('edit_note') }}" method="POST" class="col-xl-6">
+        <input value="{{ note_.path }}" name="filename" style="display:none">
+        <textarea onkeyup="previewMd()" id="editor" name="editor" class="input-custom mb-3 w-100" rows=20 style="white-space:pre-wrap">{{ content | safe }}</textarea>
+        <button type="submit" class="btn-custom w-100"><i class="bi bi-save2"></i> save</button>
+    </form>
+</div>
+{% endblock %}
