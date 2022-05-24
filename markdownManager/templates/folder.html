@@ -10,9 +10,9 @@
     {% for i in folder_.get_notes() %}
     <div class="card col-xl-4">
         <div class="card-body">
-            <a href="{{ url_for('note', filename=i.title, dirname=i.folder) }}">{{ i.title }}</a>
-            <a onclick="$('#delete' + {{ loop.index }}).fadeToggle(250)" class="bi bi-trash2 text-danger"></a>
-            <a href="{{ url_for('delete_note', filename=i.path) }}" class="font-custom text-danger" id="delete{{ loop.index }}" style="display:none">delete?</a>
+            <a class="h4" href="{{ url_for('note', filename=i.title, dirname=i.folder) }}"><i class="bi bi-sticky-fill"></i> {{ i.title }}</a>
+            <a onclick="$('#delete' + {{ loop.index }}).fadeToggle(250)" class="bi bi-trash2 text-danger float-end"></a>
+            <a href="{{ url_for('delete_note', filename=i.path) }}" class="font-custom text-danger float-end" id="delete{{ loop.index }}" style="display:none">delete?</a>
         </div>
     </div>
     {% endfor %}

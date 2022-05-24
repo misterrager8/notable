@@ -9,9 +9,10 @@
     {% for i in folders_ %}
     <div class="card col-xl-4">
         <div class="card-body">
-            <a class="" href="{{ url_for('folder_', dirname=i.name_) }}">{{ i.name_ }}</a>
-            <a onclick="toggleDiv('deleteFolder' + {{ loop.index }})" class="text-danger"><i class="bi bi-trash2"></i></a>
-            <a href="{{ url_for('delete_folder', dirname=i.name_) }}" class="text-danger font-custom" id="deleteFolder{{ loop.index }}" style="display:none">delete?</a>
+            <a class="h4 me-2" href="{{ url_for('folder_', dirname=i.name_) }}"><i class="bi bi-folder-fill"></i> {{ i.name_ }}</a>
+            <span class="badge-custom">{{ i.get_notes() | length }}</span>
+            <a onclick="toggleDiv('deleteFolder' + {{ loop.index }})" class="text-danger float-end"><i class="bi bi-trash2"></i></a>
+            <a href="{{ url_for('delete_folder', dirname=i.name_) }}" class="text-danger font-custom float-end" id="deleteFolder{{ loop.index }}" style="display:none">delete?</a>
         </div>
     </div>
     {% endfor %}

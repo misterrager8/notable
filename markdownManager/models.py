@@ -1,4 +1,5 @@
 import os
+import markdown
 
 
 class Note:
@@ -6,6 +7,16 @@ class Note:
         self.title = title
         self.folder = folder
         self.path = "notes/%s/%s.md" % (self.folder, self.title)
+
+    def get_txt(self):
+        with open(self.path) as f:
+            txt = f.read()
+        return txt
+
+    def get_md(self):
+        with open(self.path) as f:
+            txt = f.read()
+        return markdown.markdown(txt)
 
 
 class Folder:

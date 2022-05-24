@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block body %}
-<title>Local Notes</title>
+<title>markdownManager</title>
 <form onsubmit="event.preventDefault(); addNote();" class="input-group">
     <input autocomplete="off" placeholder="name" id="new_note" class="input-custom">
     <button type="submit" class="btn-custom"><i class="bi bi-plus-lg"></i> new note</button>
@@ -9,14 +9,24 @@
     {% for i in x %}
     <div class="card col-xl-4">
         <div class="card-body text-truncate">
-            <a href="{{ url_for('note', filename=i.title, dirname=i.folder) }}">{{ i.title }}</a><br>
-            <a class="badge-custom" href="{{ url_for('folder_', dirname=i.folder) }}">{{ i.folder }}</a>
+            <a data-bs-toggle="modal" data-bs-target="#read{{ loop.index }}" class="h4"><i class="bi bi-sticky-fill"></i> {{ i.title }}</a><br>
+            <a class="badge-custom" href="{{ url_for('folder_', dirname=i.folder) }}"><i class="bi bi-folder-fill"></i> {{ i.folder }}</a>
             <div class="mt-3">
+                <a href="{{ url_for('note', filename=i.title, dirname=i.folder) }}" class="me-2"><i class="bi bi-pen"></i></a>
                 <a onclick="$('#delete' + {{ loop.index }}).fadeToggle(250)" class="bi bi-trash2 text-danger"></a>
                 <a href="{{ url_for('delete_note', filename=i.path) }}" class="font-custom text-danger" id="delete{{ loop.index }}" style="display:none">delete?</a>
             </div>
         </div>
     </div>
+
+    <div class="modal" id="read{{ loop.index }}">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content p-4" style="white-space:pre-wrap">
+                {{ i.get_md() | safe }}
+            </div>
+        </div>
+    </div>
+
     {% endfor %}
 </div>
 {% endblock %}
