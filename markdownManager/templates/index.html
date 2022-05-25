@@ -5,6 +5,7 @@
     <input autocomplete="off" placeholder="name" id="new_note" class="input-custom">
     <button type="submit" class="btn-custom"><i class="bi bi-plus-lg"></i> new note</button>
 </form>
+<span class="badge-custom">{{ x | length }} note(s)</span>
 <div class="row mt-3">
     {% for i in x %}
     <div class="card col-xl-4">
