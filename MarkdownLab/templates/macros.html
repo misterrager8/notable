@@ -1,26 +1,30 @@
 {% macro folder_card(folder) %}
 <div class="py-2 px-3">
-    <a class="font-custom" href="{{ url_for('folder', dirname=folder.name) }}"><i class="bi bi-folder-fill me-2"></i> {{ folder.name }}</a>
+    <a class="font-custom" href="{{ url_for('folder', dirname=folder.name) }}">
+        <i class="bi bi-folder-fill me-2"></i>
+        {{ folder.name }}
+        <span class="small opacity-25">{{ folder.get_files() | length }}</span>
+    </a>
 </div>
 {% endmacro %}
 
 {% macro file_card(file) %}
 <div>
+    <a class="text-danger bi bi-trash3 me-3" href="{{ url_for('delete_file', name=file.name, folder=file.folder) }}"></a>
     <a class="font-custom" href="{{ url_for('editor', folder=file.folder, name=file.name) }}"><i class="bi bi-file-earmark"></i> {{ file.name }}</a>
-    <a class="bi bi-trash3" href="{{ url_for('delete_file', name=file.name, folder=file.folder) }}"></a>
 </div>
 {% endmacro %}
 
 {% macro create_folder_form() %}
 <form method="POST" action="{{ url_for('create_folder') }}" class="input-group">
-    <input autocomplete="off" class="input-custom" name="name" placeholder="Name">
+    <input required autocomplete="off" class="input-custom" name="name" placeholder="Name">
     <button class="btn-custom" type="submit">Create Folder</button>
 </form>
 {% endmacro %}
 
 {% macro create_file_form(folder) %}
 <form method="POST" action="{{ url_for('create_file', folder=folder.name) }}" class="input-group">
-    <input autocomplete="off" class="input-custom" name="name" placeholder="Name">
+    <input required autocomplete="off" class="input-custom" name="name" placeholder="Name">
     <button class="btn-custom" type="submit">Create File</button>
 </form>
 {% endmacro %}

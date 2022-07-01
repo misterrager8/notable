@@ -6,4 +6,4 @@ app = create_app(config)
 
 if __name__ == "__main__":
     webview.create_window("Markdown Lab", app, frameless=True, text_select=True)
-    webview.start(debug=True)
+    webview.start(debug=True, http_server=False)
