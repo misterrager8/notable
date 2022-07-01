@@ -1,7 +1,8 @@
-import os
 import dotenv
+import os
 
 dotenv.load_dotenv()
 
-DEBUG = os.getenv("debug")
-ENV = os.getenv("env")
+DEBUG = os.getenv("DEBUG")
+ENV = os.getenv("ENV")
+MAIN_FOLDER = os.getenv("MAIN_FOLDER")

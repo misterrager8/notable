@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros with context %}
+{% block body %}
+<title>Markdown Lab</title>
+<div class="container p-5">
+    <div class="d-flex justify-content-between mb-5">
+        <span class="font-custom"><i class="bi bi-folder-fill"></i> {{ folder_.name }}</span>
+        <div>
+            <a data-bs-toggle="modal" data-bs-target="#newFile" class="text-success font-custom me-3"><i class="bi bi-file-earmark"></i> + New File</a>
+            <a href="{{ url_for('delete_folder', dirname=folder_.name) }}" class="text-danger font-custom"><i class="bi bi-trash3"></i> Delete</a>
+        </div>
+    </div>
+    {% for i in folder_.get_files() %}
+    {{ macros.file_card(i) }}
+    {% endfor %}
+    
+    <div class="modal" id="newFile">
+        <div class="modal-dialog">
+            <div class="modal-content p-5">
+                {{ macros.create_file_form(folder_) }}
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
