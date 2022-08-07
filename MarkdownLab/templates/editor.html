@@ -2,32 +2,6 @@
 {% import "macros.html" as macros with context %}
 {% block body %}
 <title>{{ file_.name }}</title>
-<div>
-    <nav class="navbar navbar-expand sticky-top">
-        <div class="container-fluid">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item pe-2 border-end"><a onclick="toggleSidebar()" class="nav-link"><i class="bi bi-list" style="font-size: 1.5em"></i></a></li>
-                <li class="nav-item m-2 ps-3"><span class="nav-text font-custom"><i class="bi bi-file-earmark"></i> {{ file_.name }}</span></li>
-            </ul>
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link text-success font-custom" onclick="$('#save').submit()"><i class="bi bi-save"></i> Save Changes</a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ url_for('delete_file', name=file_.name, folder=file_.folder) }}" class="nav-link text-danger font-custom"><i class="bi bi-trash3"></i> Delete</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    <div class="row">
-        <div class="col-6">
-            <form id="save" method="POST" action="{{ url_for('editor', name=file_.name, folder=file_.folder) }}">
-                <textarea name="content" style="white-space: pre-wrap" rows="20" placeholder="Content" id="content" class="input-custom w-100 h-100" onkeyup="previewContent()">{{ file_.get_content() }}</textarea>
-            </form>
-        </div>
-        <div class="col-6">
-            <div id="preview" style="white-space: pre-wrap">{{ file_.get_content(True) | safe }}</div>
-        </div>
-    </div>
-</div>
+<p class="text-center"><i class="bi bi-file"></i> {{ file_.name }}</p>
+{{ macros.editor(file_) }}
 {% endblock %}

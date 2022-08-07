@@ -1,5 +1,0 @@
-Flask==2.0.0
-Markdown==3.2.1
-python-dotenv==0.20.0
-pywebview==3.6.3
-webview==0.1.5

@@ -1,30 +1,46 @@
-{% macro folder_card(folder) %}
-<div class="py-2 px-3">
-    <a class="font-custom" href="{{ url_for('folder', dirname=folder.name) }}">
-        <i class="bi bi-folder-fill me-2"></i>
-        {{ folder.name }}
-        <span class="small opacity-25">{{ folder.get_files() | length }}</span>
-    </a>
+{% macro folder_card(folder_) %}
+<div class="col-xl-12">
+    <div class="mb-3">
+        <a href="{{ url_for('folder', path=folder_) }}"><i class="bi bi-folder"></i> {{ folder_.name }}</a>
+    </div>
 </div>
 {% endmacro %}
 
-{% macro file_card(file) %}
-<div>
-    <a class="text-danger bi bi-trash3 me-3" href="{{ url_for('delete_file', name=file.name, folder=file.folder) }}"></a>
-    <a class="font-custom" href="{{ url_for('editor', folder=file.folder, name=file.name) }}"><i class="bi bi-file-earmark"></i> {{ file.name }}</a>
+{% macro file_card(file_) %}
+<div class="col-xl-12">
+    <div class="mb-3">
+        <a href="{{ url_for('file', path=file_) }}"><i class="bi bi-file"></i> {{ file_.name }}</a>
+    </div>
 </div>
 {% endmacro %}
 
-{% macro create_folder_form() %}
-<form method="POST" action="{{ url_for('create_folder') }}" class="input-group">
-    <input required autocomplete="off" class="input-custom" name="name" placeholder="Name">
-    <button class="btn-custom" type="submit">Create Folder</button>
+{% macro folder_create_form(parent) %}
+<form class="input-group" method="POST" action="{{ url_for('create_folder', parent=parent) }}">
+    <input placeholder="New Folder" autocomplete="off" name="name" class="form-control" required>
+    <button type="submit" class="btn btn-outline-success"><i class="bi bi-plus-lg"></i></button>
 </form>
 {% endmacro %}
 
-{% macro create_file_form(folder) %}
-<form method="POST" action="{{ url_for('create_file', folder=folder.name) }}" class="input-group">
-    <input required autocomplete="off" class="input-custom" name="name" placeholder="Name">
-    <button class="btn-custom" type="submit">Create File</button>
+{% macro file_create_form(parent) %}
+<form class="input-group" method="POST" action="{{ url_for('create_file', parent=parent) }}">
+    <input placeholder="New File" autocomplete="off" name="name" class="form-control" required>
+    <button type="submit" class="btn btn-outline-success"><i class="bi bi-plus-lg"></i></button>
 </form>
+{% endmacro %}
+
+{% macro editor(file_) %}
+<link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+
+<form method="POST" action="{{ url_for('editor', path=file_) }}">
+    <button class="btn btn-outline-success w-100 mb-3"><i class="bi bi-save"></i> Save</button>
+    <textarea class="w-100 h-100" name="content">{{ file_.read_text() }}</textarea>
+</form>
+
+<script>
+    const editor = new EasyMDE({
+        placeholder: 'Content',
+        autofocus: true
+    }); 
+</script>
 {% endmacro %}
