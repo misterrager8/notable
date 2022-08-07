@@ -2,13 +2,16 @@
 {% import "macros.html" as macros with context %}
 {% block body %}
 <title>{{ folder_.name }}</title>
-<p class="text-center"><i class="bi bi-folder"></i> {{ folder_.name }}</p>
+<div class="d-flex">{{ macros.folder_rename_form(folder_) }}</div>
+
 <div id="newFolder" style="display: none">{{ macros.folder_create_form(folder_) }}</div>
 <div id="newFile" style="display: none">{{ macros.file_create_form(folder_) }}</div>
+<div id="newLink" style="display: none">{{ macros.link_save_form(folder_) }}</div>
 <a class="btn btn-sm btn-outline-success" onclick="toggleDiv('newFolder')"><i class="bi bi-folder"></i> New Folder</a>
-<a class="btn btn-sm btn-outline-success" onclick="toggleDiv('newFile')"><i class="bi bi-file"></i> New File</a>
+<a class="btn btn-sm btn-outline-success" onclick="toggleDiv('newFile')"><i class="bi bi-filetype-md"></i> New File</a>
+<a class="btn btn-sm btn-outline-success" onclick="toggleDiv('newLink')"><i class="bi bi-link-45deg"></i> New Link</a>
 <a class="btn btn-sm btn-outline-light"><i class="bi bi-pen"></i> Edit</a>
-<a href="{{ url_for('delete_folder', path=folder_) }}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash3"></i> Delete</a>
+<a href="{{ url_for('folders.delete_folder', path=folder_) }}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash3"></i> Delete</a>
 <div class="mt-3">
     {% for i in folder_.iterdir() %}
     {% if i.is_dir() %}

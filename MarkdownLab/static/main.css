@@ -39,3 +39,15 @@ body {
 .fa {
     color: white !important;
 }
+
+.input-hidden {
+    background-color: inherit;
+    color: inherit;
+    border: 0;
+}
+
+span.input-group-text {
+    background-color: inherit;
+    color: inherit;
+    border: 0;
+}

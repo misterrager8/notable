@@ -1,7 +1,7 @@
 {% macro folder_card(folder_) %}
 <div class="col-xl-12">
     <div class="mb-3">
-        <a href="{{ url_for('folder', path=folder_) }}"><i class="bi bi-folder"></i> {{ folder_.name }}</a>
+        <a href="{{ url_for('folders.folder', path=folder_) }}"><i class="bi bi-folder"></i> {{ folder_.name }}</a>
     </div>
 </div>
 {% endmacro %}
@@ -9,21 +9,43 @@
 {% macro file_card(file_) %}
 <div class="col-xl-12">
     <div class="mb-3">
-        <a href="{{ url_for('file', path=file_) }}"><i class="bi bi-file"></i> {{ file_.name }}</a>
+        <a href="{{ url_for('files.file', path=file_) }}"><i class="bi bi-filetype-md"></i> {{ file_.name }}</a>
     </div>
 </div>
 {% endmacro %}
 
 {% macro folder_create_form(parent) %}
-<form class="input-group" method="POST" action="{{ url_for('create_folder', parent=parent) }}">
+<form class="input-group" method="POST" action="{{ url_for('folders.create_folder', parent=parent) }}">
     <input placeholder="New Folder" autocomplete="off" name="name" class="form-control" required>
     <button type="submit" class="btn btn-outline-success"><i class="bi bi-plus-lg"></i></button>
 </form>
 {% endmacro %}
 
 {% macro file_create_form(parent) %}
-<form class="input-group" method="POST" action="{{ url_for('create_file', parent=parent) }}">
+<form class="input-group" method="POST" action="{{ url_for('files.create_file', parent=parent) }}">
     <input placeholder="New File" autocomplete="off" name="name" class="form-control" required>
+    <button type="submit" class="btn btn-outline-success"><i class="bi bi-plus-lg"></i></button>
+</form>
+{% endmacro %}
+
+{% macro folder_rename_form(folder_) %}
+<form class="input-group" method="POST" action="{{ url_for('folders.rename_folder', path=folder_) }}">
+    <span class="input-group-text"><i class="bi bi-folder"></i></span>
+    <input value="{{ folder_.name }}" placeholder="New Folder" autocomplete="off" name="name" class="input-hidden flex-grow-1 fs-5" required>
+</form>
+{% endmacro %}
+
+{% macro file_rename_form(file_) %}
+<form class="input-group" method="POST" action="{{ url_for('files.rename_file', path=file_) }}">
+    <span class="input-group-text"><i class="bi bi-filetype-md"></i></span>
+    <input value="{{ file_.name }}" placeholder="New File" autocomplete="off" name="name" class="input-hidden flex-grow-1 fs-5" required>
+    <button type="submit" class="btn btn-outline-light"><i class="bi bi-pen"></i></button>
+</form>
+{% endmacro %}
+
+{% macro link_save_form(parent) %}
+<form class="input-group" method="POST" action="{{ url_for('files.save_link', parent=parent) }}">
+    <input placeholder="URL" autocomplete="off" name="url" class="form-control" required>
     <button type="submit" class="btn btn-outline-success"><i class="bi bi-plus-lg"></i></button>
 </form>
 {% endmacro %}
@@ -32,7 +54,7 @@
 <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
 <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
 
-<form method="POST" action="{{ url_for('editor', path=file_) }}">
+<form method="POST" action="{{ url_for('files.editor', path=file_) }}">
     <button class="btn btn-outline-success w-100 mb-3"><i class="bi bi-save"></i> Save</button>
     <textarea class="w-100 h-100" name="content">{{ file_.read_text() }}</textarea>
 </form>
