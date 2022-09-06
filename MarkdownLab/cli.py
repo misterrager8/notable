@@ -14,4 +14,4 @@ def cli():
 @cli.command()
 def run():
     """Launch web interface"""
-    app.run()
+    app.run(port=config.PORT)
