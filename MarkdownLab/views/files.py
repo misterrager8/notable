@@ -1,8 +1,9 @@
-from flask import render_template, request, redirect, url_for
 from pathlib import Path
+
 import markdown
+from flask import Blueprint, redirect, render_template, request, url_for
+
 from MarkdownLab import saver
-from flask import Blueprint
 
 files = Blueprint("files", __name__)
 

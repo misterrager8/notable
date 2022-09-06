@@ -1,6 +1,6 @@
-from bs4 import BeautifulSoup
-import requests
 import html2text
+import requests
+from bs4 import BeautifulSoup
 
 
 class Link:

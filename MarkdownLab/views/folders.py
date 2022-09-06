@@ -1,6 +1,6 @@
-from flask import render_template, request, redirect, url_for
 from pathlib import Path
-from flask import Blueprint
+
+from flask import Blueprint, redirect, render_template, request, url_for
 
 folders = Blueprint("folders", __name__)
 

@@ -1,5 +1,6 @@
-from flask import current_app, render_template
 from pathlib import Path
+
+from flask import current_app, render_template
 
 
 @current_app.context_processor
