@@ -1,7 +1,12 @@
 {% macro folder_card(folder_) %}
 <div class="col-xl-12">
     <div class="mb-3">
-        <a href="{{ url_for('folders.folder', path=folder_) }}"><i class="bi bi-folder"></i> {{ folder_.name }}</a>
+        <a href="{{ url_for('folders.folder', path=folder_.path) }}">
+            {% if current_folder and current_folder.path == folder_.path %}<i class="bi bi-play-fill"></i>{% endif %}
+            <i class="bi bi-folder"></i>
+            {{ folder_.path.name }}
+            <span class="float-end badge rounded-pill">{{ folder_.get_files() | length }}</span>
+        </a>
     </div>
 </div>
 {% endmacro %}

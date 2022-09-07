@@ -3,6 +3,7 @@ from pathlib import Path
 from flask import Blueprint, redirect, render_template, request, url_for
 
 from MarkdownLab import config
+from MarkdownLab.models import Folder
 
 folders = Blueprint("folders", __name__)
 
@@ -16,8 +17,8 @@ def create_folder():
 
 @folders.route("/folder")
 def folder():
-    folder_ = Path(request.args.get("path"))
-    return render_template("folder.html", folder_=folder_)
+    folder_ = Folder(Path(request.args.get("path")))
+    return render_template("folder.html", current_folder=folder_)
 
 
 @folders.route("/delete_folder")

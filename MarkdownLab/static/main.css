@@ -73,3 +73,10 @@ span.input-group-text {
     color: inherit;
     border: 0;
 }
+
+.badge {
+    background-color: var(--primary-txt);
+    color: var(--primary-bg);
+    font-size: 0.7em;
+    margin: 0px;
+}

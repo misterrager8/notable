@@ -3,11 +3,15 @@ from pathlib import Path
 
 from flask import current_app, render_template
 
+from MarkdownLab.models import Folder
+
 
 @current_app.context_processor
 def get_folders():
     base_dir = Path(current_app.config["BASE_DIR"])
-    return {"folders": [i for i in list(base_dir.iterdir()) if i.is_dir()]}
+    return {
+        "folders": [Folder(Path(i)) for i in list(base_dir.iterdir()) if i.is_dir()]
+    }
 
 
 @current_app.context_processor

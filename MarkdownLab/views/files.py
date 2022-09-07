@@ -48,11 +48,6 @@ def file():
     return render_template("file.html", file_=file_, content=content)
 
 
-@files.route("/favorites")
-def favorites():
-    return render_template("favorites.html")
-
-
 @files.route("/favorite_file")
 def favorite_file():
     path = request.args.get("path")
