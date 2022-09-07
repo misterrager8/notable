@@ -8,6 +8,7 @@
 	<span><i class="bi bi-pen"></i> {{ timestamp(file_.stat().st_mtime).strftime('%-m/%-d/%y %-I:%M %p') }}</span><br>
 </div>
 
+<a href="{{ url_for('files.favorite_file', path=file_) }}" class="btn btn-sm btn-outline-warning"><i class="bi bi-star"></i> Favorite</a>
 <a href="{{ url_for('files.editor', path=file_) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pen"></i> Edit</a>
 <a onclick="toggleDiv('delete')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash3"></i> Delete</a>
 <a id="delete" style="display: none;" href="{{ url_for('files.delete_file', path=file_) }}" class="btn btn-sm text-danger">Delete?</a>

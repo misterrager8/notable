@@ -3,7 +3,7 @@ from pathlib import Path
 import markdown
 from flask import Blueprint, redirect, render_template, request, url_for
 
-from MarkdownLab import saver
+from MarkdownLab import config, saver
 
 files = Blueprint("files", __name__)
 
@@ -46,6 +46,23 @@ def file():
     with open(file_) as f:
         content = markdown.markdown(f.read())
     return render_template("file.html", file_=file_, content=content)
+
+
+@files.route("/favorites")
+def favorites():
+    return render_template("favorites.html")
+
+
+@files.route("/favorite_file")
+def favorite_file():
+    path = request.args.get("path")
+    favs_ = Path(config.BASE_DIR) / "favorites.txt"
+    if not path in open(favs_).read():
+        open(favs_, "a").write(path + "\n")
+    else:
+        f = open(favs_).read()
+        open(favs_, "w").write(f.replace(path + "\n", ""))
+    return redirect(request.referrer)
 
 
 @files.route("/delete_file")

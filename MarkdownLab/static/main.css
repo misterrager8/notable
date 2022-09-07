@@ -13,6 +13,11 @@ html[data-theme="sepia"] {
     --primary-txt: #3D2300;
 }
 
+html[data-theme="charcoal"] {
+    --primary-bg: #47525C;
+    --primary-txt: #C6CFD2;
+}
+
 a, a:hover {
     text-decoration: none;
     cursor: pointer;
