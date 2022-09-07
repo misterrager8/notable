@@ -8,8 +8,14 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
     </head>
     <nav class="navbar-custom">
-        <a class="btn btn-sm btn-outline-success" onclick="toggleDiv('newTopFolder')"><i class="bi bi-folder"></i> New Folder</a>
-        <div id="newTopFolder" style="display: none">{{ macros.folder_create_form(config['BASE_DIR']) }}</div>
+        <a class="w-100 mb-2 btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-target="#themes" data-bs-toggle="dropdown"><i class="bi bi-palette-fill"></i> Themes</a>
+        <div class="dropdown-menu text-center" id="themes">
+            <a class="dropdown-item" onclick="changeTheme('light')">Light</a>
+            <a class="dropdown-item" onclick="changeTheme('dark')">Dark</a>
+            <a class="dropdown-item" onclick="changeTheme('sepia')">Sepia</a>
+        </div>
+        <a class="w-100 btn btn-sm btn-outline-success" onclick="toggleDiv('newTopFolder')"><i class="bi bi-folder"></i> New Folder</a>
+        <div id="newTopFolder" style="display: none">{{ macros.folder_create_form() }}</div>
         <div class="mt-3">
             {% for i in folders %}
             {{ macros.folder_card(i) }}

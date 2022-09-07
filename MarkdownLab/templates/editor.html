@@ -2,6 +2,6 @@
 {% import "macros.html" as macros with context %}
 {% block body %}
 <title>{{ file_.name }}</title>
-<p class="text-center"><i class="bi bi-filetype-md"></i> {{ file_.name }}</p>
+<p class="text-center"><i class="bi bi-filetype-md"></i> {{ file_.stem }}</p>
 {{ macros.editor(file_) }}
 {% endblock %}

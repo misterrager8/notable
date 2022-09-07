@@ -9,13 +9,15 @@
 {% macro file_card(file_) %}
 <div class="col-xl-12">
     <div class="mb-3">
-        <a href="{{ url_for('files.file', path=file_) }}"><i class="bi bi-filetype-md"></i> {{ file_.name }}</a>
+        <a href="{{ url_for('files.file', path=file_) }}"><i class="bi bi-filetype-md"></i> {{ file_.stem }}</a><br>
+        <small class="fst-italic text-muted"><i class="bi bi-plus"></i> {{ timestamp(file_.stat().st_birthtime).strftime('%-m/%-d/%y %-I:%M %p') }}</small><br>
+        <small class="fst-italic text-muted"><i class="bi bi-pen"></i> {{ timestamp(file_.stat().st_mtime).strftime('%-m/%-d/%y %-I:%M %p') }}</small>
     </div>
 </div>
 {% endmacro %}
 
-{% macro folder_create_form(parent) %}
-<form class="input-group" method="POST" action="{{ url_for('folders.create_folder', parent=parent) }}">
+{% macro folder_create_form() %}
+<form class="input-group" method="POST" action="{{ url_for('folders.create_folder') }}">
     <input placeholder="New Folder" autocomplete="off" name="name" class="form-control" required>
     <button type="submit" class="btn btn-outline-success"><i class="bi bi-plus-lg"></i></button>
 </form>
@@ -37,9 +39,10 @@
 
 {% macro file_rename_form(file_) %}
 <form class="input-group" method="POST" action="{{ url_for('files.rename_file', path=file_) }}">
+    <a href="{{ url_for('folders.folder', path=file_.parent) }}" class="btn btn-sm btn-outline-secondary input-group-text"><i class="bi bi-folder"></i> {{ file_.parent.name }}</a>
     <span class="input-group-text"><i class="bi bi-filetype-md"></i></span>
     <input value="{{ file_.name }}" placeholder="New File" autocomplete="off" name="name" class="input-hidden flex-grow-1 fs-5" required>
-    <button type="submit" class="btn btn-outline-light"><i class="bi bi-pen"></i></button>
+    <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-pen"></i></button>
 </form>
 {% endmacro %}
 
@@ -55,7 +58,10 @@
 <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
 
 <form method="POST" action="{{ url_for('files.editor', path=file_) }}">
-    <button class="btn btn-outline-success w-100 mb-3"><i class="bi bi-save"></i> Save</button>
+    <div class="input-group mb-3">
+        <a href="{{ url_for('files.file', path=file_) }}" class="btn btn-outline-secondary"><i class="bi bi-eye p-1"></i></a>
+        <button class="btn btn-outline-success flex-grow-1"><i class="bi bi-save"></i> Save</button>
+    </div>
     <textarea class="w-100 h-100" name="content">{{ file_.read_text() }}</textarea>
 </form>
 

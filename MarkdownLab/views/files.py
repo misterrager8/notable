@@ -12,7 +12,7 @@ files = Blueprint("files", __name__)
 def create_file():
     file_ = Path(request.args.get("parent")) / (request.form["name"] + ".md")
     file_.touch()
-    return redirect(url_for("files.file", path=file_))
+    return redirect(url_for("files.editor", path=file_))
 
 
 @files.route("/save_link", methods=["POST"])
@@ -25,7 +25,7 @@ def save_link():
     with open(file_, "w") as f:
         f.write(saver.get_html2text(url))
 
-    return redirect(url_for("files.file", path=file_))
+    return redirect(url_for("files.editor", path=file_))
 
 
 @files.route("/editor", methods=["POST", "GET"])
