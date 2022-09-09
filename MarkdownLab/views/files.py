@@ -4,6 +4,7 @@ import markdown
 from flask import Blueprint, redirect, render_template, request, url_for
 
 from MarkdownLab import config, saver
+from MarkdownLab.models import File
 
 files = Blueprint("files", __name__)
 
@@ -42,8 +43,8 @@ def editor():
 
 @files.route("/file")
 def file():
-    file_ = Path(request.args.get("path"))
-    with open(file_) as f:
+    file_ = File(Path(request.args.get("path")))
+    with open(file_.path) as f:
         content = markdown.markdown(f.read())
     return render_template("file.html", file_=file_, content=content)
 
@@ -62,9 +63,9 @@ def favorite_file():
 
 @files.route("/delete_file")
 def delete_file():
-    file_ = Path(request.args.get("path"))
-    parent = file_.parent
-    file_.unlink()
+    file_ = File(Path(request.args.get("path")))
+    parent = file_.path.parent
+    file_.path.unlink()
 
     return redirect(url_for("folders.folder", path=parent))
 

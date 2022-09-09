@@ -43,10 +43,10 @@
 {% endmacro %}
 
 {% macro file_rename_form(file_) %}
-<form class="input-group" method="POST" action="{{ url_for('files.rename_file', path=file_) }}">
-    <a href="{{ url_for('folders.folder', path=file_.parent) }}" class="btn btn-sm btn-outline-secondary input-group-text"><i class="bi bi-folder"></i> {{ file_.parent.name }}</a>
+<form class="input-group" method="POST" action="{{ url_for('files.rename_file', path=file_.path) }}">
+    <a href="{{ url_for('folders.folder', path=file_.path.parent) }}" class="btn btn-sm btn-outline-secondary input-group-text"><i class="bi bi-folder"></i> {{ file_.path.parent.name }}</a>
     <span class="input-group-text"><i class="bi bi-filetype-md"></i></span>
-    <input value="{{ file_.name }}" placeholder="New File" autocomplete="off" name="name" class="input-hidden flex-grow-1 fs-5" required>
+    <input value="{{ file_.path.name }}" placeholder="New File" autocomplete="off" name="name" class="input-hidden flex-grow-1 fs-5" required>
     <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-pen"></i></button>
 </form>
 {% endmacro %}

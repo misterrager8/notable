@@ -7,10 +7,24 @@
     <span><i class="bi bi-plus"></i> {{ timestamp(current_folder.path.stat().st_birthtime).strftime('%-m/%-d/%y %-I:%M %p') }}</span>
 </div>
 
-<div id="newFile" style="display: none">{{ macros.file_create_form(current_folder.path) }}</div>
-<div id="newLink" style="display: none">{{ macros.link_save_form(current_folder) }}</div>
-<a class="btn btn-sm btn-outline-success" onclick="toggleDiv('newFile')"><i class="bi bi-filetype-md"></i> New File</a>
-<a class="btn btn-sm btn-outline-success" onclick="toggleDiv('newLink')"><i class="bi bi-link-45deg"></i> New Link</a>
+<div class="modal" id="newFile">
+    <div class="modal-dialog">
+        <div class="modal-content p-5">
+            {{ macros.file_create_form(current_folder.path) }}
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="newLink">
+    <div class="modal-dialog">
+        <div class="modal-content p-5">
+            {{ macros.link_save_form(current_folder.path) }}
+        </div>
+    </div>
+</div>
+
+<a class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#newFile"><i class="bi bi-filetype-md"></i> New File</a>
+<a class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#newLink"><i class="bi bi-link-45deg"></i> New Link</a>
 <a onclick="toggleDiv('delete')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash3"></i> Delete</a>
 <a id="delete" style="display: none;" href="{{ url_for('folders.delete_folder', path=current_folder.path) }}" class="btn btn-sm text-danger">Delete?</a>
 <div class="mt-3">

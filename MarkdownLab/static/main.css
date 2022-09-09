@@ -24,13 +24,13 @@ a, a:hover {
     color: inherit;
 }
 
-body, .dropdown-menu {
+body, .dropdown-menu, .modal-content {
     background-color: var(--primary-bg);
     color: var(--primary-txt);
 }
 
 body {
-    margin-left: 200px;
+    margin-left: 250px;
     padding: 30px;
 }
 
@@ -44,7 +44,7 @@ body {
 
 .navbar-custom {
     border-right: 1px solid var(--primary-txt);
-    width: 200px;
+    width: 250px;
     padding: 30px;
     z-index: 1;
     top: 0;
