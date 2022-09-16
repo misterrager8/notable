@@ -3,15 +3,17 @@ from pathlib import Path
 import markdown
 from flask import Blueprint, redirect, render_template, request, url_for
 
-from MarkdownLab import config, saver
-from MarkdownLab.models import File
+from markdown_lab import config, saver
+from markdown_lab.models import File
 
 files = Blueprint("files", __name__)
 
 
 @files.route("/create_file", methods=["POST"])
 def create_file():
-    file_ = Path(request.args.get("parent")) / (request.form["name"] + ".md")
+    file_ = Path(request.args.get("parent")) / (
+        (request.form["name"] or "Untitled File") + ".md"
+    )
     file_.touch()
     return redirect(url_for("files.editor", path=file_))
 

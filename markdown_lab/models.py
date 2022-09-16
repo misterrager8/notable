@@ -1,6 +1,6 @@
 import pathlib
 
-from MarkdownLab import config
+from markdown_lab import config
 
 
 class Folder:

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from flask import current_app, render_template
 
-from MarkdownLab.models import Folder
+from markdown_lab.models import Folder
 
 
 @current_app.context_processor

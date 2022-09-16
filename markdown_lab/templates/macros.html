@@ -23,14 +23,14 @@
 
 {% macro folder_create_form() %}
 <form class="input-group" method="POST" action="{{ url_for('folders.create_folder') }}">
-    <input placeholder="New Folder" autocomplete="off" name="name" class="form-control" required>
+    <input placeholder="New Folder" autocomplete="off" name="name" class="form-control">
     <button type="submit" class="btn btn-outline-success"><i class="bi bi-plus-lg"></i></button>
 </form>
 {% endmacro %}
 
 {% macro file_create_form(parent) %}
 <form class="input-group" method="POST" action="{{ url_for('files.create_file', parent=parent) }}">
-    <input placeholder="New File" autocomplete="off" name="name" class="form-control" required>
+    <input placeholder="New File" autocomplete="off" name="name" class="form-control">
     <button type="submit" class="btn btn-outline-success"><i class="bi bi-plus-lg"></i></button>
 </form>
 {% endmacro %}
@@ -59,21 +59,11 @@
 {% endmacro %}
 
 {% macro editor(file_) %}
-<link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
-<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
-
 <form method="POST" action="{{ url_for('files.editor', path=file_) }}">
     <div class="input-group mb-3">
         <a href="{{ url_for('files.file', path=file_) }}" class="btn btn-outline-secondary"><i class="bi bi-eye p-1"></i></a>
         <button class="btn btn-outline-success flex-grow-1"><i class="bi bi-save"></i> Save</button>
     </div>
-    <textarea class="w-100 h-100" name="content">{{ file_.read_text() }}</textarea>
+    <textarea class="form-control w-100 h-100" name="content">{{ file_.read_text() }}</textarea>
 </form>
-
-<script>
-    const editor = new EasyMDE({
-        placeholder: 'Content',
-        autofocus: true
-    }); 
-</script>
 {% endmacro %}

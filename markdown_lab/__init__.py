@@ -6,8 +6,8 @@ def create_app(config):
     app.config.from_object(config)
 
     with app.app_context():
-        from MarkdownLab.views.files import files
-        from MarkdownLab.views.folders import folders
+        from markdown_lab.views.files import files
+        from markdown_lab.views.folders import folders
 
         app.register_blueprint(files)
         app.register_blueprint(folders)

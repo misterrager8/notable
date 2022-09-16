@@ -1,4 +1,4 @@
-from MarkdownLab import config, create_app
+from markdown_lab import config, create_app
 
 app = create_app(config)
 

@@ -18,13 +18,13 @@ html[data-theme="charcoal"] {
     --primary-txt: #C6CFD2;
 }
 
-a, a:hover {
+a, a:hover, .dropdown-item {
     text-decoration: none;
     cursor: pointer;
     color: inherit;
 }
 
-body, .dropdown-menu, .modal-content {
+body, nav, .dropdown-menu, .modal-content {
     background-color: var(--primary-bg);
     color: var(--primary-txt);
 }
@@ -37,9 +37,7 @@ body {
 .form-control, .form-control:focus {
     background-color: inherit;
     color: inherit;
-    border: 0;
-    border-radius: 0;
-    border-bottom: 1px solid;
+    border: 1px solid;
 }
 
 .navbar-custom {
@@ -51,15 +49,6 @@ body {
     left: 0;
     position: fixed;
     height: 100%;
-}
-
-.CodeMirror, .editor-preview, .editor-toolbar {
-    background-color: var(--primary-bg) !important;
-    color: var(--primary-txt) !important;
-}
-
-.fa {
-    color: var(--primary-txt) !important;
 }
 
 .input-hidden {

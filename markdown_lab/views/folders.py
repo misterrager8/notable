@@ -2,15 +2,15 @@ from pathlib import Path
 
 from flask import Blueprint, redirect, render_template, request, url_for
 
-from MarkdownLab import config
-from MarkdownLab.models import Folder
+from markdown_lab import config
+from markdown_lab.models import Folder
 
 folders = Blueprint("folders", __name__)
 
 
 @folders.route("/create_folder", methods=["POST"])
 def create_folder():
-    folder_ = Path(config.BASE_DIR) / request.form["name"]
+    folder_ = Path(config.BASE_DIR) / (request.form["name"] or "Untitled Folder")
     folder_.mkdir()
     return redirect(url_for("folders.folder", path=folder_))
 
