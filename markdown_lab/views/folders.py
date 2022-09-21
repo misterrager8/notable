@@ -10,28 +10,30 @@ folders = Blueprint("folders", __name__)
 
 @folders.route("/create_folder", methods=["POST"])
 def create_folder():
-    folder_ = Path(config.BASE_DIR) / (request.form["name"] or "Untitled Folder")
-    folder_.mkdir()
-    return redirect(url_for("folders.folder", path=folder_))
+    folder_ = Folder(
+        Path(config.BASE_DIR) / (request.form["name"] or "Untitled Folder")
+    )
+    folder_.create()
+    return redirect(url_for("folders.folder", path=folder_.path))
 
 
 @folders.route("/folder")
 def folder():
-    folder_ = Folder(Path(request.args.get("path")))
+    folder_ = Folder(request.args.get("path"))
     return render_template("folder.html", current_folder=folder_)
 
 
 @folders.route("/delete_folder")
 def delete_folder():
-    folder_ = Path(request.args.get("path"))
-    folder_.rmdir()
+    folder_ = Folder(request.args.get("path"))
+    folder_.delete()
 
     return redirect(url_for("index"))
 
 
 @folders.route("/rename_folder", methods=["POST"])
 def rename_folder():
-    folder_ = Path(request.args.get("path"))
-    folder_ = folder_.rename(Path(config.BASE_DIR) / request.form["name"])
+    folder_ = Folder(request.args.get("path"))
+    folder_.rename(request.form["name"])
 
-    return redirect(url_for("folders.folder", path=folder_))
+    return redirect(url_for("folders.folder", path=folder_.path))

@@ -1,22 +1,33 @@
 {% macro folder_card(folder_) %}
 <div class="col-xl-12">
     <div class="mb-3">
-        <a href="{{ url_for('folders.folder', path=folder_.path) }}">
+        <a href="{{ url_for('folders.folder', path=folder_.path) }}" class="fw-bold">
             {% if current_folder and current_folder.path == folder_.path %}<i class="bi bi-play-fill"></i>{% endif %}
             <i class="bi bi-folder"></i>
-            {{ folder_.path.name }}
-            <span class="float-end badge rounded-pill">{{ folder_.get_files() | length }}</span>
+            {{ folder_.name }}
+            <span class="float-end badge rounded-pill">{{ folder_.files | length }}</span>
         </a>
     </div>
 </div>
 {% endmacro %}
 
-{% macro file_card(file_) %}
-<div class="col-xl-12">
-    <div class="mb-3">
-        <a href="{{ url_for('files.file', path=file_) }}"><i class="bi bi-filetype-md"></i> {{ file_.stem }}</a><br>
-        <small class="fst-italic text-muted"><i class="bi bi-plus"></i> {{ timestamp(file_.stat().st_birthtime).strftime('%-m/%-d/%y %-I:%M %p') }}</small><br>
-        <small class="fst-italic text-muted"><i class="bi bi-pen"></i> {{ timestamp(file_.stat().st_mtime).strftime('%-m/%-d/%y %-I:%M %p') }}</small>
+{% macro file_card(file_, idx) %}
+<div class="col-xl-4">
+    <div class="p-3 mb-3 text-truncate" style="border-bottom: 3px solid;">
+        <a title="{{ file_.name }}" class="fs-5" href="{{ url_for('files.file', path=file_.path) }}"><i class="bi bi-filetype-md"></i> {{ file_.name }}</a><br>
+        <div class="small fst-italic text-muted mt-2">
+            <span><i class="bi bi-plus"></i> {{ file_.date_created.strftime('%-m/%-d/%y %-I:%M %p') }}</span><br>
+            <span><i class="bi bi-pen"></i> {{ file_.last_modified.strftime('%-m/%-d/%y %-I:%M %p') }}</span>
+        </div>
+        <div class="mt-3">
+            <a href="{{ url_for('files.editor', path=file_.path) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pen"></i></a>
+            <a href="{{ url_for('files.favorite_file', path=file_.path) }}" class="btn btn-sm btn{% if not file_.favorited %}-outline{% endif %}-warning"><i class="bi bi-star"></i></a>
+            <a onclick="toggleDiv('deleteFile' + {{ idx }})" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash3"></i></a>
+            <a class="small text-danger" href="{{ url_for('files.delete_file', path=file_.path) }}" id="deleteFile{{ idx }}" style="display: none;">Delete?</a>
+            {% if request.endpoint != 'folders.folder' %}
+            <a class="btn btn-sm text-muted float-end" href="{{ url_for('folders.folder', path=file_.folder.path) }}"><i class="bi bi-folder-fill"></i> {{ file_.folder.name }}</a>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endmacro %}
@@ -29,41 +40,41 @@
 {% endmacro %}
 
 {% macro file_create_form(parent) %}
-<form class="input-group" method="POST" action="{{ url_for('files.create_file', parent=parent) }}">
+<form class="input-group" method="POST" action="{{ url_for('files.create_file', parent=parent.path) }}">
     <input placeholder="New File" autocomplete="off" name="name" class="form-control">
     <button type="submit" class="btn btn-outline-success"><i class="bi bi-plus-lg"></i></button>
 </form>
 {% endmacro %}
 
 {% macro folder_rename_form(folder_) %}
-<form class="input-group" method="POST" action="{{ url_for('folders.rename_folder', path=folder_) }}">
+<form class="input-group" method="POST" action="{{ url_for('folders.rename_folder', path=folder_.path) }}">
     <span class="input-group-text"><i class="bi bi-folder"></i></span>
     <input value="{{ folder_.name }}" placeholder="New Folder" autocomplete="off" name="name" class="input-hidden flex-grow-1 fs-5" required>
 </form>
 {% endmacro %}
 
-{% macro file_rename_form(file_) %}
-<form class="input-group" method="POST" action="{{ url_for('files.rename_file', path=file_.path) }}">
-    <a href="{{ url_for('folders.folder', path=file_.path.parent) }}" class="btn btn-sm btn-outline-secondary input-group-text"><i class="bi bi-folder"></i> {{ file_.path.parent.name }}</a>
-    <span class="input-group-text"><i class="bi bi-filetype-md"></i></span>
-    <input value="{{ file_.path.name }}" placeholder="New File" autocomplete="off" name="name" class="input-hidden flex-grow-1 fs-5" required>
-    <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-pen"></i></button>
-</form>
-{% endmacro %}
-
 {% macro link_save_form(parent) %}
-<form class="input-group" method="POST" action="{{ url_for('files.save_link', parent=parent) }}">
+<form class="input-group" method="POST" action="{{ url_for('files.save_link', parent=parent.path) }}">
     <input placeholder="URL" autocomplete="off" name="url" class="form-control" required>
     <button type="submit" class="btn btn-outline-success"><i class="bi bi-plus-lg"></i></button>
 </form>
 {% endmacro %}
 
 {% macro editor(file_) %}
-<form method="POST" action="{{ url_for('files.editor', path=file_) }}">
+<form class="input-group" method="POST" action="{{ url_for('files.rename_file', path=file_.path) }}">
+    <input value="{{ file_.name }}" placeholder="New File" autocomplete="off" name="name" class="form-control flex-grow-1" required>
+    <select class="form-control" name="folder">
+    {% for i in folders %}
+    <option value="{{ i.name }}" {% if i.path == file_.folder.path %}selected{% endif %}>{{ i.name }}</option>
+    {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-pen"></i></button>
+</form>
+<form method="POST" action="{{ url_for('files.editor', path=file_.path) }}">
     <div class="input-group mb-3">
-        <a href="{{ url_for('files.file', path=file_) }}" class="btn btn-outline-secondary"><i class="bi bi-eye p-1"></i></a>
+        <a href="{{ url_for('files.file', path=file_.path) }}" class="btn btn-outline-secondary"><i class="bi bi-eye p-1"></i></a>
         <button class="btn btn-outline-success flex-grow-1"><i class="bi bi-save"></i> Save</button>
     </div>
-    <textarea class="form-control w-100 h-100" name="content">{{ file_.read_text() }}</textarea>
+    <textarea class="form-control w-100 h-100" name="content">{{ file_.text }}</textarea>
 </form>
 {% endmacro %}

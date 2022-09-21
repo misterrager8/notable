@@ -4,7 +4,7 @@
 }
 
 html[data-theme="light"] {
-    --primary-bg: white;
+    --primary-bg: #C6CFD2;
     --primary-txt: #1a1a1a;
 }
 
@@ -13,8 +13,13 @@ html[data-theme="sepia"] {
     --primary-txt: #3D2300;
 }
 
+html[data-theme="sepia-dark"] {
+    --primary-bg: #3D2300;
+    --primary-txt: #FFDAAD;
+}
+
 html[data-theme="charcoal"] {
-    --primary-bg: #47525C;
+    --primary-bg: #3E3E3D;
     --primary-txt: #C6CFD2;
 }
 
@@ -68,4 +73,9 @@ span.input-group-text {
     color: var(--primary-bg);
     font-size: 0.7em;
     margin: 0px;
+}
+
+.content-div a {
+    border-bottom: 1px solid;
+    font-style: italic;
 }

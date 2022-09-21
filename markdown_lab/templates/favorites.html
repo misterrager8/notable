@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros with context %}
+{% block body %}
+<title>MarkdownLab</title>
+<a class="btn btn-sm btn-outline-warning" onclick="toggleDiv('clearFavorites')"><i class="bi bi-x-lg"></i> Clear Favorites</a>
+<a class="btn btn-sm text-warning" href="{{ url_for('files.clear_favorites') }}" id="clearFavorites" style="display: none;">Clear?</a>
+<div class="row mt-3">
+    {% for i in favs %}
+    {{ macros.file_card(i, loop.index) }}
+    {% endfor %}
+</div>
+{% endblock %}
