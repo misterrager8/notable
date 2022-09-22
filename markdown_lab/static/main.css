@@ -79,3 +79,7 @@ span.input-group-text {
     border-bottom: 1px solid;
     font-style: italic;
 }
+
+.content-div a:hover {
+    font-weight: bold;
+}
