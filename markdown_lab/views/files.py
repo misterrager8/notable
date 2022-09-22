@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 
 from flask import Blueprint, redirect, render_template, request, url_for
@@ -13,6 +14,17 @@ def create_file():
     file_ = File(
         Path(request.args.get("parent"))
         / ((request.form["name"] or "Untitled File") + ".md")
+    )
+    file_.create()
+    return redirect(url_for("files.editor", path=file_.path))
+
+
+@files.route("/quick_file")
+def quick_file():
+    file_ = File(
+        Path(config.BASE_DIR)
+        / "Misc"
+        / f"{datetime.datetime.now().strftime('%m-%d-%y %I%M%p')}.md"
     )
     file_.create()
     return redirect(url_for("files.editor", path=file_.path))

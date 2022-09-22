@@ -25,7 +25,9 @@
             <a onclick="toggleDiv('deleteFile' + {{ idx }})" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash3"></i></a>
             <a class="small text-danger" href="{{ url_for('files.delete_file', path=file_.path) }}" id="deleteFile{{ idx }}" style="display: none;">Delete?</a>
             {% if request.endpoint != 'folders.folder' %}
-            <a class="btn btn-sm text-muted float-end" href="{{ url_for('folders.folder', path=file_.folder.path) }}"><i class="bi bi-folder-fill"></i> {{ file_.folder.name }}</a>
+            <a class="btn btn-sm text-muted float-end" href="{{ url_for('folders.folder', path=file_.folder.path) }}">
+                <i class="bi bi{% if file_.folder.name == 'Misc' %}-lightning{% else %}-folder{% endif %}-fill"></i> {{ file_.folder.name }}
+            </a>
             {% endif %}
         </div>
     </div>
@@ -64,9 +66,9 @@
 <form class="input-group" method="POST" action="{{ url_for('files.rename_file', path=file_.path) }}">
     <input value="{{ file_.name }}" placeholder="New File" autocomplete="off" name="name" class="form-control flex-grow-1" required>
     <select class="form-control" name="folder">
-    {% for i in folders %}
-    <option value="{{ i.name }}" {% if i.path == file_.folder.path %}selected{% endif %}>{{ i.name }}</option>
-    {% endfor %}
+        {% for i in folders %}
+        <option value="{{ i.name }}" {% if i.path == file_.folder.path %}selected{% endif %}>{{ i.name }}</option>
+        {% endfor %}
     </select>
     <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-pen"></i></button>
 </form>
