@@ -8,14 +8,8 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
     </head>
     <nav class="navbar-custom">
-        <a class="w-100 mb-2 btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-target="#themes" data-bs-toggle="dropdown"><i class="bi bi-palette-fill"></i> Themes</a>
-        <div class="dropdown-menu text-center" id="themes">
-            <a class="dropdown-item" onclick="changeTheme('light')">Light</a>
-            <a class="dropdown-item" onclick="changeTheme('dark')">Dark</a>
-            <a class="dropdown-item" onclick="changeTheme('sepia')">Sepia</a>
-            <a class="dropdown-item" onclick="changeTheme('sepia-dark')">Sepia Dark</a>
-            <a class="dropdown-item" onclick="changeTheme('charcoal')">Charcoal</a>
-        </div>
+        <a id="light" class="w-100 mb-2 btn btn-sm btn-outline-dark" onclick="setDark()"><i class="bi bi-moon-fill"></i> Dark</a>
+        <a id="dark" class="w-100 mb-2 btn btn-sm btn-outline-light" onclick="setLight()"><i class="bi bi-sun-fill"></i> Light</a>
         <a class="w-100 btn btn-sm btn-outline-success" data-bs-target="#newFolder" data-bs-toggle="modal"><i class="bi bi-folder"></i> New Folder</a>
         <a class="w-100 btn btn-sm btn-outline-primary mt-2" href="{{ url_for('files.quick_file') }}"><i class="bi bi-lightning"></i> Quick Note</a>
 

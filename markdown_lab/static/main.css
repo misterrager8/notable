@@ -8,21 +8,6 @@ html[data-theme="light"] {
     --primary-txt: #1a1a1a;
 }
 
-html[data-theme="sepia"] {
-    --primary-bg: #FFDAAD;
-    --primary-txt: #3D2300;
-}
-
-html[data-theme="sepia-dark"] {
-    --primary-bg: #3D2300;
-    --primary-txt: #FFDAAD;
-}
-
-html[data-theme="charcoal"] {
-    --primary-bg: #3E3E3D;
-    --primary-txt: #C6CFD2;
-}
-
 a, a:hover, .dropdown-item {
     text-decoration: none;
     cursor: pointer;
