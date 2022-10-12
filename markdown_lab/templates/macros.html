@@ -1,7 +1,7 @@
 {% macro folder_card(folder_) %}
 <div class="col-xl-12">
     <div class="mb-3">
-        <a href="{{ url_for('folders.folder', path=folder_.path) }}" class="fw-bold">
+        <a href="{{ url_for('folders.folder', name=folder_.name) }}" class="fw-bold">
             {% if current_folder and current_folder.path == folder_.path %}<i class="bi bi-play-fill"></i>{% endif %}
             <i class="bi bi-folder"></i>
             {{ folder_.name }}
@@ -14,18 +14,18 @@
 {% macro file_card(file_, idx) %}
 <div class="col-xl-4">
     <div class="p-3 mb-3 text-truncate" style="border-bottom: 3px solid;">
-        <a title="{{ file_.name }}" class="fs-5" href="{{ url_for('files.file', path=file_.path) }}"><i class="bi bi-filetype-md"></i> {{ file_.name }}</a><br>
+        <a title="{{ file_.name }}" class="fs-5" href="{{ url_for('files.file', folder=file_.folder.name, file=file_.name_ext) }}"><i class="bi bi-filetype-md"></i> {{ file_.name }}</a><br>
         <div class="small fst-italic text-muted mt-2">
             <span><i class="bi bi-plus"></i> {{ file_.date_created.strftime('%-m/%-d/%y %-I:%M %p') }}</span><br>
             <span><i class="bi bi-pen"></i> {{ file_.last_modified.strftime('%-m/%-d/%y %-I:%M %p') }}</span>
         </div>
         <div class="mt-3">
-            <a href="{{ url_for('files.editor', path=file_.path) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pen"></i></a>
+            <a href="{{ url_for('files.editor', folder=file_.folder.name, file=file_.name_ext) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pen"></i></a>
             <a href="{{ url_for('files.favorite_file', path=file_.path) }}" class="btn btn-sm btn{% if not file_.favorited %}-outline{% endif %}-warning"><i class="bi bi-star"></i></a>
             <a onclick="toggleDiv('deleteFile' + {{ idx }})" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash3"></i></a>
-            <a class="small text-danger" href="{{ url_for('files.delete_file', path=file_.path) }}" id="deleteFile{{ idx }}" style="display: none;">Delete?</a>
+            <a class="small text-danger" href="{{ url_for('files.delete_file', folder=file_.folder.name, file=file_.name_ext) }}" id="deleteFile{{ idx }}" style="display: none;">Delete?</a>
             {% if request.endpoint != 'folders.folder' %}
-            <a class="btn btn-sm text-muted float-end" href="{{ url_for('folders.folder', path=file_.folder.path) }}">
+            <a class="btn btn-sm text-muted float-end" href="{{ url_for('folders.folder', name=file_.folder.name) }}">
                 <i class="bi bi{% if file_.folder.name == 'Misc' %}-lightning{% else %}-folder{% endif %}-fill"></i> {{ file_.folder.name }}
             </a>
             {% endif %}
@@ -41,8 +41,8 @@
 </form>
 {% endmacro %}
 
-{% macro file_create_form(parent) %}
-<form class="input-group" method="POST" action="{{ url_for('files.create_file', parent=parent.path) }}">
+{% macro file_create_form(folder_) %}
+<form class="input-group" method="POST" action="{{ url_for('files.create_file', folder=folder_.name) }}">
     <input placeholder="New File" autocomplete="off" name="name" class="form-control">
     <button type="submit" class="btn btn-outline-success"><i class="bi bi-plus-lg"></i></button>
 </form>
@@ -55,8 +55,8 @@
 </form>
 {% endmacro %}
 
-{% macro link_save_form(parent) %}
-<form class="input-group" method="POST" action="{{ url_for('files.save_link', parent=parent.path) }}">
+{% macro link_save_form(folder_) %}
+<form class="input-group" method="POST" action="{{ url_for('files.save_link', folder=folder_.name) }}">
     <input placeholder="URL" autocomplete="off" name="url" class="form-control" required>
     <button type="submit" class="btn btn-outline-success"><i class="bi bi-plus-lg"></i></button>
 </form>
@@ -72,9 +72,9 @@
     </select>
     <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-pen"></i></button>
 </form>
-<form method="POST" action="{{ url_for('files.editor', path=file_.path) }}">
+<form method="POST" action="{{ url_for('files.editor', folder=file_.folder.name, file=file_.name_ext) }}">
     <div class="input-group mb-3">
-        <a href="{{ url_for('files.file', path=file_.path) }}" class="btn btn-outline-secondary"><i class="bi bi-eye p-1"></i></a>
+        <a href="{{ url_for('files.file', folder=file_.folder.name, file=file_.name_ext) }}" class="btn btn-outline-secondary"><i class="bi bi-eye p-1"></i></a>
         <button class="btn btn-outline-success flex-grow-1"><i class="bi bi-save"></i> Save</button>
     </div>
     <textarea class="form-control w-100 h-100" name="content">{{ file_.text }}</textarea>

@@ -26,7 +26,7 @@
 <a class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#newFile"><i class="bi bi-filetype-md"></i> New File</a>
 <a class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#newLink"><i class="bi bi-link-45deg"></i> New Link</a>
 <a onclick="toggleDiv('delete')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash3"></i> Delete</a>
-<a id="delete" style="display: none;" href="{{ url_for('folders.delete_folder', path=current_folder.path) }}" class="btn btn-sm text-danger">Delete?</a>
+<a id="delete" style="display: none;" href="{{ url_for('folders.delete_folder', name=current_folder.name) }}" class="btn btn-sm text-danger">Delete?</a>
 <div class="row mt-3">
     {% for i in current_folder.files %}
     {{ macros.file_card(i, loop.index) }}

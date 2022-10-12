@@ -12,40 +12,50 @@ files = Blueprint("files", __name__)
 @files.route("/create_file", methods=["POST"])
 def create_file():
     file_ = File(
-        Path(request.args.get("parent"))
+        config.BASE_DIR
+        / request.args.get("folder")
         / ((request.form["name"] or "Untitled File") + ".md")
     )
     file_.create()
-    return redirect(url_for("files.editor", path=file_.path))
+    return redirect(
+        url_for("files.editor", folder=request.args.get("folder"), file=file_.name_ext)
+    )
 
 
 @files.route("/quick_file")
 def quick_file():
     file_ = File(
-        Path(config.BASE_DIR)
+        config.BASE_DIR
         / "Misc"
         / f"{datetime.datetime.now().strftime('%m-%d-%y %I%M%p')}.md"
     )
     file_.create()
-    return redirect(url_for("files.editor", path=file_.path))
+    return redirect(
+        url_for("files.editor", folder=file_.folder.name, file=file_.name_ext)
+    )
 
 
 @files.route("/save_link", methods=["POST"])
 def save_link():
-    parent = Path(request.args.get("parent"))
     url = request.form["url"]
 
-    file_ = File(parent / (saver.get_title(url) + ".md"))
+    file_ = File(
+        config.BASE_DIR / request.args.get("folder") / (saver.get_title(url) + ".md")
+    )
     file_.create()
     with open(file_.path, "w") as f:
         f.write(saver.get_html2text(url))
 
-    return redirect(url_for("files.editor", path=file_.path))
+    return redirect(
+        url_for("files.editor", folder=file_.folder.name, file=file_.name_ext)
+    )
 
 
 @files.route("/editor", methods=["POST", "GET"])
 def editor():
-    file_ = File(request.args.get("path"))
+    file_ = File(
+        config.BASE_DIR / request.args.get("folder") / request.args.get("file")
+    )
     if request.method == "GET":
         return render_template("editor.html", file_=file_)
     else:
@@ -57,7 +67,9 @@ def editor():
 
 @files.route("/file")
 def file():
-    file_ = File(request.args.get("path"))
+    file_ = File(
+        config.BASE_DIR / request.args.get("folder") / request.args.get("file")
+    )
     return render_template("file.html", file_=file_)
 
 
@@ -70,7 +82,7 @@ def favorites():
 
 @files.route("/clear_favorites")
 def clear_favorites():
-    open(Path(config.BASE_DIR) / "favorites.txt", "w").write("")
+    open(config.BASE_DIR / "favorites.txt", "w").write("")
 
     return redirect(request.referrer)
 
@@ -78,7 +90,7 @@ def clear_favorites():
 @files.route("/favorite_file")
 def favorite_file():
     path = request.args.get("path")
-    favs_ = Path(config.BASE_DIR) / "favorites.txt"
+    favs_ = config.BASE_DIR / "favorites.txt"
     if not path in open(favs_).read():
         open(favs_, "a").write(path + "\n")
     else:
@@ -89,18 +101,22 @@ def favorite_file():
 
 @files.route("/delete_file")
 def delete_file():
-    file_ = File(request.args.get("path"))
-    parent = file_.path.parent
+    file_ = File(
+        config.BASE_DIR / request.args.get("folder") / request.args.get("file")
+    )
+    folder_ = file_.path.parent
     file_.delete()
 
-    return redirect(url_for("folders.folder", path=parent))
+    return redirect(url_for("folders.folder", name=folder_.name))
 
 
 @files.route("/rename_file", methods=["POST"])
 def rename_file():
     file_ = File(request.args.get("path"))
     file_.rename(
-        Path(config.BASE_DIR) / request.form["folder"] / (request.form["name"] + ".md")
+        config.BASE_DIR / request.form["folder"] / (request.form["name"] + ".md")
     )
 
-    return redirect(url_for("files.editor", path=file_.path))
+    return redirect(
+        url_for("files.editor", folder=file_.folder.name, file=file_.name_ext)
+    )
