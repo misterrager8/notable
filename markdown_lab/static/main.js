@@ -19,3 +19,19 @@ function setLight() {{
 function toggleDiv(divId) {
     $('#' + divId).fadeToggle(150);
 }
+
+function reloadPage() {
+    $('#pageContent').load(location.href + ' #pageContent');
+}
+
+function editNote(folder, file) {
+    $.post('edit_note', {
+        folder: folder,
+        file: file,
+        content: $('#content').val()
+    }, function(data) {
+        // reloadPage();
+        $('#done').show();
+        setTimeout(function() { $('#done').hide() }, 1000);
+    });
+}

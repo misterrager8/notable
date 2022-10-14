@@ -51,18 +51,21 @@ def save_link():
     )
 
 
-@files.route("/editor", methods=["POST", "GET"])
+@files.route("/editor")
 def editor():
     file_ = File(
         config.BASE_DIR / request.args.get("folder") / request.args.get("file")
     )
-    if request.method == "GET":
-        return render_template("editor.html", file_=file_)
-    else:
-        with open(file_.path, "w") as f:
-            f.write(request.form["content"])
+    return render_template("editor.html", file_=file_)
 
-        return redirect(request.referrer)
+
+@files.route("/edit_note", methods=["POST"])
+def edit_note():
+    file_ = File(config.BASE_DIR / request.form["folder"] / request.form["file"])
+    with open(file_.path, "w") as f:
+        f.write(request.form["content"])
+
+    return redirect(request.referrer)
 
 
 @files.route("/file")
