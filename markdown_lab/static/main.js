@@ -35,3 +35,26 @@ function editNote(folder, file) {
         setTimeout(function() { $('#done').hide() }, 1000);
     });
 }
+
+function clearFavorites() {
+    $.get('clear_favorites', function(data) {
+        reloadPage();
+    });
+}
+
+function favoriteFile(path) {
+    $.get('favorite_file', {
+        path: path
+    }, function(data) {
+        reloadPage();
+    });
+}
+
+function deleteFile(folder, file) {
+    $.get('delete_file', {
+        folder: folder,
+        file: file,
+    }, function(data) {
+        reloadPage();
+    });
+}

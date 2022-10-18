@@ -11,7 +11,7 @@
 	<span><i class="bi bi-pen"></i> {{ file_.last_modified.strftime('%-m/%-d/%y %-I:%M %p') }}</span><br>
 </div>
 
-<a href="{{ url_for('files.favorite_file', path=file_.path) }}" class="btn btn-sm btn{% if not file_.favorited %}-outline{% endif %}-warning">
+<a onclick="favoriteFile('{{ file_.path }}')" class="btn btn-sm btn{% if not file_.favorited %}-outline{% endif %}-warning">
 	<i class="bi bi-star"></i>
 	Favorite{% if file_.favorited %}d{% endif %}
 </a>
