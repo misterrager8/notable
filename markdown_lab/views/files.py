@@ -27,7 +27,7 @@ def quick_file():
     file_ = File(
         config.BASE_DIR
         / "Misc"
-        / f"{datetime.datetime.now().strftime('%m-%d-%y %I%M%p')}.md"
+        / f"{datetime.datetime.now().strftime('%m-%d-%y %I%M%p')}.txt"
     )
     file_.create()
     return redirect(

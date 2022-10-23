@@ -14,7 +14,7 @@
 {% macro file_card(file_, idx) %}
 <div class="col-xl-4">
     <div class="p-3 mb-3 text-truncate" style="border-bottom: 3px solid;">
-        <a title="{{ file_.name }}" class="fs-5" href="{{ url_for('files.file', folder=file_.folder.name, file=file_.name_ext) }}"><i class="bi bi-filetype-md"></i> {{ file_.name }}</a><br>
+        <a title="{{ file_.name }}" class="fs-5" href="{{ url_for('files.file', folder=file_.folder.name, file=file_.name_ext) }}"><i class="bi bi-{% if file_.ext == '.txt' %}filetype-txt{% else %}filetype-md{% endif %}"></i> {{ file_.name }}</a><br>
         <div class="small fst-italic text-muted mt-2">
             <span><i class="bi bi-plus"></i> {{ file_.date_created.strftime('%-m/%-d/%y %-I:%M %p') }}</span><br>
             <span><i class="bi bi-pen"></i> {{ file_.last_modified.strftime('%-m/%-d/%y %-I:%M %p') }}</span>

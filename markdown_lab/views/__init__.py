@@ -16,3 +16,8 @@ def get_files():
 @current_app.route("/")
 def index():
     return render_template("index.html")
+
+
+@current_app.route("/quickies")
+def quickies():
+    return render_template("quickies.html", quickies=File.quickies())

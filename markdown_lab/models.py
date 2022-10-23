@@ -54,10 +54,26 @@ class File:
     def delete(self):
         self.path.unlink()
 
+    @property
+    def ext(self):
+        return self.path.suffix
+
     @classmethod
     def all(cls):
         return sorted(
             [File(i) for i in Path(config.BASE_DIR).glob("**/*.md")],
+            key=lambda x: x.last_modified,
+            reverse=True,
+        )
+
+    @classmethod
+    def quickies(cls):
+        return sorted(
+            [
+                File(i)
+                for i in Path(config.BASE_DIR).glob("**/*.txt")
+                if i.name != "favorites.txt"
+            ],
             key=lambda x: x.last_modified,
             reverse=True,
         )
