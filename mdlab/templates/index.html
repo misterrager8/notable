@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros with context %}
+{% block body %}
+<title>MarkdownLab</title>
+<div class="row">
+	<div class="col-2" id="folders">
+		<a class="btn btn-sm btn-outline-success mb-3" onclick="toggleDiv('newFolder') "><i class="bi bi-plus-lg"></i> New Folder</a>
+		<form onsubmit="event.preventDefault(); createFolder();" class="mb-4" style="display: none;" id="newFolder"><input type="text" id="name" autocomplete="off" placeholder="Name" required class="form-control"></form>
+		<div class="mb-2 p-1 text-warning" id="folderFavs">
+			<a onclick="getFavorites()" class="font-custom">
+				<i class="bi bi-star-fill pe-1"></i> Favorites
+			</a>
+		</div>
+		{% for i in folders %}
+		{{ macros.folder_item(i, loop.index) }}
+		{% endfor %}
+	</div>
+	<div class="col-4" id="notes">
+		
+	</div>
+	<div class="col-6" id="note">
+		
+	</div>
+</div>
+{% endblock %}

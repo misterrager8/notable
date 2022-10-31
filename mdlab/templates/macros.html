@@ -1,0 +1,8 @@
+{% macro folder_item(folder_, id) %}
+<div id="folder{{ id }}" class="mb-2 p-1">
+	<a onclick="getFolder('{{ folder_.path.name }}', '{{ id }}')" class="font-custom">
+		<i class="bi bi-folder pe-1"></i> {{ folder_.path.name }}
+		<span class="badge-custom float-end">{{ folder_.notes|length }}</span>
+	</a>
+</div>
+{% endmacro %}

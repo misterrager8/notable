@@ -1,6 +1,4 @@
-.DS_Store
 .env
-.sh
 MarkdownLab.egg-info/
-todo.txt
 *.pyc
+.DS_Store

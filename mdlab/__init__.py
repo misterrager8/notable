@@ -6,10 +6,10 @@ def create_app(config):
     app.config.from_object(config)
 
     with app.app_context():
-        from markdown_lab.views.files import files
-        from markdown_lab.views.folders import folders
+        from mdlab.views.folders import folders
+        from mdlab.views.notes import notes
 
-        app.register_blueprint(files)
         app.register_blueprint(folders)
+        app.register_blueprint(notes)
 
         return app

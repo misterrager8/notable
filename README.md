@@ -1,30 +1,22 @@
 # Markdown Lab
 ---
 
-Open-source web-app that allows you to manage markdown files and organize them, keep them in order and organized by topic, powered by Flask and Pathlib. Also inspired by [archivy](https://github.com/archivy/archivy).
+Minimalist markdown text editor, running in any web browser of your choice. Powered by Flask and JS. Also inspired by [archivy](https://github.com/archivy/archivy).
+
+![screen1](docs/screencapture1.png)
 
 ## Features
+- Organize your folders and markdown notes in any directory you choose
+- Save your favorite notes for quicker access
+- One-page interface for simplicity, with light/dark themes
 
-- Save the html content of webpages you want to read later and save them into .md files, all you need is the URL to enter into the form.
+## Installation / Usage
+1. Clone this repo
+2. Run `python3 setup.py develop` command in working directory
+3. Set config variables in `.env`:
 
-- Your favorites are saved in a favorites.txt file for quicker access. You can also make quick notes without having to decide on a title and the folder you want it in.
+        home_dir (directory of your choice)
+        debug=['true','false']
+        env=['production', 'development']
 
-- Selectable themes: light, dark, sepia, sepia dark, charcoal
-
-## Usage
-
-But first, you need to set some config options...
-
-### Configuration
-
-`base_dir` - fullpath home of directory, where you want all your files to be
-
-`env` [optional]
-
-`debug` [optional]
-
-`port` [optional]
-
-### Command-Line
-
-Clone this repo, this run the command `python3 setup.py develop`. Then all you need to do is run the command `mdlab` and Flask will start running the app at the IP address shown on the terminal. Go to your preferred browser and navigate to the address, and there's your interface!
+4. Run `mdlab` command
