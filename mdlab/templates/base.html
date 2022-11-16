@@ -37,6 +37,10 @@
 	</div>
 </nav>
 <div class="container p-4">
+	<div class="float-end">
+		<a class="btn btn-sm btn-outline-secondary" onclick="hideNav()" id="hideNav"><i class="bi bi-eye-slash"></i> Hide Nav</a>
+		<a class="btn btn-sm btn-outline-secondary" onclick="showNav()" id="showNav"><i class="bi bi-eye"></i> Show Nav</a>
+	</div>
 	{% block body %}
 	{% endblock %}
 	<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>

@@ -2,7 +2,7 @@
 {% import "macros.html" as macros with context %}
 {% block body %}
 <title>Favorites</title>
-<div class="row">
+<div class="row mt-4">
 	{% for i in favorites_ %}
 	{{ macros.note_item(i, loop.index) }}
 	{% endfor %}

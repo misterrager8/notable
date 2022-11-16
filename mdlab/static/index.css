@@ -39,6 +39,11 @@ body { margin-left: 300px; }
 	border-right: 1px solid;
 }
 
+body.collapsed { margin-left: unset; }
+.sidenav.collapsed {
+	display: none;
+}
+
 .badge-custom {
 	background-color: var(--primary-txt);
 	color: var(--primary-bg);

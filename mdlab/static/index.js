@@ -1,5 +1,6 @@
 $(document).ready(function() {
 	localStorage.getItem('MDLab') === 'light' ? setLight() : setDark();
+	localStorage.getItem('navState') === 'collapsed' ? hideNav() : showNav();
 });
 
 function toggleDiv(id) {
@@ -18,6 +19,20 @@ function setDark() {
 	localStorage.setItem('MDLab', 'dark');
 	$('#setDark').hide();
 	$('#setLight').show();
+}
+
+function hideNav() {
+	$('body, .sidenav').addClass('collapsed');
+	localStorage.setItem('navState', 'collapsed');
+	$('#hideNav').hide();
+	$('#showNav').show();
+}
+
+function showNav() {
+	$('body, .sidenav').removeClass('collapsed');
+	localStorage.setItem('navState', 'shown');
+	$('#hideNav').show();
+	$('#showNav').hide();
 }
 
 function getText(folder, name) {
