@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros with context %}
+{% block body %}
+<title>{{ note_.name }}</title>
+<div>
+	{{ macros.note_options(note_) }}
+	<div id="note" class="my-4">{{ note_.markdown | safe }}</div>
+</div>
+{% endblock %}
