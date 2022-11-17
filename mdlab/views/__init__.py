@@ -10,7 +10,7 @@ def get_folders():
 
 @current_app.context_processor
 def get_notes():
-    def get_notes_(sort: str, reverse: bool):
+    def get_notes_(sort: str = "last_modified", reverse: bool = True):
         return Note.all(sort, reverse)
 
     return dict(notes=get_notes_)

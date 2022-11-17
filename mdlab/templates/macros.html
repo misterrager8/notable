@@ -70,6 +70,13 @@
 </div>
 {% endmacro %}
 
+{% macro counter() %}
+<span class="text-muted small fst-italic">
+	{% set x, y = folders|length, notes()|length %}
+	{{ x }} Folder{% if x > 1 %}s{% endif %}, {{ y }} Note{% if y > 1 %}s{% endif %}
+</span>
+{% endmacro %}
+
 {% macro folder_create_form() %}
 <form method="POST" action="{{ url_for('folders.create_folder') }}">
 	<input type="text" name="name" autocomplete="off" class="form-control form-control-sm border-success" placeholder="New Folder">

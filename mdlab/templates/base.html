@@ -37,6 +37,7 @@
 			</div>
 			{% endfor %}
 		</div>
+		<div class="fixed-bottom p-4">{{ macros.counter() }}</div>
 	</div>
 </nav>
 
@@ -79,6 +80,9 @@
 						{% endfor %}
 					</div>
 				</li>
+			</ul>
+			<ul class="navbar-nav ms-auto">
+				<li class="nav-item">{{ macros.counter() }}</li>
 			</ul>
 		</div>
 	</div>
