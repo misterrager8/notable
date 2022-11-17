@@ -55,6 +55,7 @@
 {% macro folder_options(folder_) %}
 <form method="POST" action="{{ url_for('folders.rename_folder', name=folder_.name) }}">
 	<input onchange="this.form.submit()" type="text" name="name" autocomplete="off" class="form-control form-control-hidden fs-3 mb-1" value="{{ folder_.name }}" required>
+	<a onclick="toggleDiv('newNote')" class="btn btn-sm btn-outline-success"><i class="bi bi-plus-lg"></i> New Note</a>
 	<span class="text-danger">
 		<a onclick="toggleDiv('deleteFolder')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash2"></i> Delete</a>
 		<a href="{{ url_for('folders.delete_folder', name=folder_.name) }}" id="deleteFolder" style="display: none;">Delete?</a>
