@@ -1,12 +1,3 @@
-{% macro folder_item(folder_) %}
-<div class="my-1">
-	<a class="heading" href="{{ url_for('folders.folder', name=folder_.name) }}">
-		<span><i class="bi bi-folder"></i> {{ folder_.name }}</span>
-		<span class="float-end badge-custom">{{ folder_.notes | length }}</span>
-	</a>
-</div>
-{% endmacro %}
-
 {% macro note_item(note_, id) %}
 <div class="col-xl-4">
 	<div class="rounded mb-4 p-3" style="border: 1px solid;">
