@@ -10,8 +10,11 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
 	<link rel="stylesheet" type="text/css" href="static/index.css">
 </head>
+
+<!-- Vertical Navbar -->
 <nav class="sidenav">
 	<div class="p-4">
+		<a class="btn btn-sm btn-outline-secondary w-100 mb-2" onclick="hideNav()" id="hideNav"><i class="bi bi-window"></i> Horizontal</a>
 		<a class="btn btn-sm btn-outline-light w-100" onclick="setLight()" id="setLight"><i class="bi bi-sun"></i> Light</a>
 		<a class="btn btn-sm btn-outline-dark w-100" onclick="setDark()" id="setDark"><i class="bi bi-moon"></i> Dark</a>
 		<div class="text-center my-3">
@@ -36,11 +39,52 @@
 		</div>
 	</div>
 </nav>
-<div class="container p-4">
-	<div class="float-end">
-		<a class="btn btn-sm btn-outline-secondary" onclick="hideNav()" id="hideNav"><i class="bi bi-eye-slash"></i> Hide Nav</a>
-		<a class="btn btn-sm btn-outline-secondary" onclick="showNav()" id="showNav"><i class="bi bi-eye"></i> Show Nav</a>
+
+<!-- Horizontal Navbar -->
+<nav class="navbar navbar-expand-lg vertnav sticky-top" style="border-bottom: 1px solid;">
+	<div class="container-fluid">
+		<div class="collapse navbar-collapse">
+			<ul class="navbar-nav me-auto">
+				<li class="nav-item me-2">
+					<a class="btn btn-sm btn-outline-secondary" onclick="showNav()" id="showNav"><i class="bi bi-layout-sidebar"></i></a>
+				</li>
+				<li class="nav-item">
+					<a class="btn btn-sm btn-outline-light" onclick="setLight()" id="setLight"><i class="bi bi-sun"></i></a>
+					<a class="btn btn-sm btn-outline-dark" onclick="setDark()" id="setDark"><i class="bi bi-moon"></i></a>
+				</li>
+				<li class="nav-item mx-3">
+					<a href="{{ url_for('index') }}" class="nav-link p-1">Markdown Lab</a>
+				</li>
+				<li class="nav-item me-3">
+					<a href="{{ url_for('notes.favorites') }}" class="nav-link text-warning p-1"><i class="bi bi-star-fill"></i> <span class="badge-custom">{{ favorites_ | length }}</span></a>
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle p-1" data-bs-toggle="dropdown" data-bs-target="#folders">
+						<i class="bi bi-folder"></i>
+						{% if note_ %}
+						{{ note_.folder.name }} <span class="badge-custom">{{ note_.folder.notes | length }}</span>
+						{% elif folder_ %}
+						{{ folder_.name }} <span class="badge-custom">{{ folder_.notes | length }}</span>
+						{% else %}
+						Select Folder
+						{% endif %}
+					</a>
+					<div id="folders" class="dropdown-menu">
+						<div class="m-2">{{ macros.folder_create_form() }}</div>
+						{% for i in folders %}
+						<a class="dropdown-item" href="{{ url_for('folders.folder', name=i.name) }}">
+							<i class="bi bi-folder"></i> {{ i.name }}
+							<span class="badge-custom float-end">{{ i.notes | length }}</span>
+						</a>
+						{% endfor %}
+					</div>
+				</li>
+			</ul>
+		</div>
 	</div>
+</nav>
+
+<div class="container p-4">
 	{% block body %}
 	{% endblock %}
 	<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>

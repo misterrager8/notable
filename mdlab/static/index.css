@@ -8,7 +8,7 @@ html[data-theme='dark'] {
 	--primary-txt: white;
 }
 
-body, .sidenav, .form-control, .form-control:focus {
+body, .sidenav, .form-control, .form-control:focus, .vertnav, .dropdown-menu, .dropdown-item {
 	background-color: var(--primary-bg);
 	color: var(--primary-txt);
 }
@@ -18,14 +18,15 @@ body, .sidenav, .form-control, .form-control:focus {
 	border: 0;
 }
 
-a, a:hover {
+a, a:hover, .nav-link, .nav-link:hover {
 	color: inherit;
 	text-decoration: none;
 	cursor: pointer;
 }
 
-.btn, ::placeholder, .heading {
+.btn, ::placeholder, .heading, .nav-link {
 	letter-spacing: 2px;
+	font-size: 0.9em;
 }
 
 body { margin-left: 300px; }
@@ -40,9 +41,7 @@ body { margin-left: 300px; }
 }
 
 body.collapsed { margin-left: unset; }
-.sidenav.collapsed {
-	display: none;
-}
+.sidenav.collapsed, .vertnav:not(.collapsed) { display: none; }
 
 .badge-custom {
 	background-color: var(--primary-txt);
