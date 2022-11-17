@@ -44,7 +44,7 @@ function getText(folder, name) {
 	}, function(data) {
 		$('#note').html(`
 			<div class="btn-group mb-4">
-				<a class="btn btn-outline-success"><i class="bi bi-save" id="saveBtn"></i></a>
+				<a onclick="editNote('${folder}', '${name}')" class="btn btn-outline-success"><i class="bi bi-save" id="saveBtn"></i></a>
 				<a onclick="copy2clip('****')" class="btn btn-outline-secondary"><i class="bi bi-type-bold"></i></a>
 				<a onclick="copy2clip('**')" class="btn btn-outline-secondary"><i class="bi bi-type-italic"></i></a>
 				<a onclick="copy2clip('1. ')" class="btn btn-outline-secondary"><i class="bi bi-list-ol"></i></a>
