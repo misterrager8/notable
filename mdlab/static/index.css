@@ -8,7 +8,7 @@ html[data-theme='dark'] {
 	--primary-txt: white;
 }
 
-body, .sidenav, .form-control, .form-control:focus, .vertnav, .dropdown-menu, .dropdown-item {
+body, .sidenav, .form-control, .form-control:focus, .form-control:disabled, .vertnav, .dropdown-menu, .dropdown-item {
 	background-color: var(--primary-bg);
 	color: var(--primary-txt);
 }

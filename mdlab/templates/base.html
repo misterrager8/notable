@@ -15,8 +15,9 @@
 <nav class="sidenav">
 	<div class="p-4">
 		<a class="btn btn-sm btn-outline-secondary w-100 mb-2" onclick="hideNav()" id="hideNav"><i class="bi bi-window"></i> Horizontal</a>
-		<a class="btn btn-sm btn-outline-light w-100" onclick="setLight()" id="setLight"><i class="bi bi-sun"></i> Light</a>
-		<a class="btn btn-sm btn-outline-dark w-100" onclick="setDark()" id="setDark"><i class="bi bi-moon"></i> Dark</a>
+		<a class="btn btn-sm btn-outline-light w-100 mb-2" onclick="setLight()" id="setLight"><i class="bi bi-sun"></i> Light</a>
+		<a class="btn btn-sm btn-outline-dark w-100 mb-2" onclick="setDark()" id="setDark"><i class="bi bi-moon"></i> Dark</a>
+		<a class="btn btn-sm btn-outline-primary w-100" href="{{ url_for('settings') }}"><i class="bi bi-gear"></i> Settings</a>
 		<div class="text-center my-3">
 			<a class="heading fs-4 text-center" href="{{ url_for('index') }}">Markdown Lab</a>
 		</div>
@@ -49,9 +50,12 @@
 				<li class="nav-item me-2">
 					<a class="btn btn-sm btn-outline-secondary" onclick="showNav()" id="showNav"><i class="bi bi-layout-sidebar"></i></a>
 				</li>
-				<li class="nav-item">
+				<li class="nav-item me-2">
 					<a class="btn btn-sm btn-outline-light" onclick="setLight()" id="setLight"><i class="bi bi-sun"></i></a>
 					<a class="btn btn-sm btn-outline-dark" onclick="setDark()" id="setDark"><i class="bi bi-moon"></i></a>
+				</li>
+				<li class="nav-item">
+					<a class="btn btn-sm btn-outline-primary" href="{{ url_for('settings') }}"><i class="bi bi-gear"></i></a>
 				</li>
 				<li class="nav-item mx-3">
 					<a href="{{ url_for('index') }}" class="nav-link p-1">Markdown Lab</a>

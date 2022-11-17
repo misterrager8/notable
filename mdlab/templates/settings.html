@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros with context %}
+{% block body %}
+<title>Settings</title>
+<div>
+	{% for i in settings_.items() %}
+	<div class="input-group input-group-sm row mb-2">
+		<span class="col-2 text-uppercase heading">{{ i[0] }}</span>
+		<input autocomplete="off" class="form-control col-10" value="{{ i[1] }}" disabled>
+	</div>
+	{% endfor %}
+</div>
+{% endblock %}

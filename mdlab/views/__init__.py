@@ -1,5 +1,6 @@
 from flask import current_app, render_template, request
 
+from mdlab import config
 from mdlab.models import Folder, Note
 
 
@@ -27,3 +28,16 @@ def index():
     reverse = request.args.get("reverse", default="True")
 
     return render_template("index.html", sort=sort, reverse=reverse.lower() == "true")
+
+
+@current_app.route("/settings")
+def settings():
+    return render_template(
+        "settings.html",
+        settings_=dict(
+            debug=config.DEBUG,
+            env=config.ENV,
+            home_dir=config.HOME_DIR,
+            port=config.PORT,
+        ),
+    )
