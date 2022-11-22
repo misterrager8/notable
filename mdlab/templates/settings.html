@@ -3,11 +3,14 @@
 {% block body %}
 <title>Settings</title>
 <div>
-	{% for i in settings_.items() %}
-	<div class="input-group input-group-sm row mb-2">
-		<span class="col-2 text-uppercase heading">{{ i[0] }}</span>
-		<input autocomplete="off" class="form-control col-10" value="{{ i[1] }}" disabled>
-	</div>
-	{% endfor %}
+	<form class="" method="POST" action="{{ url_for('settings') }}">
+		{% for i in settings_.items() %}
+		<div class="form-floating mb-1">
+			<input id="{{ i[0] }}" autocomplete="off" class="form-control border-0" value="{{ i[1] }}" name="{{ i[0] }}">
+			<label for="{{ i[0] }}">{{ i[0] }}</label>
+		</div>
+		{% endfor %}
+		<button type="submit" class="btn btn-sm btn-outline-success">Save</button>
+	</form>
 </div>
 {% endblock %}

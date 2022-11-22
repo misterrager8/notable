@@ -1,4 +1,7 @@
-from flask import current_app, render_template, request
+from pathlib import Path
+
+import dotenv
+from flask import current_app, redirect, render_template, request
 
 from mdlab import config
 from mdlab.models import Folder, Memo, Note
@@ -35,14 +38,25 @@ def index():
     return render_template("index.html", sort=sort, reverse=reverse.lower() == "true")
 
 
-@current_app.route("/settings")
+@current_app.route("/settings", methods=["POST", "GET"])
 def settings():
-    return render_template(
-        "settings.html",
-        settings_=dict(
-            debug=config.DEBUG,
-            env=config.ENV,
-            home_dir=config.HOME_DIR,
-            port=config.PORT,
-        ),
-    )
+    if request.method == "GET":
+        return render_template("settings.html", settings_=config.config_dict)
+    else:
+        dotenv.set_key(
+            Path(__file__).parent.parent.parent / ".env",
+            "home_dir",
+            request.form.get("home_dir"),
+        )
+        dotenv.set_key(
+            Path(__file__).parent.parent.parent / ".env",
+            "debug",
+            request.form.get("debug"),
+        )
+        dotenv.set_key(
+            Path(__file__).parent.parent.parent / ".env",
+            "port",
+            request.form.get("port"),
+        )
+
+        return redirect(request.referrer)
