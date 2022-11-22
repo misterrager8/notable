@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros with context %}
+{% block body %}
+<title>{{ memo_.name }}</title>
+<div>
+	<form method="POST" action="{{ url_for('memos.rename_memo', folder=memo_.folder.name, name=memo_.name) }}">
+		<input onchange="this.form.submit()" type="text" name="name" autocomplete="off" class="form-control form-control-hidden fs-3 mb-1" value="{{ memo_.stem }}" required>
+		<div class="input-group mb-1">
+			<a href="{{ url_for('folders.folder', name=memo_.folder.name) }}" class="btn btn-sm" style="color: inherit;"><i class="bi bi-folder"></i></a>
+			<select onchange="this.form.submit()" name="folder" class="form-control form-control-hidden">
+				{% for i in folders %}
+				<option value="{{ i.name }}" {% if i.name == memo_.folder.name %}selected{% endif %}>{{ i.name }}</option>
+				{% endfor %}
+			</select>
+		</div>
+	</form>
+	<div class="btn-group btn-group-sm py-2">
+		<a href="{{ url_for('memos.publish_memo', folder=memo_.folder.name, name=memo_.name) }}" class="btn btn-outline-primary"><i class="bi bi-markdown"></i> Publish To Markdown</a>
+		<a onclick="toggleDiv('deleteMemo')" class="btn btn-outline-danger"><i class="bi bi-trash2"></i> Delete</a>
+		<a style="display: none;" id="deleteMemo" href="{{ url_for('memos.delete_memo', folder=memo_.folder.name, name=memo_.name) }}" class="btn text-danger">Delete?</a>
+	</div>
+</div>
+<div>
+	<a onclick="editMemo('{{ memo_.folder.name }}', '{{ memo_.name }}')" class="btn btn-outline-success w-100 mb-3"><i class="bi bi-save" id="saveBtn"></i></a>
+	<textarea id="content" class="form-control form-control-hidden" rows="30" onchange="editMemo('{{ memo_.folder.name }}', '{{ memo_.name }}')">{{ memo_.text }}</textarea>
+</div>
+{% endblock %}

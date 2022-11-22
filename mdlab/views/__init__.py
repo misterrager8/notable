@@ -1,7 +1,7 @@
 from flask import current_app, render_template, request
 
 from mdlab import config
-from mdlab.models import Folder, Note
+from mdlab.models import Folder, Memo, Note
 
 
 @current_app.context_processor
@@ -20,6 +20,11 @@ def get_notes():
 @current_app.context_processor
 def get_favorites():
     return dict(favorites_=Note.favorites())
+
+
+@current_app.context_processor
+def get_memos():
+    return dict(memos_=Memo.all())
 
 
 @current_app.route("/")

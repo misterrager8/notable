@@ -110,3 +110,62 @@ class Note(object):
 
     def delete(self):
         self.path.unlink()
+
+
+class Memo(object):
+    def __init__(self, path: Path):
+        self.path = path
+
+    @classmethod
+    def all(cls, sort: str = "last_modified", reverse: bool = True) -> list:
+        return sorted(
+            [
+                Memo(i)
+                for i in config.HOME_DIR.glob("**/*.txt")
+                if i.name != "favorites.txt"
+            ],
+            key=operator.attrgetter(sort),
+            reverse=reverse,
+        )
+
+    @property
+    def name(self) -> str:
+        return self.path.name
+
+    @property
+    def stem(self) -> str:
+        return self.path.stem
+
+    @property
+    def folder(self) -> Folder:
+        return Folder(self.path.parent)
+
+    @property
+    def text(self) -> str:
+        return open(self.path).read()
+
+    @property
+    def date_created(self) -> datetime.datetime:
+        return datetime.datetime.fromtimestamp(self.path.stat().st_birthtime)
+
+    @property
+    def last_modified(self) -> datetime.datetime:
+        return datetime.datetime.fromtimestamp(self.path.stat().st_mtime)
+
+    def create(self):
+        self.path.touch()
+
+    def edit(self, content: str):
+        open(self.path, "w").write(content)
+
+    def rename(self, new_name: Path):
+        self.path.rename(new_name)
+
+    def publish(self):
+        _ = Note(config.HOME_DIR / self.folder.name / f"{self.stem}.md")
+        _.create()
+        _.edit(self.text)
+        return _
+
+    def delete(self):
+        self.path.unlink()

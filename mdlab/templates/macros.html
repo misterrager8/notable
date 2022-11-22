@@ -20,6 +20,28 @@
 </div>
 {% endmacro %}
 
+{% macro memo_item(memo_, id) %}
+<div class="col-xl-4">
+	<div class="rounded mb-4 p-3" style="border: 1px solid;">
+		<div class="text-truncate">
+			<span class="text-primary me-1"><i class="bi bi-stickies"></i></span>
+			<a title="{{ memo_.stem }}" href="{{ url_for('memos.memo', folder=memo_.folder.name, name=memo_.name) }}">{{ memo_.stem }}</a>
+		</div>
+		<div class="my-2">
+			<small class="text-muted"><i class="bi bi-pen"></i> {{ memo_.last_modified.strftime("%B %-d, %Y @ %-I:%M %p") }}</small><br>
+			<small class="text-muted"><i class="bi bi-plus"></i> {{ memo_.date_created.strftime("%B %-d, %Y @ %-I:%M %p") }}</small>
+		</div>
+		<div class="mt-3">
+			<a class="small fst-italic text-muted" href="{{ url_for('folders.folder', name=memo_.folder.name) }}"><i class="bi bi-folder me-1"></i> {{ memo_.folder.name }}</a>
+			<span class="float-end text-danger">
+				<a style="display: none;" id="delete{{ id }}" onclick="deleteMemo('{{ memo_.folder.name }}', '{{ memo_.name }}') ">Delete?</a>
+				<a onclick="toggleDiv('delete' + {{ id }})"><i class="bi bi-trash2"></i></a>
+			</span>
+		</div>
+	</div>
+</div>
+{% endmacro %}
+
 {% macro note_options(note_) %}
 <div>
 	<form method="POST" action="{{ url_for('notes.rename_note', folder=note_.folder.name, name=note_.name) }}">
@@ -47,6 +69,7 @@
 <form method="POST" action="{{ url_for('folders.rename_folder', name=folder_.name) }}">
 	<input onchange="this.form.submit()" type="text" name="name" autocomplete="off" class="form-control form-control-hidden fs-3 mb-1" value="{{ folder_.name }}" required>
 	<a onclick="toggleDiv('newNote')" class="btn btn-sm btn-outline-success"><i class="bi bi-plus-lg"></i> New Note</a>
+	<a onclick="toggleDiv('newMemo')" class="btn btn-sm btn-outline-primary"><i class="bi bi-stickies"></i> New Memo</a>
 	<span class="text-danger">
 		<a onclick="toggleDiv('deleteFolder')" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash2"></i> Delete</a>
 		<a href="{{ url_for('folders.delete_folder', name=folder_.name) }}" id="deleteFolder" style="display: none;">Delete?</a>
@@ -78,5 +101,11 @@
 {% macro note_create_form(folder_) %}
 <form method="POST" action="{{ url_for('notes.create_note', folder=folder_.name) }}">
 	<input type="text" name="name" autocomplete="off" class="form-control form-control-sm border-success" placeholder="New Note">
+</form>
+{% endmacro %}
+
+{% macro memo_create_form(folder_) %}
+<form method="POST" action="{{ url_for('memos.create_memo', folder=folder_.name) }}">
+	<input type="text" name="name" autocomplete="off" class="form-control form-control-sm border-primary" placeholder="New Memo">
 </form>
 {% endmacro %}

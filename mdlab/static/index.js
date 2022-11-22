@@ -82,6 +82,17 @@ function editNote(folder, name) {
 	});
 }
 
+function editMemo(folder, name) {
+	$.post('edit_memo', {
+		folder: folder,
+		name: name,
+		content: $('#content').val()
+	}, function(data) {
+		$('#saveBtn').toggleClass(['bi-save', 'bi-check-lg']);
+		setTimeout(function() { $('#saveBtn').toggleClass(['bi-save', 'bi-check-lg']); }, 1500);
+	});
+}
+
 function toggleFavorite(folder, name) {
 	$.get('toggle_favorite', {
 		folder: folder,
@@ -93,6 +104,15 @@ function toggleFavorite(folder, name) {
 
 function deleteNote(folder, name) {
 	$.get('delete_note', {
+		folder: folder,
+		name: name
+	}, function(data) {
+		location.reload();
+	});
+}
+
+function deleteMemo(folder, name) {
+	$.get('delete_memo', {
 		folder: folder,
 		name: name
 	}, function(data) {

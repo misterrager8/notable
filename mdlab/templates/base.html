@@ -17,7 +17,7 @@
 		<a class="btn btn-sm btn-outline-secondary w-100 mb-2" onclick="hideNav()" id="hideNav"><i class="bi bi-window"></i> Horizontal</a>
 		<a class="btn btn-sm btn-outline-light w-100 mb-2" onclick="setLight()" id="setLight"><i class="bi bi-sun"></i> Light</a>
 		<a class="btn btn-sm btn-outline-dark w-100 mb-2" onclick="setDark()" id="setDark"><i class="bi bi-moon"></i> Dark</a>
-		<a class="btn btn-sm btn-outline-primary w-100" href="{{ url_for('settings') }}"><i class="bi bi-gear"></i> Settings</a>
+		<a class="btn btn-sm btn-outline-info w-100" href="{{ url_for('settings') }}"><i class="bi bi-gear"></i> Settings</a>
 		<div class="text-center my-3">
 			<a class="heading fs-4 text-center" href="{{ url_for('index') }}">Markdown Lab</a>
 		</div>
@@ -26,6 +26,12 @@
 				<a class="heading" href="{{ url_for('notes.favorites') }}">
 					<span><i class="bi bi-star"></i> Favorites</span>
 					<span class="badge-custom float-end">{{ favorites_ | length }}</span>
+				</a>
+			</div>
+			<div class="my-1 text-primary">
+				<a class="heading" href="{{ url_for('memos.memos_') }}">
+					<span><i class="bi bi-stickies"></i> Memos</span>
+					<span class="badge-custom float-end">{{ memos_ | length }}</span>
 				</a>
 			</div>
 			<div class="py-3">{{ macros.folder_create_form() }}</div>
@@ -62,6 +68,9 @@
 				</li>
 				<li class="nav-item me-3">
 					<a href="{{ url_for('notes.favorites') }}" class="nav-link text-warning p-1"><i class="bi bi-star-fill"></i> <span class="badge-custom">{{ favorites_ | length }}</span></a>
+				</li>
+				<li class="nav-item me-3">
+					<a href="{{ url_for('memos.memos_') }}" class="nav-link text-primary p-1"><i class="bi bi-stickies"></i> <span class="badge-custom">{{ memos_ | length }}</span></a>
 				</li>
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle p-1" data-bs-toggle="dropdown" data-bs-target="#folders">
