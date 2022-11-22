@@ -95,3 +95,10 @@ def toggle_favorite():
 @notes.route("/favorites")
 def favorites():
     return render_template("favorites.html")
+
+
+@notes.route("/search", methods=["POST"])
+def search():
+    return render_template(
+        "search.html", results=Note.search(request.form.get("query"))
+    )

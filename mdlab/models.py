@@ -1,6 +1,7 @@
 import datetime
 import operator
 import shutil
+import subprocess
 from pathlib import Path
 
 import markdown
@@ -49,6 +50,19 @@ class Note(object):
             key=operator.attrgetter(sort),
             reverse=reverse,
         )
+
+    @classmethod
+    def search(cls, query: str) -> list:
+        return [
+            Note(Path(i))
+            for i in subprocess.run(
+                ["grep", "-rl", query, config.HOME_DIR],
+                cwd=config.HOME_DIR,
+                capture_output=True,
+                text=True,
+            ).stdout.split("\n")
+            if i.endswith(".md")
+        ]
 
     @classmethod
     def favorites(cls) -> list:

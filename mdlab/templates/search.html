@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros with context %}
+{% block body %}
+<title>Search</title>
+<p class="heading">{{ results | length }} result(s)</p>
+<div class="row">
+	{% for i in results %}
+	{{ macros.note_item(i, loop.index) }}
+	{% endfor %}
+</div>
+{% endblock %}

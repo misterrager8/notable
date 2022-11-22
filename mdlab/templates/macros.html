@@ -109,3 +109,10 @@
 	<input type="text" name="name" autocomplete="off" class="form-control form-control-sm border-primary" placeholder="New Memo">
 </form>
 {% endmacro %}
+
+{% macro search_form(class='') %}
+<form class="input-group input-group-sm {{ class }}" method="POST" action="{{ url_for('notes.search') }}">
+	<input autocomplete="off" class="form-control" placeholder="Search" name="query">
+	<button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i></button>
+</form>
+{% endmacro %}
