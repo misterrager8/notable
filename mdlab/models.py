@@ -106,9 +106,13 @@ class Note(object):
             open((config.HOME_DIR / "favorites.txt"), "a").write(f"{self.path}\n")
 
     def rename(self, new_name: Path):
+        if self.favorited:
+            self.toggle_favorite()
         self.path.rename(new_name)
 
     def delete(self):
+        if self.favorited:
+            self.toggle_favorite()
         self.path.unlink()
 
 
