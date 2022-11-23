@@ -54,14 +54,14 @@ class Note(object):
     @classmethod
     def search(cls, query: str) -> list:
         return [
-            Note(Path(i))
+            SearchResult(Path(i.split(":")[0]), "".join(i.split(":")[1:]))
             for i in subprocess.run(
-                ["grep", "-rl", query, config.HOME_DIR],
+                ["grep", "-r", query, config.HOME_DIR],
                 cwd=config.HOME_DIR,
                 capture_output=True,
                 text=True,
             ).stdout.split("\n")
-            if i.endswith(".md")
+            if i
         ]
 
     @classmethod
@@ -187,3 +187,9 @@ class Memo(object):
 
     def delete(self):
         self.path.unlink()
+
+
+class SearchResult(object):
+    def __init__(self, path: Path, match: str):
+        self.path = path
+        self.match = match

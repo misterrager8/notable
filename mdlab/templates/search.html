@@ -5,7 +5,12 @@
 <p class="heading">{{ results | length }} result(s)</p>
 <div class="row">
 	{% for i in results %}
-	{{ macros.note_item(i, loop.index) }}
+	<div class="mb-3">
+		<div>
+			<a class="heading" href="{{ url_for('notes.note', folder=i.path.parent.name, name=i.path.name) }}">{{ i.path.stem }}</a>
+		</div>
+		<p class="fst-italic text-danger">"{{ i.match }}"</p>
+	</div>
 	{% endfor %}
 </div>
 {% endblock %}
