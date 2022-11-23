@@ -55,3 +55,7 @@ body.collapsed { margin-left: unset; }
 	border-top: 1px dotted;
 	border-bottom: 1px dotted;
 }
+
+div#note a:not(.btn) {
+	color: orange;
+}
