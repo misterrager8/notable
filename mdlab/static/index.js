@@ -154,7 +154,7 @@ function formatText(type_) {
 			var newMid = `${beforeSel}- ${mid}${afterSel}`;
 			break;
 		case 'time':
-			var newMid = `${beforeSel}${mid}${new Date()}${afterSel}`;
+			var newMid = `${beforeSel}${mid}${new Date().toLocaleString()}${afterSel}`;
 			break;
 		case 'image':
 			var newMid = `${beforeSel}![${mid}](url)${afterSel}`;
