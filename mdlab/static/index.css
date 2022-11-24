@@ -57,5 +57,15 @@ body.collapsed { margin-left: unset; }
 }
 
 div#note a:not(.btn) {
-	color: orange;
+	color: #E07000;
+}
+
+div#note pre {
+	border-left: 2px solid #E13D73;
+	margin-left: 2em;
+	padding-left: 2em;
+}
+
+div#note code {
+	color: #E13D73;
 }
