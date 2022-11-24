@@ -50,7 +50,7 @@ function getText(folder, name) {
 				<a onclick="editNote('${folder}', '${name}')" class="btn btn-outline-success"><i class="bi bi-save" id="saveBtn"></i></a>
 				<a onclick="formatText('bold')" class="btn btn-outline-secondary"><i class="bi bi-type-bold"></i></a>
 				<a onclick="formatText('italic')" class="btn btn-outline-secondary"><i class="bi bi-type-italic"></i></a>
-				<a onclick="formatText('numlist')" class="btn btn-outline-secondary"><i class="bi bi-list-ol"></i></a>
+				<a onclick="formatText('numlist')" class="btn btn-outline-secondary"><i class="bi bi-123"></i></a>
 				<a onclick="formatText('bullist')" class="btn btn-outline-secondary"><i class="bi bi-list-ul"></i></a>
 				<a onclick="formatText('link')" class="btn btn-outline-secondary"><i class="bi bi-link"></i></a>
 				<a onclick="formatText('time')" class="btn btn-outline-secondary"><i class="bi bi-clock"></i></a>
