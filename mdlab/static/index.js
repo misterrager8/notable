@@ -58,6 +58,7 @@ function getText(folder, name) {
 				<a onclick="formatText('image')" class="btn btn-outline-secondary"><i class="bi bi-card-image"></i></a>
 				<a onclick="formatText('code')" class="btn btn-outline-secondary"><i class="bi bi-code"></i></a>
 				<a onclick="formatText('capitalize')" class="btn btn-outline-secondary"><i class="bi bi-type"></i></a>
+				<a onclick="formatText('hrule')" class="btn btn-outline-secondary"><i class="bi bi-hr"></i></a>
 			</div>
 			<textarea autocomplete="off" class="invisible" id="format"></textarea>
 			<textarea onselect="getselection(event)" id="content" class="form-control form-control-hidden" rows="30" onchange="editNote('${folder}', '${name}')">${data}</textarea>
@@ -148,13 +149,13 @@ function formatText(type_) {
 			var newMid = `${beforeSel}# ${mid}${afterSel}`;
 			break;
 		case 'numlist':
-			var newMid = `${beforeSel}1. ${mid}${afterSel}`;
+			var newMid = `${beforeSel}\n1. ${mid}\n${afterSel}`;
 			break;
 		case 'bullist':
-			var newMid = `${beforeSel}- ${mid}${afterSel}`;
+			var newMid = `${beforeSel}\n- ${mid}\n${afterSel}`;
 			break;
 		case 'time':
-			var newMid = `${beforeSel}${mid}${new Date().toLocaleString()}${afterSel}`;
+			var newMid = `${beforeSel}${new Date().toLocaleString()}${afterSel}`;
 			break;
 		case 'image':
 			var newMid = `${beforeSel}![${mid}](url)${afterSel}`;
@@ -162,8 +163,11 @@ function formatText(type_) {
 		case 'capitalize':
 			var newMid = `${beforeSel}${mid.toUpperCase()}${afterSel}`;
 			break;
+		case 'hrule':
+			var newMid = `${beforeSel}\n---\n${afterSel}`;
+			break;
 		case 'code':
-			var newMid = `${beforeSel}    ${mid}${afterSel}`;
+			var newMid = `${beforeSel}\n    ${afterSel}`;
 	}
 	$('#content').val(newMid);
 	$('#content').trigger('change');
