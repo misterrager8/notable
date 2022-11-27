@@ -8,7 +8,9 @@ Minimalist markdown text editor, running in any web browser of your choice. Powe
 ## Features
 - Organize your folders and markdown notes in any directory you choose
 - Save your favorite notes for quicker access
-- One-page interface for simplicity, with light/dark themes
+- Save `txt` files (called Memos) to the same folder for easier access from a wider range of devices
+- Features WYSIWYG text editor with a large set of formatting options inlcuding capitalization, images, and code blocks
+- Has vertical and horizontal navbar, depending on user preference
 
 ## Installation / Usage
 1. Clone this repo
@@ -18,5 +20,6 @@ Minimalist markdown text editor, running in any web browser of your choice. Powe
         home_dir (directory of your choice)
         debug=['true','false']
         env=['production', 'development']
+        port=[4-digit number string]
 
 4. Run `mdlab` command
