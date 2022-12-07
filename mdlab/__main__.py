@@ -34,14 +34,15 @@ def set_config(key, value):
 
 
 @cli.command()
-@click.option("--switch", "-s", is_flag=True)
-def run(switch: bool):
+@click.option("--debug", "-d", is_flag=True)
+def run(debug: bool):
     """Start the MarkdownLab app.
 
     Args:
         switch (bool, optional): switch automatically to browser when starting app. Default is False
     """
     app = create_app(config)
-    if switch:
-        webbrowser.open(f"http://localhost:{config.PORT}")
-    app.run(port=config.PORT)
+    if not debug:
+        webbrowser.open(f"http://localhost:{config.PORT}/")
+    app.config["ENV"] = "development" if debug else "production"
+    app.run(port=config.PORT, debug=debug)
