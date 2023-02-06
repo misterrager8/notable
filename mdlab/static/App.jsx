@@ -14,7 +14,7 @@ function Navbar() {
 	return (
 		<div className="d-flex justify-content-between p-2">
 			<div className="btn-group btn-group-sm">
-				<a className="btn btn-outline-secondary"><i className="bi bi-house-fill"></i></a>
+				<a href="/" className="btn btn-outline-secondary"><i className="bi bi-house-fill"></i></a>
 				<a data-bs-target="#themes" data-bs-toggle="dropdown" className="btn btn-outline-secondary dropdown-toggle text-capitalize"><i className="bi bi-paint-bucket"></i> {theme}</a>
 				<div id="themes" className="dropdown-menu text-center">
 					{theme !== 'light' && <a onClick={() => changeTheme('light')} className="small dropdown-item text-capitalize">light</a>}
@@ -30,69 +30,14 @@ function Navbar() {
 		);
 }
 
-function Editor(props) {
-	const [mode, setMode] = React.useState('view');
-	const [saved, setSaved] = React.useState(false);
-	const [fullscreen, setFullscreen] = React.useState(false);
-
-	const editNote = () => {
-		$.post('/edit_note', {
-			folder: props.note.folder,
-			name: props.note.name,
-			content: $('#content').val()
-		}, function (data) {
-			setSaved(true);
-			setTimeout(function() { setSaved(false); }, 1500);
-		});
-	}
-
-	const toggleFullscreen = () => {
-		if (fullscreen) {
-			$('#folders, #folder').hide();
-			$('#note').addClass('col-12');
-			$('#note').removeClass('col-7');
-			setFullscreen(!fullscreen);
-		} else {
-			$('#folders, #folder').show();
-			$('#note').removeClass('col-12');
-			$('#note').addClass('col-7');
-			setFullscreen(!fullscreen);
-		}
-	}
-
-	return (
-		<div>
-			<div><a className="btn btn-sm text-muted" onClick={() => toggleFullscreen()}><i className={'bi bi-fullscreen'}></i> Toggle Fullscreen</a></div>
-			<div className="btn-group btn-group-sm mb-3 col-4 offset-4">
-				<a onClick={() => setMode('view')} className={'btn btn-outline-secondary' + (mode === 'view' ? ' active' : '')}><i className="bi bi-eye"></i> View</a>
-				<a onClick={() => setMode('edit')} className={'btn btn-outline-secondary' + (mode === 'edit' ? ' active' : '')}><i className="bi bi-pen"></i> Edit</a>
-			</div>
-			{mode === 'view' ? (
-				<div dangerouslySetInnerHTML={{__html:props.note.markdown }}></div>
-				) : (
-				<div>
-					<div className="btn-group mb-3">
-						<a onClick={() => editNote(props.note.folder, props.note.name)} className="btn btn-outline-success"><i className={'bi bi-' + (saved ? 'check-lg' : 'save2')}></i></a>
-						<a className="btn btn-outline-secondary"><i className="bi bi-type-bold"></i></a>
-						<a className="btn btn-outline-secondary"><i className="bi bi-type-italic"></i></a>
-						<a className="btn btn-outline-secondary"><i className="bi bi-link"></i></a>
-						<a className="btn btn-outline-secondary"><i className="bi bi-type"></i></a>
-						<a className="btn btn-outline-secondary"><i className="bi bi-clock"></i></a>
-						<a className="btn btn-outline-secondary"><i className="bi bi-code"></i></a>
-						<a className="btn btn-outline-secondary"><i className="bi bi-image"></i></a>
-						<a className="btn btn-outline-secondary"><i className="bi bi-type-h1"></i></a>
-					</div>
-					<textarea id="content" className="form-control" rows="20" defaultValue={props.note.text}></textarea>
-				</div>
-				)}
-		</div>
-		);
-}
-
 function Layout() {
 	const [folders, setFolders] = React.useState([]);
 	const [selectedFolder, setSelectedFolder] = React.useState([]);
 	const [selectedNote, setSelectedNote] = React.useState([]);
+
+	const [mode, setMode] = React.useState('view');
+	const [saved, setSaved] = React.useState(false);
+	const [fullscreen, setFullscreen] = React.useState(false);
 
 	React.useEffect(() => {
 		$.get('/get_folders', function(data) {
@@ -106,6 +51,7 @@ function Layout() {
 			name: $('#new-folder-name').val()
 		}, function(data) {
 			setSelectedFolder(data);
+			$('#new-folder-name').val('');
 		});
 	}
 
@@ -134,6 +80,27 @@ function Layout() {
 			name: $('#new-note-name').val()
 		}, function(data) {
 			setSelectedNote(data);
+			$('#new-note-name').val('');
+		});
+	}
+
+	const getNote = (folder, name) => {
+		$.get('/get_note', {
+			folder: folder,
+			name: name
+		}, function(data) {
+			setSelectedNote(data);
+		});
+	}
+
+	const editNote = () => {
+		$.post('/edit_note', {
+			folder: selectedNote.folder,
+			name: selectedNote.name,
+			content: $('#content').val()
+		}, function (data) {
+			setSaved(true);
+			setTimeout(function() { setSaved(false); }, 1500);
 		});
 	}
 
@@ -145,6 +112,20 @@ function Layout() {
 			setSelectedFolder(data);
 			setSelectedNote([]);
 		});
+	}
+
+	const toggleFullscreen = () => {
+		if (fullscreen) {
+			$('#folders, #folder').hide();
+			$('#note').addClass('col-12');
+			$('#note').removeClass('col-7');
+			setFullscreen(!fullscreen);
+		} else {
+			$('#folders, #folder').show();
+			$('#note').removeClass('col-12');
+			$('#note').addClass('col-7');
+			setFullscreen(!fullscreen);
+		}
 	}
 
 	return (
@@ -183,7 +164,7 @@ function Layout() {
 							</form>
 							{selectedFolder.notes.map((x, id) => (
 							<div className={'px-3 py-1 text-truncate rounded' + (x.name === selectedNote.name ? ' selected' : '')}>
-								<a onClick={() => setSelectedNote(x)}>
+								<a onClick={() => getNote(x.folder, x.name)}>
 									<div className="heading">{x.stem}</div>
 								</a>
 							</div>
@@ -203,7 +184,31 @@ function Layout() {
 								<a onClick={() => $('#delete-note').toggle()} className="btn btn-outline-danger"><i className="bi bi-trash2"></i> Delete</a>
 								<a onClick={() => deleteNote()} id="delete-note" style={{ display: 'none' }} className="btn btn-outline-danger">Delete?</a>
 							</div>
-							<Editor note={selectedNote}/>
+							<div>
+								<div><a className="btn btn-sm" style={{ color:'inherit' }} onClick={() => toggleFullscreen()}><i className={'bi bi-fullscreen'}></i> Toggle Fullscreen</a></div>
+								<div className="btn-group btn-group-sm mb-3 col-4 offset-4">
+									<a onClick={() => setMode('view')} className={'btn btn-outline-secondary' + (mode === 'view' ? ' active' : '')}><i className="bi bi-eye"></i> View</a>
+									<a onClick={() => setMode('edit')} className={'btn btn-outline-secondary' + (mode === 'edit' ? ' active' : '')}><i className="bi bi-pen"></i> Edit</a>
+								</div>
+								{mode === 'view' ? (
+									<div dangerouslySetInnerHTML={{__html:selectedNote.markdown }}></div>
+									) : (
+									<div>
+										<div className="btn-group mb-3">
+											<a onClick={() => editNote(selectedNote.folder, selectedNote.name)} className="btn btn-outline-success"><i className={'bi bi-' + (saved ? 'check-lg' : 'save2')}></i></a>
+											<a className="btn btn-outline-secondary"><i className="bi bi-type-bold"></i></a>
+											<a className="btn btn-outline-secondary"><i className="bi bi-type-italic"></i></a>
+											<a className="btn btn-outline-secondary"><i className="bi bi-link"></i></a>
+											<a className="btn btn-outline-secondary"><i className="bi bi-type"></i></a>
+											<a className="btn btn-outline-secondary"><i className="bi bi-clock"></i></a>
+											<a className="btn btn-outline-secondary"><i className="bi bi-code"></i></a>
+											<a className="btn btn-outline-secondary"><i className="bi bi-image"></i></a>
+											<a className="btn btn-outline-secondary"><i className="bi bi-type-h1"></i></a>
+										</div>
+										<textarea id="content" className="form-control" rows="20" defaultValue={selectedNote.text}></textarea>
+									</div>
+									)}
+							</div>
 						</div>
 						)}
 				</div>
