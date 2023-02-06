@@ -2,3 +2,4 @@
 MarkdownLab.egg-info/
 *.pyc
 .DS_Store
+todos.json

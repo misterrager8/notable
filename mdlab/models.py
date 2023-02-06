@@ -54,6 +54,11 @@ class Folder(object):
         """Delete this Folder."""
         shutil.rmtree(self.path)
 
+    def to_dict(self):
+        return dict(
+            name=self.name, path=str(self.path), notes=[i.to_dict() for i in self.notes]
+        )
+
 
 class Note(object):
     """File with .md file extension.
@@ -193,6 +198,19 @@ class Note(object):
         if self.favorited:
             self.toggle_favorite()
         self.path.unlink()
+
+    def to_dict(self):
+        return dict(
+            path=str(self.path),
+            name=self.name,
+            favorited=self.favorited,
+            stem=self.stem,
+            folder=self.folder.name,
+            text=self.text,
+            markdown=self.markdown,
+            date_created=self.date_created.strftime("%-m-%-d-%Y @ %I:%M %p"),
+            last_modified=self.last_modified.strftime("%-m-%-d-%Y @ %I:%M %p"),
+        )
 
 
 class Memo(object):

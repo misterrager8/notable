@@ -7,9 +7,24 @@ from mdlab import config
 from mdlab.models import Folder, Memo, Note
 
 
-@current_app.context_processor
+@current_app.route("/get_folders")
 def get_folders():
-    return dict(folders=Folder.all())
+    return dict(folders=[i.to_dict() for i in Folder.all()])
+
+
+@current_app.route("/get_folder")
+def get_folder():
+    folder_ = Folder(config.HOME_DIR / request.args.get("name"))
+    return folder_.to_dict()
+
+
+@current_app.route("/get_note")
+def get_note():
+    note_ = Note(
+        config.HOME_DIR / request.args.get("folder") / request.args.get("name")
+    )
+
+    return note_.to_dict()
 
 
 @current_app.context_processor

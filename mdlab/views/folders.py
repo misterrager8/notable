@@ -11,7 +11,7 @@ def create_folder():
     folder_ = Folder(config.HOME_DIR / request.form.get("name"))
     folder_.create()
 
-    return redirect(url_for("folders.folder", name=folder_.name))
+    return folder_.to_dict()
 
 
 @folders.route("/folder")
@@ -34,4 +34,4 @@ def delete_folder():
     folder_ = Folder(config.HOME_DIR / request.args.get("name"))
     folder_.delete()
 
-    return redirect(url_for("index"))
+    return dict(folders=[i.to_dict() for i in Folder.all()])

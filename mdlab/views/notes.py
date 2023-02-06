@@ -14,10 +14,10 @@ def create_note():
         request.form.get("name")
         or f"Note #{datetime.datetime.now().strftime('%y%m%d%H%M%S')}"
     )
-    note_ = Note(config.HOME_DIR / request.args.get("folder") / f"{name_}.md")
+    note_ = Note(config.HOME_DIR / request.form.get("folder") / f"{name_}.md")
     note_.create()
 
-    return redirect(url_for("notes.note", folder=note_.folder.name, name=note_.name))
+    return note_.to_dict()
 
 
 @notes.route("/note")
@@ -76,10 +76,10 @@ def delete_note():
     note_ = Note(
         config.HOME_DIR / request.args.get("folder") / request.args.get("name")
     )
-    folder_ = note_.folder.name
+    folder_ = note_.folder
     note_.delete()
 
-    return redirect(url_for("folders.folder", name=folder_))
+    return folder_.to_dict()
 
 
 @notes.route("/toggle_favorite")
