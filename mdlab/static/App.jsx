@@ -84,12 +84,26 @@ function Layout() {
 		});
 	}
 
+	const saveNote = (e) => {
+		e.preventDefault();
+		$.post('/save_note', {
+			folder: selectedFolder.name,
+			url: $('#url').val()
+		}, function(data) {
+			setSelectedNote(data);
+			$('#url').val('');
+		});
+	}
+
 	const getNote = (folder, name) => {
 		$.get('/get_note', {
 			folder: folder,
 			name: name
 		}, function(data) {
 			setSelectedNote(data);
+			if (mode === 'edit') {
+				$('#content').val(selectedNote.text);
+			}
 		});
 	}
 
@@ -99,6 +113,7 @@ function Layout() {
 			name: selectedNote.name,
 			content: $('#content').val()
 		}, function (data) {
+			setSelectedNote(data);
 			setSaved(true);
 			setTimeout(function() { setSaved(false); }, 1500);
 		});
@@ -162,6 +177,9 @@ function Layout() {
 							<form className="input-group input-group-sm mb-3" onSubmit={(e) => createNote(e)}>
 								<input autoComplete="off" className="form-control border-success" placeholder="New Note" id="new-note-name" />
 							</form>
+							<form className="input-group input-group-sm mb-3" onSubmit={(e) => saveNote(e)}>
+								<input autoComplete="off" className="form-control border-success" placeholder="Save Page" id="url" />
+							</form>
 							{selectedFolder.notes.map((x, id) => (
 							<div className={'px-3 py-1 text-truncate rounded' + (x.name === selectedNote.name ? ' selected' : '')}>
 								<a onClick={() => getNote(x.folder, x.name)}>
@@ -191,7 +209,7 @@ function Layout() {
 									<a onClick={() => setMode('edit')} className={'btn btn-outline-secondary' + (mode === 'edit' ? ' active' : '')}><i className="bi bi-pen"></i> Edit</a>
 								</div>
 								{mode === 'view' ? (
-									<div dangerouslySetInnerHTML={{__html:selectedNote.markdown }}></div>
+									<div id="note-reader" dangerouslySetInnerHTML={{__html:selectedNote.markdown }}></div>
 									) : (
 									<div>
 										<div className="btn-group mb-3">

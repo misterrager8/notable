@@ -1,5 +1,8 @@
 import datetime
 
+import html2text
+import requests
+from bs4 import BeautifulSoup
 from flask import Blueprint, redirect, render_template, request, url_for
 
 from mdlab import config
@@ -16,6 +19,18 @@ def create_note():
     )
     note_ = Note(config.HOME_DIR / request.form.get("folder") / f"{name_}.md")
     note_.create()
+
+    return note_.to_dict()
+
+
+@notes.post("/save_note")
+def save_note():
+    soup = BeautifulSoup(requests.get(request.form.get("url")).text, "html.parser")
+    title = soup.find("title").get_text()
+
+    note_ = Note(config.HOME_DIR / request.form.get("folder") / f"{title}.md")
+    note_.create()
+    note_.edit(html2text.html2text(str(soup)))
 
     return note_.to_dict()
 
@@ -50,7 +65,7 @@ def edit_note():
     )
     note_.edit(request.form.get("content"))
 
-    return redirect(request.referrer)
+    return note_.to_dict()
 
 
 @notes.route("/rename_note", methods=["POST"])

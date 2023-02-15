@@ -72,3 +72,21 @@ a, a:hover {
 	color: inherit !important;
 	opacity: 50% !important;
 }
+
+div#note-reader img {
+	width: 100%;
+}
+
+div#note-reader a:not(.btn) {
+	text-decoration: underline;
+}
+
+div#note-reader pre {
+	border-left: 2px solid;
+	margin-left: 2em;
+	padding-left: 2em;
+}
+
+div#note-reader code {
+	opacity: 85%;
+}
