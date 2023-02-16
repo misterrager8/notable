@@ -6,12 +6,6 @@ def create_app(config):
     app.config.from_object(config)
 
     with app.app_context():
-        from mdlab.views.folders import folders
-        from mdlab.views.memos import memos
-        from mdlab.views.notes import notes
-
-        app.register_blueprint(folders)
-        app.register_blueprint(notes)
-        app.register_blueprint(memos)
+        from . import api
 
         return app

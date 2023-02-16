@@ -63,9 +63,14 @@ a, a:hover {
 	color: darkorange;
 }
 
-.btn-outline-warning:hover {
+.text-warning {
+	color: darkorange !important;
+}
+
+.btn-outline-warning:hover, .btn-warning {
 	background-color: darkorange;
-	color: inherit;
+	border-color: darkorange;
+/*	color: inherit;*/
 }
 
 ::placeholder {
@@ -89,4 +94,8 @@ div#note-reader pre {
 
 div#note-reader code {
 	opacity: 85%;
+}
+
+.folder-card {
+	border-bottom: 1px solid;
 }

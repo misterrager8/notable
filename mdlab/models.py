@@ -209,7 +209,7 @@ class Note(object):
             text=self.text,
             markdown=self.markdown,
             date_created=self.date_created.strftime("%-m-%-d-%Y @ %I:%M %p"),
-            last_modified=self.last_modified.strftime("%-m-%-d-%Y @ %I:%M %p"),
+            last_modified=self.last_modified.strftime("%-m/%-d/%y"),
         )
 
 
