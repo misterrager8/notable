@@ -1,5 +1,8 @@
 import datetime
 
+import html2text
+import requests
+from bs4 import BeautifulSoup
 from flask import current_app, render_template, request
 
 from . import config
@@ -68,6 +71,18 @@ def create_note():
         / f"Untitled Note {datetime.datetime.now().strftime('%m%d%y%I%M%p')}.md"
     )
     note_.create()
+
+    return dict(note=note_.to_dict(), folder=note_.folder.to_dict())
+
+
+@current_app.post("/save_note")
+def save_note():
+    soup = BeautifulSoup(requests.get(request.form.get("url")).text, "html.parser")
+    title = soup.find("title").get_text()
+
+    note_ = Note(config.HOME_DIR / request.form.get("folder") / f"{title}.md")
+    note_.create()
+    note_.edit(html2text.html2text(str(soup)))
 
     return dict(note=note_.to_dict(), folder=note_.folder.to_dict())
 

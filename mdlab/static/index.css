@@ -33,7 +33,7 @@ html[data-theme='lavender'] {
 	--primary-txt: #edd1ff;
 }
 
-body, .form-control, .form-control:focus, .dropdown-item, .dropdown-menu, .btn-outline-secondary {
+body, .form-control, .form-control:focus, .dropdown-item, .dropdown-menu, .btn-outline-secondary, .modal-content {
 	background-color: var(--primary-bg);
 	color: var(--primary-txt);
 }
