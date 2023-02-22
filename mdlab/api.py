@@ -4,6 +4,7 @@ import html2text
 import requests
 from bs4 import BeautifulSoup
 from flask import current_app, render_template, request
+from readability import Document
 
 from . import config
 from .models import Folder, Note
@@ -77,12 +78,13 @@ def create_note():
 
 @current_app.post("/save_note")
 def save_note():
-    soup = BeautifulSoup(requests.get(request.form.get("url")).text, "html.parser")
-    title = soup.find("title").get_text()
+    document = Document(requests.get(request.form.get("url")).text)
+    title = document.short_title()
+    parsed_html = BeautifulSoup(document.summary(), "html.parser")
 
     note_ = Note(config.HOME_DIR / request.form.get("folder") / f"{title}.md")
     note_.create()
-    note_.edit(html2text.html2text(str(soup)))
+    note_.edit(html2text.html2text(str(parsed_html), bodywidth=0))
 
     return dict(note=note_.to_dict(), folder=note_.folder.to_dict())
 
