@@ -95,17 +95,17 @@ class Note(object):
             query (str): the string to search for
 
         Returns:
-            list: SearchResult objects
+            list: Notes
         """
         return [
-            SearchResult(Path(i.split(":")[0]), "".join(i.split(":")[1:]))
+            Note(Path(i))
             for i in subprocess.run(
-                ["grep", "-r", query, config.HOME_DIR],
+                ["grep", "-rl", query, config.HOME_DIR],
                 cwd=config.HOME_DIR,
                 capture_output=True,
                 text=True,
             ).stdout.split("\n")
-            if i
+            if i.endswith(".md")
         ]
 
     @classmethod

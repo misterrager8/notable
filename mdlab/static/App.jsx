@@ -51,16 +51,14 @@ function NoteItem(props) {
 }
 
 function App() {
-	const [showFolders, setShowFolders] = React.useState(true);
+	const [showFolders, setShowFolders] = React.useState(localStorage.getItem('show-folders')==='true');
 	const [loading, setLoading] = React.useState(false);
 
 	const [folders, setFolders] = React.useState([]);
-
-	const [favorites, setFavorites] = React.useState([]);
-	const [showFavorites, setShowFavorites] = React.useState(false);
-
 	const [folder, setFolder] = React.useState([]);
+
 	const [note, setNote] = React.useState([]);
+	const [notes, setNotes] = React.useState([]);
 
 	const [deletingNote, setDeletingNote] = React.useState(false);
 	const [deletingFolder, setDeletingFolder] = React.useState(false);
@@ -82,9 +80,10 @@ function App() {
 	}
 
 	const getFavorites = () => {
+		setFolder([]);
 		setLoading(true);
 		$.get('/get_favorites', function(data) {
-			setFavorites(data.favs);
+			setNotes(data.favs);
 			setLoading(false);
 		});
 	}
@@ -106,7 +105,7 @@ function App() {
 			name: name
 		}, function(data) {
 			setFolder(data);
-			// setNote([]);
+			setNote([]);
 			localStorage.setItem('last-folder-opened', data.name);
 			setLoading(false);
 		});
@@ -172,7 +171,6 @@ function App() {
 			name: name
 		}, function(data) {
 			setNote(data);
-			localStorage.setItem('last-note-opened', data.name);
 			setLoading(false);
 		});
 	}
@@ -188,6 +186,18 @@ function App() {
 			setSaved(true);
 			setLoading(false);
 			setTimeout(function() { setSaved(false); }, 1500);
+		});
+	}
+
+	const searchNotes = (e) => {
+		e.preventDefault();
+		setLoading(true);
+		setFolder([]);
+		$.post('/search', {
+			query: $('#query').val()
+		}, function(data) {
+			setNotes(data.results);
+			setLoading(false);
 		});
 	}
 
@@ -212,7 +222,6 @@ function App() {
 			name: note.name
 		}, function(data) {
 			getNote(note.folder, note.name);
-			getFavorites();
 			setLoading(false);
 		});
 	}
@@ -278,10 +287,16 @@ function App() {
 
 	React.useEffect(() => {
 		getFolders();
-		getFavorites();
 		getFolder(localStorage.getItem('last-folder-opened'));
-		getNote(localStorage.getItem('last-folder-opened'), localStorage.getItem('last-note-opened'));
 	}, []);
+
+	React.useEffect(() => {
+		setNotes(folder.notes ? folder.notes : []);
+	}, [folder]);
+
+	React.useEffect(() => {
+		localStorage.setItem('show-folders', showFolders ? 'true' : 'false');
+	}, [showFolders]);
 
 	return (
 		<div className="p-4">
@@ -290,7 +305,6 @@ function App() {
 				{loading && <span className="btn text-secondary"><span className="spinner-border spinner-border-sm"></span></span>}
 				<a className="btn btn-outline-secondary" onClick={() => setShowFolders(!showFolders)} ><i className="bi bi-layout-sidebar-inset"></i> {(showFolders ? 'Hide ' : 'Show ') + 'Folders'}</a>
 				{folder.length !== 0 && (<a data-bs-toggle="dropdown" data-bs-target="#new" className="btn btn-outline-success dropdown-toggle"><i className="bi bi-plus-lg"></i> New</a>)}
-				
 				<div id="new" className="dropdown-menu text-center">
 					<a onClick={() => createNote()} className="dropdown-item small">Note</a>
 					<a data-bs-toggle="modal" data-bs-target="#save-note" className="dropdown-item small">Page</a>
@@ -305,7 +319,6 @@ function App() {
 						</div>
 					</div>
 				</div>
-				
 				{note.length !== 0 && <a onClick={() => toggleFavorite()} className={'btn btn-' + (!note.favorited ? 'outline-' : '') + 'warning'}><i className="bi bi-star"></i> {'Favorite' + (note.favorited ? 'd' : '')}</a>}
 				{note.length !== 0 && <a onClick={() => setDeletingNote(!deletingNote)} className="btn btn-outline-danger"><i className="bi bi-trash2"></i> Delete Note</a>}
 				{(note.length !== 0 && deletingNote) && <a onClick={() => deleteNote()} className="btn text-danger">Delete?</a>}
@@ -313,31 +326,33 @@ function App() {
 			<div className="row">
 				{(folders.length !== 0 && showFolders) &&
 				<div className="col-2">
-					<div className={'px-3 py-1 text-truncate rounded text-warning mb-2'}>
-						<a onClick={() => setFolder([])} className="heading"><i className="bi bi-star-fill"></i> Favorites</a>
+					<div className={'px-3 py-1 text-truncate rounded text-warning'}>
+						<a onClick={() => getFavorites()} className="heading"><i className="bi bi-star-fill"></i> Favorites</a>
 					</div>
-					{folders.map((x, id) => <FolderItem folder={x} key={id} selected={folder.name} fn={getFolder}/> )}
+					<form onSubmit={(e) => searchNotes(e)} className="input-group input-group-sm my-3">
+						<input autoComplete="off" className="form-control" placeholder="Search Notes" id="query" required/>
+						<button type="submit" className="btn btn-outline-primary"><i className="bi bi-search"></i></button>
+					</form>
+					{folders.map((x, id) => <FolderItem folder={x} key={id} selected={folder.name} fn={getFolder}/>)}
 					<div className={'px-3 py-1 text-truncate rounded text-success mt-2 fst-italic'}>
 						<a onClick={() => createFolder()} className="heading"><i className="bi bi-plus-circle"></i> New Folder</a>
 					</div>
 				</div>}
-				{folder.length !== 0 ? (
 				<div className="col-2">
+					{folder.length !== 0 && 
 					<div className={'folder-card px-3 py-2 text-truncate text-center mb-2'}>
 						<form onSubmit={(e) => renameFolder(e)} className="input-group">
 							<span className="text-secondary me-3"><i className="bi bi-folder"></i></span>
 							<input autoComplete="off" id="folder-name" defaultValue={folder.name} key={folder.name} className="form-control border-0 p-0 small heading"/>
 						</form>
-					</div>
-					{folder.notes.map((x, id) => <NoteItem note={x} key={id} selected={note.stem} fn={getNote}/> )}
+					</div>}
+					{notes.map((x, id) => <NoteItem note={x} key={id} selected={note.stem} fn={getNote}/>)}
+					{folder.length !== 0 && 
 					<div className={'folder-card px-3 py-2 text-truncate text-danger text-center mt-2'}>
 						<a onClick={() => setDeletingFolder(!deletingFolder)} className="small heading">Delete {folder.name}</a><br/>
 						{deletingFolder && <a onClick={() => deleteFolder()} className="btn btn-sm btn-outline-danger w-100 my-2">Delete?</a>}
-					</div>
+					</div>}
 				</div>
-				) : (
-					<div className="col-2">{favorites.map((x, id) => <NoteItem note={x} key={id} selected={note.stem} fn={getNote}/> )}</div>
-				)}
 				{note.length !== 0 &&
 				<div className={'col-' + (showFolders ? '8' : '10')}>
 					<div className="text-center small fw-light mb-2">Last Modified: {note.last_modified}</div>

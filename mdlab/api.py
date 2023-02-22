@@ -150,3 +150,8 @@ def delete_note():
 @current_app.get("/")
 def index():
     return render_template("index.html")
+
+
+@current_app.post("/search")
+def search():
+    return dict(results=[i.to_dict() for i in Note.search(request.form.get("query"))])
