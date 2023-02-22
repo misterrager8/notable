@@ -22,12 +22,12 @@ function Navbar(props) {
 				<div id="themes" className="dropdown-menu text-center">
 					{theme !== 'light' && <a onClick={() => changeTheme('light')} className="small dropdown-item text-capitalize">light</a>}
 					{theme !== 'dark' && <a onClick={() => changeTheme('dark')} className="small dropdown-item text-capitalize">dark</a>}
-					{theme !== 'teal' && <a onClick={() => changeTheme('teal')} className="small dropdown-item text-capitalize">teal</a>}
-					{theme !== 'strawberry' && <a onClick={() => changeTheme('strawberry')} className="small dropdown-item text-capitalize">strawberry</a>}
-					{theme !== 'manila' && <a onClick={() => changeTheme('manila')} className="small dropdown-item text-capitalize">manila</a>}
-					{theme !== 'forest' && <a onClick={() => changeTheme('forest')} className="small dropdown-item text-capitalize">forest</a>}
-					{theme !== 'lavender' && <a onClick={() => changeTheme('lavender')} className="small dropdown-item text-capitalize">lavender</a>}
+					{theme !== 'ocean' && <a onClick={() => changeTheme('ocean')} className="small dropdown-item text-capitalize">ocean</a>}
+					{theme !== 'seashell' && <a onClick={() => changeTheme('seashell')} className="small dropdown-item text-capitalize">seashell</a>}
+					{theme !== 'vanilla' && <a onClick={() => changeTheme('vanilla')} className="small dropdown-item text-capitalize">vanilla</a>}
+					{theme !== 'mint' && <a onClick={() => changeTheme('mint')} className="small dropdown-item text-capitalize">mint</a>}
 				</div>
+				<a target="_blank" href="https://github.com/misterrager8/Markdown-Lab/" className="btn btn-outline-secondary"><i className="bi bi-info-circle"></i> About</a>
 			</div>
 		</div>
 		);
@@ -55,6 +55,10 @@ function App() {
 	const [loading, setLoading] = React.useState(false);
 
 	const [folders, setFolders] = React.useState([]);
+
+	const [favorites, setFavorites] = React.useState([]);
+	const [showFavorites, setShowFavorites] = React.useState(false);
+
 	const [folder, setFolder] = React.useState([]);
 	const [note, setNote] = React.useState([]);
 
@@ -73,6 +77,14 @@ function App() {
 		setLoading(true);
 		$.get('/get_folders', function(data) {
 			setFolders(data.folders);
+			setLoading(false);
+		});
+	}
+
+	const getFavorites = () => {
+		setLoading(true);
+		$.get('/get_favorites', function(data) {
+			setFavorites(data.favs);
 			setLoading(false);
 		});
 	}
@@ -200,6 +212,7 @@ function App() {
 			name: note.name
 		}, function(data) {
 			getNote(note.folder, note.name);
+			getFavorites();
 			setLoading(false);
 		});
 	}
@@ -236,7 +249,7 @@ function App() {
 				var newMid = `${beforeSel}[${mid}](url)${afterSel}`;
 				break;
 			case 'heading':
-				var newMid = `${beforeSel}# ${mid}${afterSel}`;
+				var newMid = `${beforeSel}<h2 id="">${mid}</h2>${afterSel}`;
 				break;
 			case 'numlist':
 				var newMid = `${beforeSel}\n1. ${mid}\n${afterSel}`;
@@ -265,6 +278,7 @@ function App() {
 
 	React.useEffect(() => {
 		getFolders();
+		getFavorites();
 		getFolder(localStorage.getItem('last-folder-opened'));
 		getNote(localStorage.getItem('last-folder-opened'), localStorage.getItem('last-note-opened'));
 	}, []);
@@ -300,14 +314,14 @@ function App() {
 				{(folders.length !== 0 && showFolders) &&
 				<div className="col-2">
 					<div className={'px-3 py-1 text-truncate rounded text-warning mb-2'}>
-						<a className="heading"><i className="bi bi-star-fill"></i> Favorites</a>
+						<a onClick={() => setFolder([])} className="heading"><i className="bi bi-star-fill"></i> Favorites</a>
 					</div>
 					{folders.map((x, id) => <FolderItem folder={x} key={id} selected={folder.name} fn={getFolder}/> )}
 					<div className={'px-3 py-1 text-truncate rounded text-success mt-2 fst-italic'}>
 						<a onClick={() => createFolder()} className="heading"><i className="bi bi-plus-circle"></i> New Folder</a>
 					</div>
 				</div>}
-				{folder.length !== 0 &&
+				{folder.length !== 0 ? (
 				<div className="col-2">
 					<div className={'folder-card px-3 py-2 text-truncate text-center mb-2'}>
 						<form onSubmit={(e) => renameFolder(e)} className="input-group">
@@ -320,7 +334,10 @@ function App() {
 						<a onClick={() => setDeletingFolder(!deletingFolder)} className="small heading">Delete {folder.name}</a><br/>
 						{deletingFolder && <a onClick={() => deleteFolder()} className="btn btn-sm btn-outline-danger w-100 my-2">Delete?</a>}
 					</div>
-				</div>}
+				</div>
+				) : (
+					<div className="col-2">{favorites.map((x, id) => <NoteItem note={x} key={id} selected={note.stem} fn={getNote}/> )}</div>
+				)}
 				{note.length !== 0 &&
 				<div className={'col-' + (showFolders ? '8' : '10')}>
 					<div className="text-center small fw-light mb-2">Last Modified: {note.last_modified}</div>
@@ -342,6 +359,8 @@ function App() {
 							<a onClick={() => formatText('heading')} className="btn btn-outline-secondary"><i className="bi bi-type-h1"></i></a>
 							<a onClick={() => formatText('code')} className="btn btn-outline-secondary"><i className="bi bi-code"></i></a>
 							<a onClick={() => formatText('time')} className="btn btn-outline-secondary"><i className="bi bi-clock"></i></a>
+							<a onClick={() => formatText('image')} className="btn btn-outline-secondary"><i className="bi bi-card-image"></i></a>
+							<a onClick={() => formatText('hrule')} className="btn btn-outline-secondary"><i className="bi bi-file-break"></i></a>
 						</span>}
 					</div>
 					{mode === 'view' ? (

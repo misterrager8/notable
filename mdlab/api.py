@@ -35,6 +35,11 @@ def get_folder():
     return folder_.to_dict()
 
 
+@current_app.get("/get_favorites")
+def get_favorites():
+    return dict(favs=[i.to_dict() for i in Note.favorites()])
+
+
 @current_app.post("/rename_folder")
 def rename_folder():
     folder_ = Folder(config.HOME_DIR / request.form.get("folder"))

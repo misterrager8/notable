@@ -8,29 +8,24 @@ html[data-theme='dark'] {
 	--primary-txt: #cccccc;
 }
 
-html[data-theme='teal'] {
-	--primary-bg: #0D5D56;
-	--primary-txt: #DBFAF7;
+html[data-theme='ocean'] {
+	--primary-bg: #b3c6ff;
+	--primary-txt: #242386;
 }
 
-html[data-theme='strawberry'] {
-	--primary-bg: #974e4e;
-	--primary-txt: #f9d7d7;
+html[data-theme='seashell'] {
+	--primary-bg: #ebadad;
+	--primary-txt: #700011;
 }
 
-html[data-theme='manila'] {
-	--primary-bg: #fdd463;
-	--primary-txt: #6a572f;
+html[data-theme='vanilla'] {
+	--primary-bg: #d3b769;
+	--primary-txt: #613d00;
 }
 
-html[data-theme='forest'] {
-	--primary-bg: #2f7938;
-	--primary-txt: #ccffdc;
-}
-
-html[data-theme='lavender'] {
-	--primary-bg: #7b5699;
-	--primary-txt: #edd1ff;
+html[data-theme='mint'] {
+	--primary-bg: #93d68a;
+	--primary-txt: #00382a;
 }
 
 body, .form-control, .form-control:focus, .dropdown-item, .dropdown-menu, .btn-outline-secondary, .modal-content {
