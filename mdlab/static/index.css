@@ -94,3 +94,7 @@ div#note-reader code {
 .folder-card {
 	border-bottom: 1px solid;
 }
+
+.selected {
+	border-radius: 3px;
+}

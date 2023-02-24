@@ -60,6 +60,11 @@ def delete_folder():
 # NOTES
 
 
+@current_app.get("/get_all_notes")
+def get_all_notes():
+    return dict(notes=[i.to_dict() for i in Note.all()])
+
+
 @current_app.get("/get_note")
 def get_note():
     note_ = Note(

@@ -4,6 +4,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
+import frontmatter
 import markdown
 
 from mdlab import config
@@ -144,7 +145,11 @@ class Note(object):
     @property
     def text(self) -> str:
         """str: the plaintext content of this Note."""
-        return open(self.path).read()
+        return frontmatter.load(self.path).content
+
+    @property
+    def metadata_(self):
+        return frontmatter.load(self.path).metadata
 
     @property
     def markdown(self) -> str:
@@ -207,117 +212,8 @@ class Note(object):
             stem=self.stem,
             folder=self.folder.name,
             text=self.text,
+            metadata_=self.metadata_,
             markdown=self.markdown,
             date_created=self.date_created.strftime("%-m-%-d-%Y @ %I:%M %p"),
             last_modified=self.last_modified.strftime("%-m/%-d/%y"),
         )
-
-
-class Memo(object):
-    """File with .txt file extension.
-
-    Attributes:
-        path (Path): full filepath of the Memo. This must be a pathlib Path, not a str
-    """
-
-    def __init__(self, path: Path):
-        self.path = path
-
-    @classmethod
-    def all(cls, sort: str = "last_modified", reverse: bool = True) -> list:
-        """Get all Memos recursively found in your HOME directory.
-
-        Args:
-            sort (str): attributed to sort Memos by. 'last_modified' by default.
-            reverse (bool): sort in descending order. True by default.
-
-        Returns:
-            list: all Memos
-        """
-        return sorted(
-            [
-                Memo(i)
-                for i in config.HOME_DIR.glob("**/*.txt")
-                if i.name != "favorites.txt"
-            ],
-            key=operator.attrgetter(sort),
-            reverse=reverse,
-        )
-
-    @property
-    def name(self) -> str:
-        """str: name of this Memo, containing file extension."""
-        return self.path.name
-
-    @property
-    def stem(self) -> str:
-        """str: name of this Memo, without file extension."""
-        return self.path.stem
-
-    @property
-    def folder(self) -> Folder:
-        """Folder: the folder that contains this Memo."""
-        return Folder(self.path.parent)
-
-    @property
-    def text(self) -> str:
-        """str: the plaintext content of this Memo."""
-        return open(self.path).read()
-
-    @property
-    def date_created(self) -> datetime.datetime:
-        """datetime.datetime: the creation date of this Memo."""
-        return datetime.datetime.fromtimestamp(self.path.stat().st_birthtime)
-
-    @property
-    def last_modified(self) -> datetime.datetime:
-        """datetime.datetime: the last time this Memo was edited."""
-        return datetime.datetime.fromtimestamp(self.path.stat().st_mtime)
-
-    def create(self):
-        """Create a new Memo."""
-        self.path.touch()
-
-    def edit(self, content: str):
-        """Edit this Memo.
-
-        Args:
-            content (str): content of the edited Memo
-        """
-        open(self.path, "w").write(content)
-
-    def rename(self, new_name: Path):
-        """Rename this Memo. Can also be used to move Notes between Folders.
-
-        Args:
-            new_name (Path): new desired filepath of this Memo.
-        """
-        self.path.rename(new_name)
-
-    def publish(self):
-        """Convert this Memo to a Note.
-
-        Returns:
-            Note: the new Note created with this Memo
-        """
-        _ = Note(config.HOME_DIR / self.folder.name / f"{self.stem}.md")
-        _.create()
-        _.edit(self.text)
-        return _
-
-    def delete(self):
-        """Delete this Memo."""
-        self.path.unlink()
-
-
-class SearchResult(object):
-    """Object used for Note search functionality.
-
-    Attributes:
-        path (Path): full filepath of the Folder. This must be a pathlib Path, not a str
-        match (str): segment of the Note where the search query can be found
-    """
-
-    def __init__(self, path: Path, match: str):
-        self.path = path
-        self.match = match

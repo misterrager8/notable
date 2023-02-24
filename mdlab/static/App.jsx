@@ -88,6 +88,15 @@ function App() {
 		});
 	}
 
+	const getAll = () => {
+		setFolder([]);
+		setLoading(true);
+		$.get('/get_all_notes', function(data) {
+			setNotes(data.notes);
+			setLoading(false);
+		});
+	}
+
 	const createFolder = () => {
 		setLoading(true);
 		$.get('/create_folder', function(data) {
@@ -278,6 +287,9 @@ function App() {
 			case 'hrule':
 				var newMid = `${beforeSel}\n---\n${afterSel}`;
 				break;
+			case 'highlight':
+				var newMid = `${beforeSel}<span class="selected">${mid}</span>${afterSel}`;
+				break;
 			case 'code':
 				var newMid = `${beforeSel}\n    ${afterSel}`;
 		}
@@ -333,6 +345,9 @@ function App() {
 						<input autoComplete="off" className="form-control" placeholder="Search Notes" id="query" required/>
 						<button type="submit" className="btn btn-outline-primary"><i className="bi bi-search"></i></button>
 					</form>
+					<div className={'px-3 py-1 text-truncate rounded'}>
+						<a className="heading" onClick={() => getAll()}><i className="bi bi-asterisk"></i> All Notes</a>
+					</div>
 					{folders.map((x, id) => <FolderItem folder={x} key={id} selected={folder.name} fn={getFolder}/>)}
 					<div className={'px-3 py-1 text-truncate rounded text-success mt-2 fst-italic'}>
 						<a onClick={() => createFolder()} className="heading"><i className="bi bi-plus-circle"></i> New Folder</a>
@@ -376,6 +391,7 @@ function App() {
 							<a onClick={() => formatText('time')} className="btn btn-outline-secondary"><i className="bi bi-clock"></i></a>
 							<a onClick={() => formatText('image')} className="btn btn-outline-secondary"><i className="bi bi-card-image"></i></a>
 							<a onClick={() => formatText('hrule')} className="btn btn-outline-secondary"><i className="bi bi-file-break"></i></a>
+							<a onClick={() => formatText('highlight')} className="btn btn-outline-secondary"><i className="bi bi-pencil-fill"></i></a>
 						</span>}
 					</div>
 					{mode === 'view' ? (
