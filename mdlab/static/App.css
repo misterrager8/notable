@@ -28,12 +28,12 @@ html[data-theme='mint'] {
 	--primary-txt: #00382a;
 }
 
-body, .form-control, .form-control:focus, .dropdown-item, .dropdown-menu, .btn-outline-secondary, .modal-content {
+body, nav, .form-control, .form-control:focus, .dropdown-item, .dropdown-menu, .btn-outline-secondary, .modal-content {
 	background-color: var(--primary-bg);
 	color: var(--primary-txt);
 }
 
-.btn-outline-secondary:hover, .dropdown-toggle.show, .selected, .btn.active {
+.btn-outline-secondary:hover, .dropdown-toggle.show, .selected, .btn.active, .dropdown-item:hover, .dropdown-item.active {
 	background-color: var(--primary-txt) !important;
 	border-color: var(--primary-txt) !important;
 	color: var(--primary-bg) !important;
@@ -97,4 +97,8 @@ div#note-reader code {
 
 .selected {
 	border-radius: 3px;
+}
+
+.text-secondary {
+	color: var(--primary-txt) !important;
 }

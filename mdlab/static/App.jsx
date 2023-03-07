@@ -1,7 +1,16 @@
-var beforeSel;
-var afterSel;
+function App() {
+	const [folders, setFolders] = React.useState([]);
+	const [currentFolder, setCurrentFolder] = React.useState([]);
 
-function Navbar(props) {
+	const [notes, setNotes] = React.useState([]);
+	const [currentNote, setCurrentNote] = React.useState([]);
+
+	const [loading, setLoading] = React.useState(false);
+	const [deleting, setDeleting] = React.useState(false);
+	const [saved, setSaved] = React.useState(false);
+
+	const [mode, setMode] = React.useState('view');
+
 	const [theme, setTheme] = React.useState(localStorage.getItem('MarkdownLab'));
 
 	const changeTheme = (theme_) => {
@@ -10,65 +19,25 @@ function Navbar(props) {
 		setTheme(theme_);
 	}
 
-	React.useEffect(() => {
-		changeTheme(theme);
-	}, []);
+	const createFolder = () => {
+		setLoading(true);
+		$.get('/create_folder', function(data) {
+			setCurrentFolder(data);
+			setNotes(data.notes);
+			getFolders();
+			setLoading(false);
+		});
+	}
 
-	return (
-		<div className="d-flex justify-content-between p-2">
-			<div className="btn-group btn-group-sm">
-				<a onClick={() => props.fn()} className="btn btn-outline-secondary"><i className="bi bi-house-fill"></i></a>
-				<a data-bs-target="#themes" data-bs-toggle="dropdown" className="btn btn-outline-secondary dropdown-toggle text-capitalize"><i className="bi bi-paint-bucket"></i> {theme}</a>
-				<div id="themes" className="dropdown-menu text-center">
-					{theme !== 'light' && <a onClick={() => changeTheme('light')} className="small dropdown-item text-capitalize">light</a>}
-					{theme !== 'dark' && <a onClick={() => changeTheme('dark')} className="small dropdown-item text-capitalize">dark</a>}
-					{theme !== 'ocean' && <a onClick={() => changeTheme('ocean')} className="small dropdown-item text-capitalize">ocean</a>}
-					{theme !== 'seashell' && <a onClick={() => changeTheme('seashell')} className="small dropdown-item text-capitalize">seashell</a>}
-					{theme !== 'vanilla' && <a onClick={() => changeTheme('vanilla')} className="small dropdown-item text-capitalize">vanilla</a>}
-					{theme !== 'mint' && <a onClick={() => changeTheme('mint')} className="small dropdown-item text-capitalize">mint</a>}
-				</div>
-				<a target="_blank" href="https://github.com/misterrager8/Markdown-Lab/" className="btn btn-outline-secondary"><i className="bi bi-info-circle"></i> About</a>
-			</div>
-		</div>
-		);
-}
-
-function FolderItem(props) {
-	return (
-		<div className={'px-3 py-1 text-truncate rounded' + (props.folder.name === props.selected ? ' selected' : '')}>
-			<a className="heading" onClick={() => props.fn(props.folder.name)}>{props.folder.name}</a>
-		</div>
-		);
-}
-
-function NoteItem(props) {
-	return (
-		<div className={'folder-card px-3 py-2 text-truncate' + (props.note.stem === props.selected ? ' selected' : '')}>
-			<a title={props.note.stem} className="heading" onClick={() => props.fn(props.note.folder, props.note.name)}>{props.note.stem}</a>
-			<div className="small fw-light">{props.note.last_modified}</div>
-		</div>
-		);
-}
-
-function App() {
-	const [showFolders, setShowFolders] = React.useState(localStorage.getItem('show-folders')==='true');
-	const [loading, setLoading] = React.useState(false);
-
-	const [folders, setFolders] = React.useState([]);
-	const [folder, setFolder] = React.useState([]);
-
-	const [note, setNote] = React.useState([]);
-	const [notes, setNotes] = React.useState([]);
-
-	const [deletingNote, setDeletingNote] = React.useState(false);
-	const [deletingFolder, setDeletingFolder] = React.useState(false);
-	const [saved, setSaved] = React.useState(false);
-
-	const [mode, setMode] = React.useState('view');
-
-	const exitAll = () => {
-		setFolder([]);
-		setNote([]);
+	const getFolder = (name) => {
+		setLoading(true);
+		$.get('/get_folder', {
+			name: name
+		}, function(data) {
+			setCurrentFolder(data);
+			setNotes(data.notes);
+			setLoading(false);
+		});
 	}
 
 	const getFolders = () => {
@@ -80,55 +49,23 @@ function App() {
 	}
 
 	const getFavorites = () => {
-		setFolder([]);
 		setLoading(true);
 		$.get('/get_favorites', function(data) {
+			currentFolder.name !== 'Favorites' && setCurrentFolder({name : 'Favorites'});
 			setNotes(data.favs);
 			setLoading(false);
 		});
 	}
 
-	const getAll = () => {
-		setFolder([]);
-		setLoading(true);
-		$.get('/get_all_notes', function(data) {
-			setNotes(data.notes);
-			setLoading(false);
-		});
-	}
-
-	const createFolder = () => {
-		setLoading(true);
-		$.get('/create_folder', function(data) {
-			setFolder(data);
-			setNote([]);
-			getFolders();
-			setLoading(false);
-			setTimeout(function(){$('#folder-name').select();}, 250);
-		});
-	}
-
-	const getFolder = (name) => {
-		setLoading(true);
-		$.get('/get_folder', {
-			name: name
-		}, function(data) {
-			setFolder(data);
-			setNote([]);
-			localStorage.setItem('last-folder-opened', data.name);
-			setLoading(false);
-		});
-	}
-
 	const renameFolder = (e) => {
-		setLoading(true);
 		e.preventDefault();
+		setLoading(true);
 		$.post('/rename_folder', {
-			folder: folder.name,
+			folder: currentFolder.name,
 			new_name: $('#folder-name').val()
 		}, function(data) {
 			getFolders();
-			setFolder(data);
+			getFolder(data.name);
 			setLoading(false);
 		});
 	}
@@ -136,10 +73,9 @@ function App() {
 	const deleteFolder = () => {
 		setLoading(true);
 		$.get('/delete_folder', {
-			name: folder.name
+			name: currentFolder.name,
 		}, function(data) {
-			setFolder([]);
-			setDeletingFolder(false);
+			setCurrentFolder([]);
 			getFolders();
 			setLoading(false);
 		});
@@ -148,28 +84,22 @@ function App() {
 	const createNote = () => {
 		setLoading(true);
 		$.get('/create_note', {
-			folder: folder.name
+			folder: currentFolder.name
 		}, function(data) {
-			setNote(data.note);
-			setFolder(data.folder);
-			setMode('edit');
+			setCurrentNote(data.note);
 			setLoading(false);
-			setTimeout(function(){$('#note-name').select();}, 250);
 		});
-	}	
+	}
 
 	const saveNote = (e) => {
 		e.preventDefault();
+		setLoading(true);
 		$.post('/save_note', {
-			folder: folder.name,
-			url: $('#url').val()
+			folder: currentFolder.name,
+			url: $('#page-url').val()
 		}, function(data) {
-			setNote(data.note);
-			setFolder(data.folder);
-			setMode('edit');
+			setCurrentNote(data.note);
 			setLoading(false);
-			$('#save-note').modal('toggle'); 
-			setTimeout(function(){$('#note-name').select();}, 250);
 		});
 	}
 
@@ -179,7 +109,21 @@ function App() {
 			folder: folder,
 			name: name
 		}, function(data) {
-			setNote(data);
+			setCurrentNote(data);
+			setLoading(false);
+		});
+	}
+
+	const renameNote = (e) => {
+		e.preventDefault();
+		setLoading(true);
+		$.post('/rename_note', {
+			folder: currentNote.folder,
+			name: currentNote.name,
+			new_name: $('#note-name').val()
+		}, function(data) {
+			getFolder(data.folder.name);
+			setTimeout(function() { getNote(data.note.folder, data.note.name); }, 250);
 			setLoading(false);
 		});
 	}
@@ -187,223 +131,126 @@ function App() {
 	const editNote = () => {
 		setLoading(true);
 		$.post('/edit_note', {
-			folder: note.folder,
-			name: note.name,
+			folder: currentNote.folder,
+			name: currentNote.name,
 			content: $('#content').val()
 		}, function(data) {
-			setNote(data);
+			getNote(currentNote.folder, currentNote.name);
+			setLoading(false);
 			setSaved(true);
-			setLoading(false);
 			setTimeout(function() { setSaved(false); }, 1500);
-		});
-	}
-
-	const searchNotes = (e) => {
-		e.preventDefault();
-		setLoading(true);
-		setFolder([]);
-		$.post('/search', {
-			query: $('#query').val()
-		}, function(data) {
-			setNotes(data.results);
-			setLoading(false);
-		});
-	}
-
-	const renameNote = (e) => {
-		setLoading(true);
-		e.preventDefault();
-		$.post('/rename_note', {
-			folder: note.folder,
-			name: note.name,
-			new_name: $('#note-name').val()
-		}, function(data) {
-			setNote(data.note);
-			setFolder(data.folder);
-			setLoading(false);
 		});
 	}
 
 	const toggleFavorite = () => {
 		setLoading(true);
 		$.get('/toggle_favorite', {
-			folder: note.folder,
-			name: note.name
+			folder: currentNote.folder,
+			name: currentNote.name
 		}, function(data) {
-			getNote(note.folder, note.name);
+			getNote(currentNote.folder, currentNote.name);
+			currentFolder.name === 'Favorites' && getFavorites();
 			setLoading(false);
 		});
 	}
-
+	
 	const deleteNote = () => {
 		setLoading(true);
 		$.get('/delete_note', {
-			folder: note.folder,
-			name: note.name
+			folder: currentNote.folder,
+			name: currentNote.name
 		}, function(data) {
-			getFolder(note.folder);
-			setDeletingNote(false);
+			getFolder(currentFolder.name);
+			setDeleting(false);
 			setLoading(false);
 		});
 	}
 
-	const getSelection = (event) => {
-		var sel = $('#content').val().substring(event.currentTarget.selectionStart, event.currentTarget.selectionEnd);
-		beforeSel = $('#content').val().substring(0, event.currentTarget.selectionStart);
-		afterSel = $('#content').val().substring(event.currentTarget.selectionEnd);
-		$('#format').val(sel);
-	}
-
-	const formatText = (type_) => {
-		var mid = $('#format').val();
-		switch (type_) {
-			case 'bold':
-				var newMid = `${beforeSel}**${mid}**${afterSel}`;
-				break;
-			case 'italic':
-				var newMid = `${beforeSel}*${mid}*${afterSel}`;
-				break;
-			case 'link':
-				var newMid = `${beforeSel}[${mid}](url)${afterSel}`;
-				break;
-			case 'heading':
-				var newMid = `${beforeSel}<h2 id="">${mid}</h2>${afterSel}`;
-				break;
-			case 'numlist':
-				var newMid = `${beforeSel}\n1. ${mid}\n${afterSel}`;
-				break;
-			case 'bullist':
-				var newMid = `${beforeSel}\n- ${mid}\n${afterSel}`;
-				break;
-			case 'time':
-				var newMid = `${beforeSel}${new Date().toLocaleString()}${afterSel}`;
-				break;
-			case 'image':
-				var newMid = `${beforeSel}![${mid}](url)${afterSel}`;
-				break;
-			case 'capitalize':
-				var newMid = `${beforeSel}${mid.toUpperCase()}${afterSel}`;
-				break;
-			case 'hrule':
-				var newMid = `${beforeSel}\n---\n${afterSel}`;
-				break;
-			case 'highlight':
-				var newMid = `${beforeSel}<span class="selected">${mid}</span>${afterSel}`;
-				break;
-			case 'code':
-				var newMid = `${beforeSel}\n    ${afterSel}`;
-		}
-		$('#content').val(newMid);
-		$('#content').trigger('change');
-	}
-
 	React.useEffect(() => {
+		changeTheme(theme);
 		getFolders();
-		getFolder(localStorage.getItem('last-folder-opened'));
 	}, []);
 
 	React.useEffect(() => {
-		setNotes(folder.notes ? folder.notes : []);
-	}, [folder]);
-
-	React.useEffect(() => {
-		localStorage.setItem('show-folders', showFolders ? 'true' : 'false');
-	}, [showFolders]);
+		setCurrentNote([]);
+	}, [currentFolder]);
 
 	return (
 		<div className="p-4">
-			<Navbar fn={exitAll}/>
-			<div className="btn-group btn-group-sm mx-2 py-3">
-				{loading && <span className="btn text-secondary"><span className="spinner-border spinner-border-sm"></span></span>}
-				<a className="btn btn-outline-secondary" onClick={() => setShowFolders(!showFolders)} ><i className="bi bi-layout-sidebar-inset"></i> {(showFolders ? 'Hide ' : 'Show ') + 'Folders'}</a>
-				{folder.length !== 0 && (<a data-bs-toggle="dropdown" data-bs-target="#new" className="btn btn-outline-success dropdown-toggle"><i className="bi bi-plus-lg"></i> New</a>)}
-				<div id="new" className="dropdown-menu text-center">
-					<a onClick={() => createNote()} className="dropdown-item small">Note</a>
-					<a data-bs-toggle="modal" data-bs-target="#save-note" className="dropdown-item small">Page</a>
+			<nav className="py-2 sticky-top">
+				<a onClick={() => setCurrentFolder([])} className="btn btn-sm text-secondary">{loading ? <span className="spinner-border spinner-border-sm"></span> : <i className="bi bi-house"></i>}</a>
+					<a data-bs-target="#themes" data-bs-toggle="dropdown" className="btn btn-sm text-secondary dropdown-toggle text-capitalize"><i className="bi bi-paint-bucket"></i> {theme}</a>
+					<div id="themes" className="dropdown-menu text-center">
+						{theme !== 'light' && <a onClick={() => changeTheme('light')} className="small dropdown-item text-capitalize">light</a>}
+						{theme !== 'dark' && <a onClick={() => changeTheme('dark')} className="small dropdown-item text-capitalize">dark</a>}
+						{theme !== 'ocean' && <a onClick={() => changeTheme('ocean')} className="small dropdown-item text-capitalize">ocean</a>}
+						{theme !== 'seashell' && <a onClick={() => changeTheme('seashell')} className="small dropdown-item text-capitalize">seashell</a>}
+						{theme !== 'vanilla' && <a onClick={() => changeTheme('vanilla')} className="small dropdown-item text-capitalize">vanilla</a>}
+						{theme !== 'mint' && <a onClick={() => changeTheme('mint')} className="small dropdown-item text-capitalize">mint</a>}
+					</div>
+				<a className={'btn btn-sm dropdown-toggle text-' + (currentFolder.name === 'Favorites' ? 'warning' : 'secondary')} data-bs-target="#folders" data-bs-toggle="dropdown"><i className={'bi bi-' + (currentFolder.name === 'Favorites' ? 'star-fill' : 'folder')}></i> {currentFolder.length === 0 ? 'Select Folder' : currentFolder.name}</a>
+				<div className="dropdown-menu" id="folders">
+					<a onClick={() => createFolder()} className="text-center dropdown-item small text-success mb-2"><i className="bi bi-plus-circle"></i> New Folder</a>
+					<a onClick={() => getFavorites()} className={'dropdown-item small text-warning ' + (currentFolder.name === 'Favorites' && 'active')}><i className="bi bi-star-fill"></i> Favorites</a>
+					{folders.map((x, id) => (
+						<a onClick={() => getFolder(x.name)} key={id} className={'dropdown-item small d-flex justify-content-between ' + (x.name === currentFolder.name && 'active')}>
+							<span>{x.name}</span>
+							<span>{x.notes.length}</span>
+						</a>
+					))}
 				</div>
-
-				<div className="modal" id="save-note">
-					<div className="modal-dialog">
-						<div className="modal-content">
-							<form onSubmit={(e) => saveNote(e)}>
-								<input required autoComplete="off" className="form-control form-control-sm" placeholder="URL" id="url"/>
-							</form>
+				{currentFolder.length !== 0  &&
+					<span>
+						<span><i className="bi bi-chevron-right mx-2"></i></span>
+						<a className="btn btn-sm text-secondary dropdown-toggle" data-bs-target="#folders" data-bs-toggle="dropdown"><i className="bi bi-file-earmark"></i> {currentNote.length === 0 ? 'Select Note' : currentNote.stem}</a>
+						<div className="dropdown-menu" id="notes">
+							<form className="m-1" onSubmit={(e) => renameFolder(e)}><input required autoComplete="off" className="form-control form-control-sm" key={currentFolder.name} defaultValue={currentFolder.name} id="folder-name"/></form>
+							<form className="m-1" onSubmit={(e) => saveNote(e)}><input placeholder="Save Note" required autoComplete="off" className="form-control form-control-sm border-primary" id="page-url"/></form>
+							<a onClick={() => createNote()} className="text-center dropdown-item small text-success mb-2"><i className="bi bi-plus-circle"></i> New Note</a>
+							{notes.map((x, id) => (
+								<a onClick={() => getNote(x.folder, x.name)} key={id} className={'dropdown-item small ' + (x.stem === currentNote.stem && 'active')}>{x.stem}</a>
+							))}
+							<a onClick={() => deleteFolder()} className="text-center dropdown-item small text-danger mt-2"><i className="bi bi-x-circle"></i> Delete Folder</a>
 						</div>
-					</div>
-				</div>
-				{note.length !== 0 && <a onClick={() => toggleFavorite()} className={'btn btn-' + (!note.favorited ? 'outline-' : '') + 'warning'}><i className="bi bi-star"></i> {'Favorite' + (note.favorited ? 'd' : '')}</a>}
-				{note.length !== 0 && <a onClick={() => setDeletingNote(!deletingNote)} className="btn btn-outline-danger"><i className="bi bi-trash2"></i> Delete Note</a>}
-				{(note.length !== 0 && deletingNote) && <a onClick={() => deleteNote()} className="btn text-danger">Delete?</a>}
-			</div>
-			<div className="row">
-				{(folders.length !== 0 && showFolders) &&
-				<div className="col-2">
-					<div className={'px-3 py-1 text-truncate rounded text-warning'}>
-						<a onClick={() => getFavorites()} className="heading"><i className="bi bi-star-fill"></i> Favorites</a>
-					</div>
-					<form onSubmit={(e) => searchNotes(e)} className="input-group input-group-sm my-3">
-						<input autoComplete="off" className="form-control" placeholder="Search Notes" id="query" required/>
-						<button type="submit" className="btn btn-outline-primary"><i className="bi bi-search"></i></button>
-					</form>
-					<div className={'px-3 py-1 text-truncate rounded'}>
-						<a className="heading" onClick={() => getAll()}><i className="bi bi-asterisk"></i> All Notes</a>
-					</div>
-					{folders.map((x, id) => <FolderItem folder={x} key={id} selected={folder.name} fn={getFolder}/>)}
-					<div className={'px-3 py-1 text-truncate rounded text-success mt-2 fst-italic'}>
-						<a onClick={() => createFolder()} className="heading"><i className="bi bi-plus-circle"></i> New Folder</a>
-					</div>
-				</div>}
-				<div className="col-2">
-					{folder.length !== 0 && 
-					<div className={'folder-card px-3 py-2 text-truncate text-center mb-2'}>
-						<form onSubmit={(e) => renameFolder(e)} className="input-group">
-							<span className="text-secondary me-3"><i className="bi bi-folder"></i></span>
-							<input autoComplete="off" id="folder-name" defaultValue={folder.name} key={folder.name} className="form-control border-0 p-0 small heading"/>
-						</form>
-					</div>}
-					{notes.map((x, id) => <NoteItem note={x} key={id} selected={note.stem} fn={getNote}/>)}
-					{folder.length !== 0 && 
-					<div className={'folder-card px-3 py-2 text-truncate text-danger text-center mt-2'}>
-						<a onClick={() => setDeletingFolder(!deletingFolder)} className="small heading">Delete {folder.name}</a><br/>
-						{deletingFolder && <a onClick={() => deleteFolder()} className="btn btn-sm btn-outline-danger w-100 my-2">Delete?</a>}
-					</div>}
-				</div>
-				{note.length !== 0 &&
-				<div className={'col-' + (showFolders ? '8' : '10')}>
-					<div className="text-center small fw-light mb-2">Last Modified: {note.last_modified}</div>
-					<form onSubmit={(e) => renameNote(e)}><input key={note.stem} id="note-name" autoComplete="off" className="form-control border-0 fs-2 p-0" defaultValue={note.stem}/></form>
-					<div className="my-3">
-						<span className="btn-group btn-group-sm">
-							<a onClick={() => setMode('view')} className={'btn btn-outline-secondary' + (mode === 'view' ? ' active' : '')}><i className="bi bi-eye"></i> View</a>
-							<a onClick={() => setMode('edit')} className={'btn btn-outline-secondary' + (mode === 'edit' ? ' active' : '')}><i className="bi bi-pen"></i> Edit</a>
-						</span>
+					</span>
+				}
+			</nav>
+			{currentNote.length !== 0 &&
+				<div>
+					<form onSubmit={(e) => renameNote(e)}><input id="note-name" autoComplete="off" className="form-control border-0 p-0 fs-1 text-center my-1" defaultValue={currentNote.stem} key={currentNote.name} /></form>
+					<div className="small fw-light mb-2 text-center">Last Modified: {currentNote.last_modified}</div>
+					<div className="d-flex justify-content-between mb-3">
+						<div className="btn-group btn-group-sm py-1">
+							<a onClick={() => setMode('view')} className={'btn btn-outline-secondary ' + (mode === 'view' && 'active')}><i className="bi bi-eye"></i> View</a>
+							<a onClick={() => setMode('edit')} className={'btn btn-outline-secondary ' + (mode === 'edit' && 'active')}><i className="bi bi-pen"></i> Edit</a>
+							<a onClick={() => toggleFavorite()} className={'btn btn-' + (currentNote.favorited ? 'warning' : 'outline-warning')}><i className="bi bi-star"></i> {'Favorite' + (currentNote.favorited ? 'd' : '')}</a>
+							<a onClick={() => setDeleting(!deleting)} className="btn btn-outline-danger"><i className="bi bi-x-circle"></i> Delete</a>
+							{deleting && <a onClick={() => deleteNote()} className="btn text-danger">Delete?</a>}
+						</div>
 						{mode === 'edit' &&
-						<span className="btn-group mx-3">
-							<a onClick={() => editNote()} className="btn btn-outline-success"><i className={'bi bi-' + (saved ? 'check-lg' : 'save2')}></i></a>
-							<a onClick={() => formatText('bold')} className="btn btn-outline-secondary"><i className="bi bi-type-bold"></i></a>
-							<a onClick={() => formatText('italic')} className="btn btn-outline-secondary"><i className="bi bi-type-italic"></i></a>
-							<a onClick={() => formatText('numlist')} className="btn btn-outline-secondary"><i className="bi bi-list-ol"></i></a>
-							<a onClick={() => formatText('bullist')} className="btn btn-outline-secondary"><i className="bi bi-list-ul"></i></a>
-							<a onClick={() => formatText('link')} className="btn btn-outline-secondary"><i className="bi bi-link"></i></a>
-							<a onClick={() => formatText('capitalize')} className="btn btn-outline-secondary"><i className="bi bi-type"></i></a>
-							<a onClick={() => formatText('heading')} className="btn btn-outline-secondary"><i className="bi bi-type-h1"></i></a>
-							<a onClick={() => formatText('code')} className="btn btn-outline-secondary"><i className="bi bi-code"></i></a>
-							<a onClick={() => formatText('time')} className="btn btn-outline-secondary"><i className="bi bi-clock"></i></a>
-							<a onClick={() => formatText('image')} className="btn btn-outline-secondary"><i className="bi bi-card-image"></i></a>
-							<a onClick={() => formatText('hrule')} className="btn btn-outline-secondary"><i className="bi bi-file-break"></i></a>
-							<a onClick={() => formatText('highlight')} className="btn btn-outline-secondary"><i className="bi bi-pencil-fill"></i></a>
-						</span>}
+							<span className="btn-group">
+								<a className="btn btn-outline-success" onClick={() => editNote()}><i className={'bi bi-' + (saved ? 'check-lg' : 'save2')}></i></a>
+								<a className="btn btn-outline-secondary"><i className="bi bi-type-bold"></i></a>
+								<a className="btn btn-outline-secondary"><i className="bi bi-type-italic"></i></a>
+								<a className="btn btn-outline-secondary"><i className="bi bi-type-h1"></i></a>
+								<a className="btn btn-outline-secondary"><i className="bi bi-type"></i></a>
+								<a className="btn btn-outline-secondary"><i className="bi bi-list-ol"></i></a>
+								<a className="btn btn-outline-secondary"><i className="bi bi-list-ul"></i></a>
+								<a className="btn btn-outline-secondary"><i className="bi bi-clock"></i></a>
+								<a className="btn btn-outline-secondary"><i className="bi bi-link"></i></a>
+								<a className="btn btn-outline-secondary"><i className="bi bi-hr"></i></a>
+								<a className="btn btn-outline-secondary"><i className="bi bi-code"></i></a>
+								<a className="btn btn-outline-secondary"><i className="bi bi-image"></i></a>
+							</span>
+						}
 					</div>
 					{mode === 'view' ? (
-						<div id="note-reader" dangerouslySetInnerHTML={{__html:note.markdown }}></div>
+						<div id="note-reader" dangerouslySetInnerHTML={{__html:currentNote.markdown }}></div>
 					) : (
-						<div>
-							<textarea onSelect={(e) => getSelection(e)} id="content" className="form-control form-control-sm border-0" rows="20" defaultValue={note.text} key={note.text}></textarea>
-							<textarea autocomplete="off" class="invisible" id="format"></textarea>
-						</div>
+						<textarea id="content" className="form-control" rows="20" key={currentNote.stem} defaultValue={currentNote.text}></textarea>
 					)}
-				</div>}
-			</div>
+				</div>
+			}
 		</div>
 		);
 }
