@@ -111,16 +111,12 @@ class Note(object):
 
     @classmethod
     def favorites(cls) -> list:
-        """Get all Note paths found in the favorites.txt file.
+        """Get all Notes that are favorited.
 
         Returns:
             list: Notes that are favorited
         """
-        return [
-            Note(Path(i.strip()))
-            for i in open(config.HOME_DIR / "favorites.txt").readlines()
-            if i.strip()
-        ]
+        return filter(lambda x: x.favorited == True, Note.all())
 
     @property
     def name(self) -> str:
@@ -130,7 +126,7 @@ class Note(object):
     @property
     def favorited(self) -> bool:
         """bool: whether or not this Note is favorited."""
-        return str(self.path) in open(config.HOME_DIR / "favorites.txt").read()
+        return self.frontmatter.metadata["favorited"]
 
     @property
     def stem(self) -> str:
@@ -148,8 +144,14 @@ class Note(object):
         return frontmatter.load(self.path).content
 
     @property
-    def metadata_(self):
-        return frontmatter.load(self.path).metadata
+    def frontmatter(self):
+        _ = frontmatter.load(self.path)
+        if not frontmatter.check(self.path):
+            _.metadata.update({"favorited": False})
+            new_data = frontmatter.dumps(_)
+            open(self.path, "w").write(new_data)
+
+        return _
 
     @property
     def markdown(self) -> str:
@@ -180,13 +182,10 @@ class Note(object):
 
     def toggle_favorite(self):
         """Mark this Note as favorited or not favorited."""
-        favs = open(config.HOME_DIR / "favorites.txt").read()
-        if self.favorited:
-            open((config.HOME_DIR / "favorites.txt"), "w").write(
-                favs.replace(f"{self.path}\n", "")
-            )
-        else:
-            open((config.HOME_DIR / "favorites.txt"), "a").write(f"{self.path}\n")
+        _ = self.frontmatter
+        _.metadata["favorited"] = not self.favorited
+        new_data = frontmatter.dumps(_)
+        open(self.path, "w").write(new_data)
 
     def rename(self, new_name: Path):
         """Rename this Note. Can also be used to move Notes between Folders.
@@ -212,7 +211,7 @@ class Note(object):
             stem=self.stem,
             folder=self.folder.name,
             text=self.text,
-            metadata_=self.metadata_,
+            metadata_=self.frontmatter.metadata,
             markdown=self.markdown,
             date_created=self.date_created.strftime("%-m-%-d-%Y @ %I:%M %p"),
             last_modified=self.last_modified.strftime("%-m/%-d/%y"),
