@@ -31,12 +31,12 @@ class Folder(object):
         return self.path.name
 
     @property
-    def notes(self, sort: str = "last_modified", reverse: bool = True) -> list:
+    def notes(self) -> list:
         """list: Notes found in this Folder."""
         return sorted(
             [Note(i) for i in self.path.iterdir() if i.is_file() and i.suffix == ".md"],
-            key=operator.attrgetter(sort),
-            reverse=reverse,
+            key=lambda y: y.favorited,
+            reverse=True,
         )
 
     def create(self):
@@ -72,20 +72,16 @@ class Note(object):
         self.path = path
 
     @classmethod
-    def all(cls, sort: str = "last_modified", reverse: bool = True) -> list:
+    def all(cls) -> list:
         """Get all Notes recursively found in your HOME directory.
-
-        Args:
-            sort (str): attributed to sort Notes by. 'last_modified' by default.
-            reverse (bool): sort in descending order. True by default.
 
         Returns:
             list: all Notes
         """
         return sorted(
             [Note(i) for i in config.HOME_DIR.glob("**/*.md")],
-            key=operator.attrgetter(sort),
-            reverse=reverse,
+            key=lambda z: z.favorited,
+            reverse=True,
         )
 
     @classmethod
@@ -98,16 +94,7 @@ class Note(object):
         Returns:
             list: Notes
         """
-        return [
-            Note(Path(i))
-            for i in subprocess.run(
-                ["grep", "-rl", query, config.HOME_DIR],
-                cwd=config.HOME_DIR,
-                capture_output=True,
-                text=True,
-            ).stdout.split("\n")
-            if i.endswith(".md")
-        ]
+        return filter(lambda a: query.lower() in a.stem.lower(), Note.all())
 
     @classmethod
     def favorites(cls) -> list:
@@ -178,7 +165,10 @@ class Note(object):
         Args:
             content (str): content of the edited Note
         """
-        open(self.path, "w").write(content)
+        _ = self.frontmatter
+        _.content = content
+        new_data = frontmatter.dumps(_)
+        open(self.path, "w").write(new_data)
 
     def toggle_favorite(self):
         """Mark this Note as favorited or not favorited."""
@@ -211,8 +201,7 @@ class Note(object):
             stem=self.stem,
             folder=self.folder.name,
             text=self.text,
-            metadata_=self.frontmatter.metadata,
             markdown=self.markdown,
-            date_created=self.date_created.strftime("%-m-%-d-%Y @ %I:%M %p"),
-            last_modified=self.last_modified.strftime("%-m/%-d/%y"),
+            date_created=self.date_created.strftime("%B %-d, %Y"),
+            last_modified=self.last_modified.strftime("%-m-%-d-%y @ %I:%M %p"),
         )
