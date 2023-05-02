@@ -110,6 +110,25 @@ function FolderPage() {
     );
   };
 
+  const renameFolder = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    $.post(
+      "/rename_folder",
+      {
+        name: currentFolder.name,
+        new_name: $("#folder-name").val(),
+      },
+      function (data) {
+        setCurrentFolder(data);
+        $.get("/folders", function (data_) {
+          setFolders(data_.folders);
+          setLoading(false);
+        });
+      }
+    );
+  };
+
   const createNote = () => {
     setLoading(true);
     $.get(
@@ -137,7 +156,10 @@ function FolderPage() {
     <>
       {currentFolder.length !== 0 && (
         <>
-          <form className="input-group input-group-lg mb-1">
+          <form
+            onSubmit={(e) => renameFolder(e)}
+            className="input-group input-group-lg mb-1"
+          >
             <a onClick={() => createNote()} className="ps-0 btn text-success">
               <i className="bi bi-filetype-md"></i>
             </a>
@@ -159,6 +181,7 @@ function FolderPage() {
               </a>
             )}
             <input
+              id="folder-name"
               className="form-control border-0 heading p-0"
               autoComplete="off"
               key={currentFolder.name}
@@ -233,6 +256,32 @@ function NotePage() {
     );
   };
 
+  const renameNote = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    $.post(
+      "/rename_note",
+      {
+        folder: currentNote.folder,
+        name: currentNote.name,
+        new_name: $("#note-name").val(),
+        new_suffix: ".md",
+      },
+      function (data) {
+        setCurrentNote(data);
+        $.get(
+          "/folder",
+          {
+            name: data.folder,
+          },
+          function (data_) {
+            setCurrentFolder(data_);
+            setLoading(false);
+          }
+        );
+      }
+    );
+  };
   const editNote = () => {
     $.post(
       "/edit_note",
@@ -255,7 +304,10 @@ function NotePage() {
     <>
       {currentNote.length !== 0 && (
         <>
-          <form className="input-group input-group-lg mb-1">
+          <form
+            onSubmit={(e) => renameNote(e)}
+            className="input-group input-group-lg mb-1"
+          >
             <a
               onClick={() => setMode(mode === "view" ? "edit" : "view")}
               className="btn text-secondary ps-0"
@@ -272,6 +324,7 @@ function NotePage() {
             <input
               className="form-control border-0 heading p-0 fst-italic"
               autoComplete="off"
+              id="note-name"
               key={currentNote.name}
               defaultValue={currentNote.stem}
             />
@@ -328,6 +381,7 @@ function Home() {
   const [currentFolder, setCurrentFolder] =
     React.useContext(CurrentFolderContext);
   const [currentNote, setCurrentNote] = React.useContext(CurrentNoteContext);
+  const [fullscreen, setFullscreen] = React.useState(false);
 
   return (
     <>
@@ -348,10 +402,23 @@ function Home() {
             </a>
           )}
           {currentNote.length !== 0 && (
-            <a className="btn text-secondary">
-              <i className={"me-2 bi bi-chevron-right"}></i>
-              {currentNote.stem}
-            </a>
+            <>
+              <a className="btn text-secondary">
+                <i className={"me-2 bi bi-chevron-right"}></i>
+                {currentNote.stem}
+              </a>
+              <a
+                onClick={() => setFullscreen(!fullscreen)}
+                className="btn text-secondary"
+              >
+                <i
+                  className={
+                    "me-2 bi bi-layout-sidebar-inset" +
+                    (fullscreen ? "" : "-reverse")
+                  }
+                ></i>
+              </a>
+            </>
           )}
         </div>
         <div className="btn-group btn-group-sm">
@@ -372,13 +439,13 @@ function Home() {
       </div>
       <hr />
       <div className="row">
-        <div className="col-2">
+        <div className={fullscreen ? "d-none" : "col-2"}>
           <FolderList />
         </div>
         <div className="col-3">
           <FolderPage />
         </div>
-        <div className="col-7">
+        <div className={fullscreen ? "col-9" : "col-7"}>
           <NotePage />
         </div>
       </div>
