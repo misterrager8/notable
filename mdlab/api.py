@@ -74,8 +74,14 @@ def edit_note():
 @app.post("/rename_note")
 def rename_note():
     note_ = Note(request.form.get("folder"), request.form.get("name"))
+    return note_.rename(f"{request.form.get('new_name')}{note_.path.suffix}").to_dict()
+
+
+@app.get("/switch_extension")
+def switch_extension():
+    note_ = Note(request.args.get("folder"), request.args.get("name"))
     return note_.rename(
-        f"{request.form.get('new_name')}{request.form.get('new_suffix')}"
+        f"{note_.stem}{'.md' if note_.path.suffix == '.txt' else '.txt'}"
     ).to_dict()
 
 

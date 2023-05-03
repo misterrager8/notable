@@ -3,3 +3,4 @@ MarkdownLab.egg-info/
 *.pyc
 .DS_Store
 todos.txt
+.vscode/

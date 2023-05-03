@@ -47,8 +47,7 @@ function FolderList() {
     <>
       <a
         onClick={() => createFolder()}
-        className="btn btn-outline-success w-100 mb-2"
-      >
+        className="btn btn-outline-success w-100 mb-2">
         <i className="me-2 bi bi-folder-plus"></i>New Folder
       </a>
       <hr />
@@ -59,8 +58,7 @@ function FolderList() {
             className={
               "d-block rounded heading text-truncate px-3 py-1 my-1 hover" +
               (currentFolder.name === x.name ? " bg-secondary" : "")
-            }
-          >
+            }>
             {x.name}
           </a>
         ))}
@@ -70,6 +68,7 @@ function FolderList() {
 }
 
 function FolderPage() {
+  const [adding, setAdding] = React.useState(false);
   const [loading, setLoading] = React.useContext(LoadingContext);
   const [folders, setFolders] = React.useContext(FoldersContext);
   const [currentFolder, setCurrentFolder] =
@@ -129,6 +128,33 @@ function FolderPage() {
     );
   };
 
+  const savePage = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    $.post(
+      "/save_page",
+      {
+        folder: currentFolder.name,
+        url: $("#url").val(),
+      },
+      function (data) {
+        setCurrentNote(data);
+        $.get(
+          "/folder",
+          {
+            name: currentFolder.name,
+          },
+          function (data_) {
+            setCurrentFolder(data_);
+            setLoading(false);
+            e.target.reset();
+            setAdding(false);
+          }
+        );
+      }
+    );
+  };
+
   const createNote = () => {
     setLoading(true);
     $.get(
@@ -158,25 +184,24 @@ function FolderPage() {
         <>
           <form
             onSubmit={(e) => renameFolder(e)}
-            className="input-group input-group-lg mb-1"
-          >
+            className="input-group input-group-lg mb-1">
             <a onClick={() => createNote()} className="ps-0 btn text-success">
               <i className="bi bi-filetype-md"></i>
             </a>
-            <a className="ps-0 btn text-primary">
+            <a
+              onClick={() => setAdding(!adding)}
+              className="ps-0 btn text-primary">
               <i className="bi bi-filetype-html"></i>
             </a>
             <a
               onClick={() => setDeleting(!deleting)}
-              className="ps-0 btn text-danger"
-            >
+              className="ps-0 btn text-danger">
               <i className="bi bi-trash2"></i>
             </a>
             {deleting && (
               <a
                 onClick={() => deleteFolder()}
-                className="ps-0 btn text-danger"
-              >
+                className="ps-0 btn text-danger">
                 <i className="bi bi-question-lg"></i>
               </a>
             )}
@@ -188,16 +213,37 @@ function FolderPage() {
               defaultValue={currentFolder.name}
             />
           </form>
+          {adding && (
+            <form onSubmit={(e) => savePage(e)}>
+              <input
+                autoComplete="off"
+                id="url"
+                placeholder="URL"
+                className="form-control"
+              />
+            </form>
+          )}
           <hr />
           {currentFolder.notes.map((x) => (
             <a
               onClick={() => getNote(x.folder, x.name)}
               className={
-                "d-block rounded heading text-truncate px-3 py-1 my-1 hover" +
+                "row rounded heading px-3 fst-italic py-1 my-1 hover" +
                 (currentNote.name === x.name ? " bg-secondary" : "")
-              }
-            >
-              {x.stem}
+              }>
+              <span className="col-1 p-0">
+                {x.favorited && (
+                  <i className="bi bi-star-fill text-warning"></i>
+                )}
+              </span>
+              <span className="col p-0 text-truncate">{x.stem}</span>
+              <div
+                className={
+                  "col-1 badge " + (x.suffix === ".md" ? "markdown" : "txt")
+                }
+                title={x.suffix}>
+                <span>{x.suffix}</span>
+              </div>
             </a>
           ))}
         </>
@@ -251,7 +297,16 @@ function NotePage() {
       },
       function (data) {
         setCurrentNote(data);
-        setLoading(false);
+        $.get(
+          "/folder",
+          {
+            name: currentNote.folder,
+          },
+          function (data_) {
+            setCurrentFolder(data_);
+            setLoading(false);
+          }
+        );
       }
     );
   };
@@ -265,7 +320,6 @@ function NotePage() {
         folder: currentNote.folder,
         name: currentNote.name,
         new_name: $("#note-name").val(),
-        new_suffix: ".md",
       },
       function (data) {
         setCurrentNote(data);
@@ -282,6 +336,31 @@ function NotePage() {
       }
     );
   };
+
+  const switchExtension = () => {
+    setLoading(true);
+    $.get(
+      "/switch_extension",
+      {
+        folder: currentNote.folder,
+        name: currentNote.name,
+      },
+      function (data) {
+        setCurrentNote(data);
+        $.get(
+          "/folder",
+          {
+            name: data.folder,
+          },
+          function (data_) {
+            setCurrentFolder(data_);
+            setLoading(false);
+          }
+        );
+      }
+    );
+  };
+
   const editNote = () => {
     $.post(
       "/edit_note",
@@ -306,19 +385,18 @@ function NotePage() {
         <>
           <form
             onSubmit={(e) => renameNote(e)}
-            className="input-group input-group-lg mb-1"
-          >
+            className="input-group input-group-lg mb-1">
             <a
               onClick={() => setMode(mode === "view" ? "edit" : "view")}
-              className="btn text-secondary ps-0"
-            >
-              <i className={"bi bi-" + (mode === "view" ? "pen" : "eye")}></i>
+              className="btn text-secondary ps-0">
+              <i className={"bi bi-" + (mode === "view" ? "eye" : "pen")}></i>
             </a>
             {mode === "edit" && (
               <a onClick={() => editNote()} className="btn text-success ps-0">
                 <i
-                  className={"bi bi-" + (saved ? "check-lg" : "save2-fill")}
-                ></i>
+                  className={
+                    "bi bi-" + (saved ? "check-lg" : "save2-fill")
+                  }></i>
               </a>
             )}
             <input
@@ -330,13 +408,11 @@ function NotePage() {
             />
             <a
               onClick={() => toggleFavorite()}
-              className="btn text-warning px-2"
-            >
+              className="btn text-warning px-2">
               <i
                 className={
                   "bi bi-star" + (currentNote.favorited ? "-fill" : "")
-                }
-              ></i>
+                }></i>
             </a>
             {deleting && (
               <a onClick={() => deleteNote()} className="btn text-danger px-2">
@@ -345,18 +421,34 @@ function NotePage() {
             )}
             <a
               onClick={() => setDeleting(!deleting)}
-              className="btn text-danger px-2"
-            >
+              className="btn text-danger px-2">
               <i className="bi bi-trash2"></i>
             </a>
+            <button type="submit" className="d-none"></button>
           </form>
+
+          <a
+            onClick={() => switchExtension()}
+            className={
+              "btn " + (currentNote.suffix === ".md" ? "markdown" : "txt")
+            }>
+            <i className="me-2 bi bi-asterisk"></i>
+            {currentNote.suffix}
+          </a>
           <hr />
           <div style={{ height: "525px", overflow: "scroll" }}>
             {mode === "view" ? (
               <>
-                <div
-                  dangerouslySetInnerHTML={{ __html: currentNote.content.md }}
-                />
+                {currentNote.suffix === ".md" ? (
+                  <div
+                    id="reader"
+                    dangerouslySetInnerHTML={{ __html: currentNote.content.md }}
+                  />
+                ) : (
+                  <div style={{ whiteSpace: "pre-wrap" }}>
+                    {currentNote.content.txt}
+                  </div>
+                )}
               </>
             ) : (
               <>
@@ -364,8 +456,7 @@ function NotePage() {
                   id="content"
                   key={currentNote.stem}
                   className="form-control h-100 border-0"
-                  defaultValue={currentNote.content.txt}
-                ></textarea>
+                  defaultValue={currentNote.content.txt}></textarea>
               </>
             )}
           </div>
@@ -387,7 +478,22 @@ function Home() {
     <>
       <div className="d-flex justify-content-between">
         <div className="btn-group btn-group-sm">
-          <a className="btn text-secondary">
+          {currentNote.length !== 0 && (
+            <a
+              onClick={() => setFullscreen(!fullscreen)}
+              className="btn text-secondary">
+              <i
+                className={
+                  "bi bi-layout-sidebar-inset" + (fullscreen ? "" : "-reverse")
+                }></i>
+            </a>
+          )}
+          <a
+            onClick={() => {
+              setCurrentFolder([]);
+              setCurrentNote([]);
+            }}
+            className="btn text-secondary">
             {loading ? (
               <span className="me-2 spinner-border spinner-border-sm"></span>
             ) : (
@@ -402,31 +508,20 @@ function Home() {
             </a>
           )}
           {currentNote.length !== 0 && (
-            <>
-              <a className="btn text-secondary">
-                <i className={"me-2 bi bi-chevron-right"}></i>
-                {currentNote.stem}
-              </a>
-              <a
-                onClick={() => setFullscreen(!fullscreen)}
-                className="btn text-secondary"
-              >
-                <i
-                  className={
-                    "me-2 bi bi-layout-sidebar-inset" +
-                    (fullscreen ? "" : "-reverse")
-                  }
-                ></i>
-              </a>
-            </>
+            <a className="btn text-secondary">
+              <i className={"me-2 bi bi-chevron-right"}></i>
+              {currentNote.stem}
+            </a>
           )}
         </div>
         <div className="btn-group btn-group-sm">
           <a
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            className="btn text-secondary text-capitalize"
-          >
-            <i className={"me-2 bi bi-paint-bucket"}></i>
+            className="btn text-secondary text-capitalize">
+            <i
+              className={
+                "me-2 bi bi-" + (theme === "light" ? "sun-fill" : "moon-fill")
+              }></i>
             {theme}
           </a>
           <a className="btn text-secondary">
@@ -440,10 +535,14 @@ function Home() {
       <hr />
       <div className="row">
         <div className={fullscreen ? "d-none" : "col-2"}>
-          <FolderList />
+          <div className="px-2">
+            <FolderList />
+          </div>
         </div>
         <div className="col-3">
-          <FolderPage />
+          <div className="px-3">
+            <FolderPage />
+          </div>
         </div>
         <div className={fullscreen ? "col-9" : "col-7"}>
           <NotePage />
@@ -473,11 +572,9 @@ function App() {
         <ThemeContext.Provider value={[theme, setTheme]}>
           <FoldersContext.Provider value={[folders, setFolders]}>
             <CurrentFolderContext.Provider
-              value={[currentFolder, setCurrentFolder]}
-            >
+              value={[currentFolder, setCurrentFolder]}>
               <CurrentNoteContext.Provider
-                value={[currentNote, setCurrentNote]}
-              >
+                value={[currentNote, setCurrentNote]}>
                 <div className="p-2">
                   <Home />
                 </div>

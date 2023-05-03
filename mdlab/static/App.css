@@ -53,3 +53,28 @@ a:hover {
 .text-warning {
   color: darkorange !important;
 }
+
+.markdown {
+  color: #ff6b6b;
+}
+
+.txt {
+  color: #5f5fff;
+}
+
+div#reader img {
+  max-width: 100%;
+}
+
+div#reader a {
+  color: darkorchid;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+div#reader pre {
+  opacity: 75%;
+  border-left: 1px dotted;
+  margin-left: 2em;
+  padding-left: 2em;
+}
