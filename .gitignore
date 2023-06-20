@@ -1,6 +1,5 @@
 .env
-MarkdownLab.egg-info/
 *.pyc
+MarkdownLab.egg-info/
 .DS_Store
-todos.txt
-.vscode/
+Notes/

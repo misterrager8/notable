@@ -1,0 +1,71 @@
+import datetime
+
+from flask import current_app, render_template, request
+
+from mdlab.models import Note
+
+
+@current_app.get("/")
+def index():
+    return render_template("index.html")
+
+
+@current_app.post("/notes")
+def notes():
+    return {"notes": [i.to_dict() for i in Note.all()]}
+
+
+@current_app.post("/add_note")
+def add_note():
+    note_ = Note.add(f"Note {datetime.datetime.now().strftime('%H%m%s')}")
+
+    return note_.to_dict()
+
+
+@current_app.post("/note")
+def note():
+    note_ = Note(request.json.get("name"))
+
+    return note_.to_dict()
+
+
+@current_app.post("/edit_note")
+def edit_note():
+    note_ = Note(request.json.get("name"))
+    note_.edit(request.json.get("content"))
+
+    return note_.to_dict()
+
+
+@current_app.post("/rename_note")
+def rename_note():
+    note_ = Note(request.json.get("name"))
+
+    return note_.rename(request.json.get("new_name")).to_dict()
+
+
+@current_app.post("/delete_note")
+def delete_note():
+    Note(request.json.get("name")).delete()
+
+    return {"status": "done"}
+
+
+@current_app.post("/toggle_favorite")
+def toggle_favorite():
+    Note(request.json.get("name")).toggle_favorite()
+
+    return {"status": "done"}
+
+
+@current_app.post("/edit_tag")
+def edit_tag():
+    note_ = Note(request.json.get("name"))
+    note_.edit_tag(request.json.get("new_tag"))
+
+    return note_.to_dict()
+
+
+@current_app.post("/search")
+def search():
+    return {"results": [i.to_dict() for i in Note.search(request.json.get("query"))]}

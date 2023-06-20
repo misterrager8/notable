@@ -2,24 +2,51 @@
 html[data-theme="light"] {
   --primary-bg: #cccccc;
   --primary-txt: #1a1a1a;
+  --btn-color: #3d3550;
 }
 
 html[data-theme="dark"] {
   --primary-bg: #1a1a1a;
   --primary-txt: #cccccc;
+  --btn-color: #968cac;
 }
 
-body,
-.form-control,
-.form-control:focus {
+html[data-theme="navy"] {
+  --primary-bg: #171738;
+  --primary-txt: #9f9fbc;
+  --btn-color: #dff3e4;
+}
+
+html[data-theme="manila"] {
+  --primary-bg: #f2c57c;
+  --primary-txt: #342a1b;
+  --btn-color: #272932;
+}
+
+html[data-theme="shell"] {
+  --primary-bg: #313638;
+  --primary-txt: #acafb1;
+  --btn-color: #f09d51;
+}
+
+body {
   background-color: var(--primary-bg);
   color: var(--primary-txt);
 }
 
-.bg-secondary,
-.hover:hover {
-  background-color: var(--primary-txt) !important;
-  color: var(--primary-bg) !important;
+.btn {
+  background-color: transparent;
+  color: var(--btn-color);
+  border-color: var(--btn-color);
+  letter-spacing: 2px;
+  font-size: small;
+}
+
+.btn:hover,
+.btn.active {
+  background-color: var(--btn-color);
+  color: white;
+  border-color: transparent;
 }
 
 a,
@@ -29,52 +56,56 @@ a:hover {
   cursor: pointer;
 }
 
-.btn-outline-secondary {
-  border-color: inherit;
-  color: inherit;
-}
-
-.btn-outline-secondary:hover {
-  background-color: var(--primary-txt);
+.form-control,
+.form-control:focus {
+  background-color: transparent;
+  color: var(--primary-txt);
   border-color: var(--primary-txt);
-  color: var(--primary-bg);
 }
 
-.text-secondary {
-  color: inherit !important;
+.dropdown-item {
+  color: var(--primary-txt);
+  letter-spacing: 1px;
+  text-align: center;
+  font-size: small;
 }
 
-.btn,
-::placeholder,
+.dropdown-menu {
+  background-color: var(--primary-bg);
+  color: var(--primary-txt);
+  border: 1px solid var(--btn-color);
+}
+
 .heading {
   letter-spacing: 1px;
 }
 
-.text-warning {
-  color: darkorange !important;
+.bi-record-fill {
+  color: var(--btn-color);
 }
 
-.markdown {
-  color: #ff6b6b;
+.badge {
+  background-color: transparent;
+  color: var(--btn-color);
 }
 
-.txt {
-  color: #5f5fff;
+textarea {
+  resize: none;
 }
 
-div#reader img {
-  max-width: 100%;
+.input-group-text {
+  background-color: transparent;
+  color: var(--btn-color);
+  border: 0;
+  padding-left: 0;
 }
 
-div#reader a {
-  color: darkorchid;
-  text-decoration: underline;
-  font-weight: bold;
+::placeholder {
+  color: var(--primary-txt) !important;
+  letter-spacing: 1px !important;
+  opacity: 25% !important;
 }
 
-div#reader pre {
-  opacity: 75%;
-  border-left: 1px dotted;
-  margin-left: 2em;
-  padding-left: 2em;
+.form-control {
+  font-size: small;
 }

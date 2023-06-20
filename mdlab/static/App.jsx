@@ -1,312 +1,39 @@
+// Contexts
 const LoadingContext = React.createContext();
-const ThemeContext = React.createContext();
-const FoldersContext = React.createContext();
-const CurrentFolderContext = React.createContext();
-const CurrentNoteContext = React.createContext();
+const NoteContext = React.createContext();
+const NotesContext = React.createContext();
 
-function FolderList() {
-  const [loading, setLoading] = React.useContext(LoadingContext);
-  const [folders, setFolders] = React.useContext(FoldersContext);
-  const [currentFolder, setCurrentFolder] =
-    React.useContext(CurrentFolderContext);
-
-  React.useEffect(() => {
-    setLoading(true);
-    $.get("/folders", function (data) {
-      setFolders(data.folders);
-      setLoading(false);
-    });
-  }, []);
-
-  const getFolder = (name) => {
-    setLoading(true);
-    $.get(
-      "/folder",
-      {
-        name: name,
-      },
-      function (data) {
-        setCurrentFolder(data);
-        setLoading(false);
-      }
-    );
-  };
-
-  const createFolder = () => {
-    setLoading(true);
-    $.get("/create_folder", function (data) {
-      setCurrentFolder(data);
-      $.get("/folders", function (data_) {
-        setFolders(data_.folders);
-      });
-      setLoading(false);
-    });
-  };
-
-  return (
-    <>
-      <a
-        onClick={() => createFolder()}
-        className="btn btn-outline-success w-100 mb-2">
-        <i className="me-2 bi bi-folder-plus"></i>New Folder
-      </a>
-      <hr />
-      <div>
-        {folders.map((x) => (
-          <a
-            onClick={() => getFolder(x.name)}
-            className={
-              "d-block rounded heading text-truncate px-3 py-1 my-1 hover" +
-              (currentFolder.name === x.name ? " bg-secondary" : "")
-            }>
-            {x.name}
-          </a>
-        ))}
-      </div>
-    </>
-  );
+function apiCall(url, params, callback) {
+  fetch(url, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify(params),
+  })
+    .then((response) => response.json())
+    .then((data) => callback(data));
 }
 
-function FolderPage() {
-  const [adding, setAdding] = React.useState(false);
-  const [loading, setLoading] = React.useContext(LoadingContext);
-  const [folders, setFolders] = React.useContext(FoldersContext);
-  const [currentFolder, setCurrentFolder] =
-    React.useContext(CurrentFolderContext);
-  const [currentNote, setCurrentNote] = React.useContext(CurrentNoteContext);
-  const [deleting, setDeleting] = React.useState(false);
+// Forms
 
-  const getNote = (folder, name) => {
-    setLoading(true);
-    $.get(
-      "/note",
-      {
-        folder: folder,
-        name: name,
-      },
-      function (data) {
-        setCurrentNote(data);
-        setLoading(false);
-      }
-    );
-  };
-
-  const deleteFolder = () => {
-    setLoading(true);
-    $.get(
-      "/delete_folder",
-      {
-        name: currentFolder.name,
-      },
-      function (data) {
-        setCurrentFolder([]);
-        setDeleting(false);
-        $.get("/folders", function (data_) {
-          setFolders(data_.folders);
-          setLoading(false);
-        });
-      }
-    );
-  };
-
-  const renameFolder = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    $.post(
-      "/rename_folder",
-      {
-        name: currentFolder.name,
-        new_name: $("#folder-name").val(),
-      },
-      function (data) {
-        setCurrentFolder(data);
-        $.get("/folders", function (data_) {
-          setFolders(data_.folders);
-          setLoading(false);
-        });
-      }
-    );
-  };
-
-  const savePage = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    $.post(
-      "/save_page",
-      {
-        folder: currentFolder.name,
-        url: $("#url").val(),
-      },
-      function (data) {
-        setCurrentNote(data);
-        $.get(
-          "/folder",
-          {
-            name: currentFolder.name,
-          },
-          function (data_) {
-            setCurrentFolder(data_);
-            setLoading(false);
-            e.target.reset();
-            setAdding(false);
-          }
-        );
-      }
-    );
-  };
-
-  const createNote = () => {
-    setLoading(true);
-    $.get(
-      "/create_note",
-      {
-        folder: currentFolder.name,
-      },
-      function (data) {
-        setCurrentNote(data);
-        $.get(
-          "/folder",
-          {
-            name: currentFolder.name,
-          },
-          function (data_) {
-            setCurrentFolder(data_);
-            setLoading(false);
-          }
-        );
-      }
-    );
-  };
-
-  return (
-    <>
-      {currentFolder.length !== 0 && (
-        <>
-          <form
-            onSubmit={(e) => renameFolder(e)}
-            className="input-group input-group-lg mb-1">
-            <a onClick={() => createNote()} className="ps-0 btn text-success">
-              <i className="bi bi-filetype-md"></i>
-            </a>
-            <a
-              onClick={() => setAdding(!adding)}
-              className="ps-0 btn text-primary">
-              <i className="bi bi-filetype-html"></i>
-            </a>
-            <a
-              onClick={() => setDeleting(!deleting)}
-              className="ps-0 btn text-danger">
-              <i className="bi bi-trash2"></i>
-            </a>
-            {deleting && (
-              <a
-                onClick={() => deleteFolder()}
-                className="ps-0 btn text-danger">
-                <i className="bi bi-question-lg"></i>
-              </a>
-            )}
-            <input
-              id="folder-name"
-              className="form-control border-0 heading p-0"
-              autoComplete="off"
-              key={currentFolder.name}
-              defaultValue={currentFolder.name}
-            />
-          </form>
-          {adding && (
-            <form onSubmit={(e) => savePage(e)}>
-              <input
-                autoComplete="off"
-                id="url"
-                placeholder="URL"
-                className="form-control"
-              />
-            </form>
-          )}
-          <hr />
-          {currentFolder.notes.map((x) => (
-            <a
-              onClick={() => getNote(x.folder, x.name)}
-              className={
-                "row rounded heading px-3 fst-italic py-1 my-1 hover" +
-                (currentNote.name === x.name ? " bg-secondary" : "")
-              }>
-              <span className="col-1 p-0">
-                {x.favorited && (
-                  <i className="bi bi-star-fill text-warning"></i>
-                )}
-              </span>
-              <span className="col p-0 text-truncate">{x.stem}</span>
-              <div
-                className={
-                  "col-1 badge " + (x.suffix === ".md" ? "markdown" : "txt")
-                }
-                title={x.suffix}>
-                <span>{x.suffix}</span>
-              </div>
-            </a>
-          ))}
-        </>
-      )}
-    </>
-  );
-}
-
-function NotePage() {
+function Editor() {
+  const [, setLoading] = React.useContext(LoadingContext);
   const [mode, setMode] = React.useState("view");
+  const [note, setNote] = React.useContext(NoteContext);
+  const [, , getNotes] = React.useContext(NotesContext);
   const [saved, setSaved] = React.useState(false);
-  const [deleting, setDeleting] = React.useState(false);
-  const [currentNote, setCurrentNote] = React.useContext(CurrentNoteContext);
-  const [currentFolder, setCurrentFolder] =
-    React.useContext(CurrentFolderContext);
-  const [loading, setLoading] = React.useContext(LoadingContext);
 
-  const deleteNote = () => {
-    let x = currentNote.folder;
+  const editNote = () => {
     setLoading(true);
-    $.get(
-      "/delete_note",
-      {
-        folder: currentNote.folder,
-        name: currentNote.name,
-      },
-      function (data) {
-        setCurrentNote([]);
-        $.get(
-          "/folder",
-          {
-            name: x,
-          },
-          function (data_) {
-            setCurrentFolder(data_);
-            setLoading(false);
-            setDeleting(false);
-          }
-        );
-      }
-    );
-  };
-
-  const toggleFavorite = () => {
-    setLoading(true);
-    $.get(
-      "/toggle_favorite",
-      {
-        folder: currentNote.folder,
-        name: currentNote.name,
-      },
-      function (data) {
-        setCurrentNote(data);
-        $.get(
-          "/folder",
-          {
-            name: currentNote.folder,
-          },
-          function (data_) {
-            setCurrentFolder(data_);
-            setLoading(false);
-          }
-        );
+    apiCall(
+      "/edit_note",
+      { name: note.name, content: document.getElementById("content").value },
+      (data) => {
+        setNote(data);
+        setLoading(false);
+        setSaved(true);
+        setTimeout(() => setSaved(false), 500);
       }
     );
   };
@@ -314,274 +41,328 @@ function NotePage() {
   const renameNote = (e) => {
     e.preventDefault();
     setLoading(true);
-    $.post(
+    apiCall(
       "/rename_note",
-      {
-        folder: currentNote.folder,
-        name: currentNote.name,
-        new_name: $("#note-name").val(),
-      },
-      function (data) {
-        setCurrentNote(data);
-        $.get(
-          "/folder",
-          {
-            name: data.folder,
-          },
-          function (data_) {
-            setCurrentFolder(data_);
-            setLoading(false);
-          }
-        );
+      { name: note.name, new_name: document.getElementById("note-name").value },
+      (data) => {
+        setNote(data);
+        getNotes();
+        setLoading(false);
       }
     );
   };
 
-  const switchExtension = () => {
+  const editTag = (e) => {
+    e.preventDefault();
     setLoading(true);
-    $.get(
-      "/switch_extension",
-      {
-        folder: currentNote.folder,
-        name: currentNote.name,
-      },
-      function (data) {
-        setCurrentNote(data);
-        $.get(
-          "/folder",
-          {
-            name: data.folder,
-          },
-          function (data_) {
-            setCurrentFolder(data_);
-            setLoading(false);
-          }
-        );
-      }
-    );
-  };
-
-  const editNote = () => {
-    $.post(
-      "/edit_note",
-      {
-        folder: currentNote.folder,
-        name: currentNote.name,
-        content: $("#content").val(),
-      },
-      function (data) {
-        setCurrentNote(data);
-        setSaved(true);
-        setTimeout(function () {
-          setSaved(false);
-        }, 1500);
+    apiCall(
+      "/edit_tag",
+      { name: note.name, new_tag: document.getElementById("note-tag").value },
+      (data) => {
+        setNote(data);
+        getNotes();
+        setLoading(false);
       }
     );
   };
 
   return (
     <>
-      {currentNote.length !== 0 && (
-        <>
-          <form
-            onSubmit={(e) => renameNote(e)}
-            className="input-group input-group-lg mb-1">
-            <a
-              onClick={() => setMode(mode === "view" ? "edit" : "view")}
-              className="btn text-secondary ps-0">
-              <i className={"bi bi-" + (mode === "view" ? "eye" : "pen")}></i>
-            </a>
-            {mode === "edit" && (
-              <a onClick={() => editNote()} className="btn text-success ps-0">
-                <i
-                  className={
-                    "bi bi-" + (saved ? "check-lg" : "save2-fill")
-                  }></i>
-              </a>
-            )}
-            <input
-              className="form-control border-0 heading p-0 fst-italic"
-              autoComplete="off"
-              id="note-name"
-              key={currentNote.name}
-              defaultValue={currentNote.stem}
-            />
-            <a
-              onClick={() => toggleFavorite()}
-              className="btn text-warning px-2">
-              <i
-                className={
-                  "bi bi-star" + (currentNote.favorited ? "-fill" : "")
-                }></i>
-            </a>
-            {deleting && (
-              <a onClick={() => deleteNote()} className="btn text-danger px-2">
-                <i className="bi bi-question-lg"></i>
-              </a>
-            )}
-            <a
-              onClick={() => setDeleting(!deleting)}
-              className="btn text-danger px-2">
-              <i className="bi bi-trash2"></i>
-            </a>
-            <button type="submit" className="d-none"></button>
-          </form>
-
-          <a
-            onClick={() => switchExtension()}
-            className={
-              "btn " + (currentNote.suffix === ".md" ? "markdown" : "txt")
-            }>
-            <i className="me-2 bi bi-asterisk"></i>
-            {currentNote.suffix}
+      <form onSubmit={(e) => renameNote(e)}>
+        <input
+          required
+          autoComplete="off"
+          className="form-control border-0 p-0 heading fs-5"
+          defaultValue={note.name}
+          key={`${note.name}-name`}
+          id="note-name"
+        />
+      </form>
+      <form onSubmit={(e) => editTag(e)} className="input-group">
+        <span className="input-group-text">
+          <i className="bi bi-tag-fill"></i>
+        </span>
+        <input
+          placeholder="Tag"
+          autoComplete="off"
+          className="form-control border-0 p-0 heading"
+          defaultValue={note.tag}
+          key={`${note.name}-tag`}
+          id="note-tag"
+        />
+      </form>
+      <div className="btn-group mb-2">
+        <a
+          className={"btn" + (mode === "view" ? " active" : "")}
+          onClick={() => setMode("view")}>
+          <i className="bi bi-eye"></i>
+        </a>
+        <a
+          className={"btn" + (mode === "edit" ? " active" : "")}
+          onClick={() => setMode("edit")}>
+          <i className="bi bi-pen"></i>
+        </a>
+        {mode === "edit" && (
+          <a className="btn" onClick={() => editNote()}>
+            <i className={"bi bi-" + (saved ? "check-lg" : "save2")}></i>
           </a>
-          <hr />
-          <div style={{ height: "525px", overflow: "scroll" }}>
-            {mode === "view" ? (
-              <>
-                {currentNote.suffix === ".md" ? (
-                  <div
-                    id="reader"
-                    dangerouslySetInnerHTML={{ __html: currentNote.content.md }}
-                  />
-                ) : (
-                  <div style={{ whiteSpace: "pre-wrap" }}>
-                    {currentNote.content.txt}
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                <textarea
-                  id="content"
-                  key={currentNote.stem}
-                  className="form-control h-100 border-0"
-                  defaultValue={currentNote.content.txt}></textarea>
-              </>
-            )}
-          </div>
-        </>
-      )}
+        )}
+      </div>
+      <hr />
+      <div className="p-1" style={{ height: "500px", overflowY: "scroll" }}>
+        {mode === "view" ? (
+          <>
+            <div dangerouslySetInnerHTML={{ __html: note.content?.md }}></div>
+          </>
+        ) : (
+          <>
+            <textarea
+              className="form-control h-100 border-0"
+              key={note.name}
+              id="content"
+              defaultValue={note.content.txt}></textarea>
+          </>
+        )}
+      </div>
     </>
   );
 }
 
-function Home() {
-  const [loading, setLoading] = React.useContext(LoadingContext);
-  const [theme, setTheme] = React.useContext(ThemeContext);
-  const [currentFolder, setCurrentFolder] =
-    React.useContext(CurrentFolderContext);
-  const [currentNote, setCurrentNote] = React.useContext(CurrentNoteContext);
-  const [fullscreen, setFullscreen] = React.useState(false);
+function NoteItem({ item }) {
+  const [, , getNotes] = React.useContext(NotesContext);
+  const [, setLoading] = React.useContext(LoadingContext);
+  const [note, setNote] = React.useContext(NoteContext);
+  const [deleting, setDeleting] = React.useState(false);
+
+  const deleteNote = () => {
+    setLoading(true);
+    apiCall("/delete_note", { name: item.name }, (data) => {
+      note.name === item.name && setNote([]);
+      setLoading(false);
+      getNotes();
+    });
+  };
+
+  const toggleFavorite = () => {
+    setLoading(true);
+    apiCall("/toggle_favorite", { name: item.name }, (data) => {
+      setLoading(false);
+      getNotes();
+    });
+  };
+
+  return (
+    <div className="d-flex justify-content-between text-truncate mb-1">
+      <div className="text-truncate heading">
+        {item.name === note.name && <i className="me-2 bi bi-record-fill"></i>}
+        <a title={item.name} onClick={() => setNote(item)}>
+          {item.name}
+        </a>
+      </div>
+      <div>
+        {item.tag && (
+          <span className="badge">
+            <i className="me-1 bi bi-tag-fill"></i>
+            {item.tag}
+          </span>
+        )}
+        <div className="btn-group">
+          <button className="btn" onClick={() => toggleFavorite()}>
+            <i className={"bi bi-star" + (item.favorited ? "-fill" : "")}></i>
+          </button>
+          {deleting && (
+            <button className="btn" onClick={() => deleteNote()}>
+              <i className="bi bi-question-lg"></i>
+            </button>
+          )}
+          <button className="btn" onClick={() => setDeleting(!deleting)}>
+            <i className="bi bi-trash2"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Search() {
+  const [, setLoading] = React.useContext(LoadingContext);
+  const [query, setQuery] = React.useState("");
+  const [results, setResults] = React.useState([]);
+
+  const onChangeQuery = (e) => {
+    setQuery(e.target.value);
+  };
+
+  const search = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    apiCall("/search", { query: query }, (data) => {
+      setLoading(false);
+      setResults(data.results);
+    });
+  };
 
   return (
     <>
-      <div className="d-flex justify-content-between">
-        <div className="btn-group btn-group-sm">
-          {currentNote.length !== 0 && (
-            <a
-              onClick={() => setFullscreen(!fullscreen)}
-              className="btn text-secondary">
-              <i
-                className={
-                  "bi bi-layout-sidebar-inset" + (fullscreen ? "" : "-reverse")
-                }></i>
-            </a>
-          )}
-          <a
+      <form className="input-group" onSubmit={(e) => search(e)}>
+        <input
+          className="form-control"
+          placeholder="Search"
+          autoComplete="off"
+          value={query}
+          onChange={onChangeQuery}
+          required
+        />
+        {results.length !== 0 && (
+          <button
+            className="btn"
             onClick={() => {
-              setCurrentFolder([]);
-              setCurrentNote([]);
-            }}
-            className="btn text-secondary">
-            {loading ? (
-              <span className="me-2 spinner-border spinner-border-sm"></span>
-            ) : (
-              <i className={"me-2 bi bi-markdown"}></i>
-            )}
-            Markdown-Lab
-          </a>
-          {currentFolder.length !== 0 && (
-            <a className="btn text-secondary">
-              <i className={"me-2 bi bi-chevron-right"}></i>
-              {currentFolder.name}
-            </a>
-          )}
-          {currentNote.length !== 0 && (
-            <a className="btn text-secondary">
-              <i className={"me-2 bi bi-chevron-right"}></i>
-              {currentNote.stem}
-            </a>
-          )}
-        </div>
-        <div className="btn-group btn-group-sm">
-          <a
-            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            className="btn text-secondary text-capitalize">
-            <i
-              className={
-                "me-2 bi bi-" + (theme === "light" ? "sun-fill" : "moon-fill")
-              }></i>
-            {theme}
-          </a>
-          <a className="btn text-secondary">
-            <i className={"me-2 bi bi-gear"}></i>Settings
-          </a>
-          <a className="btn text-secondary">
-            <i className={"me-2 bi bi-info-circle"}></i>About
-          </a>
-        </div>
-      </div>
-      <hr />
-      <div className="row">
-        <div className={fullscreen ? "d-none" : "col-2"}>
-          <div className="px-2">
-            <FolderList />
-          </div>
-        </div>
-        <div className="col-3">
-          <div className="px-3">
-            <FolderPage />
-          </div>
-        </div>
-        <div className={fullscreen ? "col-9" : "col-7"}>
-          <NotePage />
-        </div>
+              setQuery("");
+              setResults([]);
+            }}>
+            <i className="bi bi-x-lg"></i>
+          </button>
+        )}
+        <button type="submit" className="btn">
+          <i className="bi bi-search"></i>
+        </button>
+      </form>
+
+      <div className="my-2">
+        {results.map((x) => (
+          <>
+            <a className="d-block heading">{x.file}</a>
+            <div className="fst-italic small opacity-50">"{x.match}"</div>
+          </>
+        ))}
       </div>
     </>
+  );
+}
+
+function Notes() {
+  const [, setLoading] = React.useContext(LoadingContext);
+  const [notes, , getNotes] = React.useContext(NotesContext);
+  const [, setNote] = React.useContext(NoteContext);
+
+  React.useEffect(() => {
+    getNotes();
+  }, []);
+
+  const addNote = () => {
+    setLoading(true);
+    apiCall("/add_note", {}, (data) => {
+      setLoading(false);
+      setNote(data);
+      getNotes();
+    });
+  };
+
+  return (
+    <>
+      <Search />
+      <a className="btn w-100" onClick={() => addNote()}>
+        <i className="me-2 bi bi-plus-lg"></i>New Note
+      </a>
+      <div className="mt-3">
+        {notes.map((x) => (
+          <NoteItem key={`${x.name}-card`} item={x} />
+        ))}
+      </div>
+    </>
+  );
+}
+
+function Nav() {
+  const [loading] = React.useContext(LoadingContext);
+  const [, setNote] = React.useContext(NoteContext);
+  const [theme, setTheme] = React.useState(
+    localStorage.getItem("mdlab-theme") || "light"
+  );
+
+  React.useEffect(() => {
+    localStorage.setItem("mdlab-theme", theme);
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
+  const themes = ["light", "dark", "navy", "manila", "shell"];
+
+  return (
+    <div className="d-flex justify-content-between mb-4">
+      <div className="btn-group">
+        <a onClick={() => setNote([])} className="btn border-0">
+          {!loading ? (
+            <i className="me-2 bi bi-markdown-fill"></i>
+          ) : (
+            <span className="me-2 spinner-border spinner-border-sm"></span>
+          )}
+          Markdown-Lab
+        </a>
+      </div>
+      <div className="btn-group">
+        <div className="btn-group dropdown text-capitalize">
+          <a
+            data-bs-toggle="dropdown"
+            data-bs-target="#themes"
+            className="btn dropdown-toggle">
+            <i className="me-2 bi bi-paint-bucket"></i>
+            {theme}
+          </a>
+          <div id="themes" className="dropdown-menu">
+            {themes.map((x) => (
+              <>
+                {theme !== x && (
+                  <a
+                    key={x}
+                    onClick={() => setTheme(x)}
+                    className="dropdown-item">
+                    {x}
+                  </a>
+                )}
+              </>
+            ))}
+          </div>
+        </div>
+        <a
+          target="_blank"
+          href="https://github.com/misterrager8/Markdown-Lab"
+          className="btn">
+          <i className="me-2 bi bi-info-circle"></i>About
+        </a>
+      </div>
+    </div>
   );
 }
 
 function App() {
   const [loading, setLoading] = React.useState(false);
-  const [theme, setTheme] = React.useState(
-    localStorage.getItem("Markdown-Lab") || "light"
-  );
-  const [folders, setFolders] = React.useState([]);
-  const [currentFolder, setCurrentFolder] = React.useState([]);
-  const [currentNote, setCurrentNote] = React.useState([]);
+  const [note, setNote] = React.useState([]);
+  const [notes, setNotes] = React.useState([]);
 
-  React.useEffect(() => {
-    localStorage.setItem("Markdown-Lab", theme);
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
+  const getNotes = () => {
+    setLoading(true);
+    apiCall("/notes", {}, (data) => {
+      setNotes(data.notes);
+      setLoading(false);
+    });
+  };
 
   return (
     <>
       <LoadingContext.Provider value={[loading, setLoading]}>
-        <ThemeContext.Provider value={[theme, setTheme]}>
-          <FoldersContext.Provider value={[folders, setFolders]}>
-            <CurrentFolderContext.Provider
-              value={[currentFolder, setCurrentFolder]}>
-              <CurrentNoteContext.Provider
-                value={[currentNote, setCurrentNote]}>
-                <div className="p-2">
-                  <Home />
+        <NotesContext.Provider value={[notes, setNotes, getNotes]}>
+          <NoteContext.Provider value={[note, setNote]}>
+            <div className="p-4">
+              <Nav />
+              <div className="row">
+                <div className="col-3">
+                  <Notes />
                 </div>
-              </CurrentNoteContext.Provider>
-            </CurrentFolderContext.Provider>
-          </FoldersContext.Provider>
-        </ThemeContext.Provider>
+                <div className="col-9">{note.length !== 0 && <Editor />}</div>
+              </div>
+            </div>
+          </NoteContext.Provider>
+        </NotesContext.Provider>
       </LoadingContext.Provider>
     </>
   );
