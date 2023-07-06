@@ -109,3 +109,19 @@ textarea {
 .form-control {
   font-size: small;
 }
+
+#reader img {
+  max-width: 100%;
+}
+
+#reader a {
+  color: var(--btn-color);
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+#reader code,
+#reader pre {
+  color: var(--btn-color);
+  font-family: monospace;
+}

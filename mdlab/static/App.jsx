@@ -112,7 +112,9 @@ function Editor() {
       <div className="p-1" style={{ height: "500px", overflowY: "scroll" }}>
         {mode === "view" ? (
           <>
-            <div dangerouslySetInnerHTML={{ __html: note.content?.md }}></div>
+            <div
+              id="reader"
+              dangerouslySetInnerHTML={{ __html: note.content?.md }}></div>
           </>
         ) : (
           <>
@@ -181,6 +183,48 @@ function NoteItem({ item }) {
         </div>
       </div>
     </div>
+  );
+}
+
+function Spinner() {
+  return <span className="me-2 spinner-border spinner-border-sm"></span>;
+}
+
+function PageSaver() {
+  const [url, setUrl] = React.useState("");
+  const [, , getNotes] = React.useContext(NotesContext);
+  const [, setNote] = React.useContext(NoteContext);
+  const [loading, setLoading] = React.useState(false);
+
+  const onChangeUrl = (e) => setUrl(e.target.value);
+
+  const savePage = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    apiCall("/save_page", { url: url }, (data) => {
+      getNotes();
+      setNote(data);
+      setLoading(false);
+      setUrl("");
+    });
+  };
+
+  return (
+    <>
+      <form onSubmit={savePage} className="input-group">
+        <input
+          autoComplete="off"
+          className="form-control"
+          placeholder="URL"
+          value={url}
+          onChange={onChangeUrl}
+        />
+        <button type="submit" className="btn">
+          {loading && <Spinner />}
+          Save
+        </button>
+      </form>
+    </>
   );
 }
 
@@ -260,6 +304,7 @@ function Notes() {
 
   return (
     <>
+      <PageSaver />
       <Search />
       <a className="btn w-100" onClick={() => addNote()}>
         <i className="me-2 bi bi-plus-lg"></i>New Note
@@ -294,7 +339,7 @@ function Nav() {
           {!loading ? (
             <i className="me-2 bi bi-markdown-fill"></i>
           ) : (
-            <span className="me-2 spinner-border spinner-border-sm"></span>
+            <Spinner />
           )}
           Markdown-Lab
         </a>

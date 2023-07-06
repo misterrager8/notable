@@ -1,6 +1,9 @@
 import datetime
+from bs4 import BeautifulSoup
 
 from flask import current_app, render_template, request
+import html2text
+import requests
 
 from mdlab.models import Note
 
@@ -33,6 +36,17 @@ def note():
 def edit_note():
     note_ = Note(request.json.get("name"))
     note_.edit(request.json.get("content"))
+
+    return note_.to_dict()
+
+
+@current_app.post("/save_page")
+def save_page():
+    soup = BeautifulSoup(requests.get(request.json.get("url")).text, "html.parser")
+    title = soup.find("title").get_text()
+
+    note_ = Note.add(title)
+    note_.edit(html2text.html2text(str(soup), bodywidth=0))
 
     return note_.to_dict()
 

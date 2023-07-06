@@ -3,3 +3,4 @@
 MarkdownLab.egg-info/
 .DS_Store
 Notes/
+*.db
