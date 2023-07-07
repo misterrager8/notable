@@ -15,7 +15,19 @@ def index():
 
 @current_app.post("/notes")
 def notes():
-    return {"notes": [i.to_dict() for i in Note.all()]}
+    sort = request.json.get("sort")
+    return {"notes": [i.to_dict() for i in Note.all(sort=sort)]}
+
+
+@current_app.post("/tags")
+def tags():
+    return {"tags": list(set([i.tag for i in Note.all()]))}
+
+
+@current_app.post("/filter_by_tag")
+def filter_by_tag():
+    tag_ = request.json.get("tag")
+    return {"notes": [i.to_dict() for i in Note.all() if i.tag == tag_]}
 
 
 @current_app.post("/add_note")

@@ -1,4 +1,5 @@
 import datetime
+from operator import attrgetter
 from pathlib import Path
 import subprocess
 
@@ -81,11 +82,11 @@ class Note:
         open(self.path, "w").write(new_data)
 
     @classmethod
-    def all(cls):
+    def all(cls, sort: str = "favorited", filter: str = None):
         return sorted(
             [Note(i.stem) for i in config.HOME_DIR.glob("**/*.md")],
-            key=lambda x: x.favorited,
-            reverse=True,
+            key=attrgetter(sort),
+            reverse=sort == "favorited",
         )
 
     @classmethod

@@ -2,6 +2,8 @@
 const LoadingContext = React.createContext();
 const NoteContext = React.createContext();
 const NotesContext = React.createContext();
+const FullscreenContext = React.createContext();
+const SortFilterContext = React.createContext();
 
 function apiCall(url, params, callback) {
   fetch(url, {
@@ -23,6 +25,7 @@ function Editor() {
   const [note, setNote] = React.useContext(NoteContext);
   const [, , getNotes] = React.useContext(NotesContext);
   const [saved, setSaved] = React.useState(false);
+  const [fullscreen, setFullscreen] = React.useContext(FullscreenContext);
 
   const editNote = () => {
     setLoading(true);
@@ -68,6 +71,7 @@ function Editor() {
 
   return (
     <>
+      <div></div>
       <form onSubmit={(e) => renameNote(e)}>
         <input
           required
@@ -92,6 +96,12 @@ function Editor() {
         />
       </form>
       <div className="btn-group mb-2">
+        <a onClick={() => setFullscreen(!fullscreen)} className="btn">
+          <i
+            className={
+              "bi bi-arrow-bar-" + (fullscreen ? "right" : "left")
+            }></i>
+        </a>
         <a
           className={"btn" + (mode === "view" ? " active" : "")}
           onClick={() => setMode("view")}>
@@ -168,16 +178,20 @@ function NoteItem({ item }) {
             {item.tag}
           </span>
         )}
-        <div className="btn-group">
-          <button className="btn" onClick={() => toggleFavorite()}>
+        <div className="btn-group ps-2">
+          <button
+            className="btn border-0 px-1"
+            onClick={() => toggleFavorite()}>
             <i className={"bi bi-star" + (item.favorited ? "-fill" : "")}></i>
           </button>
           {deleting && (
-            <button className="btn" onClick={() => deleteNote()}>
+            <button className="btn border-0 px-1" onClick={() => deleteNote()}>
               <i className="bi bi-question-lg"></i>
             </button>
           )}
-          <button className="btn" onClick={() => setDeleting(!deleting)}>
+          <button
+            className="btn border-0 px-1"
+            onClick={() => setDeleting(!deleting)}>
             <i className="bi bi-trash2"></i>
           </button>
         </div>
@@ -284,6 +298,81 @@ function Search() {
   );
 }
 
+function SortAndFilter() {
+  const [, setNotes, getNotes] = React.useContext(NotesContext);
+  const [tags, setTags] = React.useState([]);
+  const [filter, setFilter] = React.useState("");
+  const [sort, setSort] = React.useContext(SortFilterContext);
+
+  React.useEffect(() => {
+    apiCall("/tags", {}, (data) => {
+      setTags(data.tags);
+    });
+  }, []);
+
+  const filterByTag = (tag_) => {
+    apiCall("/filter_by_tag", { tag: tag_ }, (data) => {
+      setFilter(tag_);
+      setNotes(data.notes);
+    });
+  };
+
+  return (
+    <div className="d-flex justify-content-between mt-3">
+      <button
+        data-bs-target="#sort"
+        data-bs-toggle="dropdown"
+        className="btn border-0 dropdown-toggle">
+        <i className="me-2 bi bi-filter-right"></i>Sort
+      </button>
+      <div id="sort" className="dropdown-menu">
+        <button onClick={() => setSort("name")} className="dropdown-item">
+          Name
+        </button>
+        <button onClick={() => setSort("tag")} className="dropdown-item">
+          Tag
+        </button>
+        <button
+          onClick={() => setSort("last_modified")}
+          className="dropdown-item">
+          Updated
+        </button>
+        <button
+          onClick={() => setSort("date_created")}
+          className="dropdown-item">
+          Created
+        </button>
+      </div>
+      <button
+        data-bs-target="#tags"
+        data-bs-toggle="dropdown"
+        className={
+          "btn border-0 dropdown-toggle" + (filter !== "" ? " active" : "")
+        }>
+        <i className="me-2 bi bi-tag-fill"></i>
+        {filter !== "" ? filter : "Filter"}
+      </button>
+      <div id="tags" className="dropdown-menu">
+        {filter !== "" && (
+          <button
+            onClick={() => {
+              setFilter("");
+              getNotes();
+            }}
+            className="dropdown-item text-danger">
+            Clear
+          </button>
+        )}
+        {tags.map((x) => (
+          <button onClick={() => filterByTag(x)} className="dropdown-item">
+            {x}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Notes() {
   const [, setLoading] = React.useContext(LoadingContext);
   const [notes, , getNotes] = React.useContext(NotesContext);
@@ -309,7 +398,8 @@ function Notes() {
       <a className="btn w-100" onClick={() => addNote()}>
         <i className="me-2 bi bi-plus-lg"></i>New Note
       </a>
-      <div className="mt-3">
+      <SortAndFilter />
+      <div className="mt-3" style={{ height: "500px", overflowY: "scroll" }}>
         {notes.map((x) => (
           <NoteItem key={`${x.name}-card`} item={x} />
         ))}
@@ -330,7 +420,18 @@ function Nav() {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
-  const themes = ["light", "dark", "navy", "manila", "shell"];
+  const themes = [
+    "light",
+    "dark",
+    "silver",
+    "sienna",
+    "mint",
+    "salmon",
+    "looseleaf",
+    "ruby",
+    "watermelon",
+    "laker",
+  ];
 
   return (
     <div className="d-flex justify-content-between mb-4">
@@ -383,31 +484,43 @@ function App() {
   const [loading, setLoading] = React.useState(false);
   const [note, setNote] = React.useState([]);
   const [notes, setNotes] = React.useState([]);
+  const [fullscreen, setFullscreen] = React.useState(false);
+  const [sort, setSort] = React.useState("favorited");
 
   const getNotes = () => {
     setLoading(true);
-    apiCall("/notes", {}, (data) => {
+    apiCall("/notes", { sort: sort }, (data) => {
       setNotes(data.notes);
       setLoading(false);
     });
   };
 
+  React.useEffect(() => {
+    getNotes();
+  }, [sort]);
+
   return (
     <>
       <LoadingContext.Provider value={[loading, setLoading]}>
-        <NotesContext.Provider value={[notes, setNotes, getNotes]}>
-          <NoteContext.Provider value={[note, setNote]}>
-            <div className="p-4">
-              <Nav />
-              <div className="row">
-                <div className="col-3">
-                  <Notes />
+        <SortFilterContext.Provider value={[sort, setSort]}>
+          <NotesContext.Provider value={[notes, setNotes, getNotes]}>
+            <NoteContext.Provider value={[note, setNote]}>
+              <FullscreenContext.Provider value={[fullscreen, setFullscreen]}>
+                <div className="p-4">
+                  <Nav />
+                  <div className="row">
+                    <div className={fullscreen ? "d-none" : "col-3"}>
+                      <Notes />
+                    </div>
+                    <div className={"col-" + (fullscreen ? "12" : "9")}>
+                      {note.length !== 0 && <Editor />}
+                    </div>
+                  </div>
                 </div>
-                <div className="col-9">{note.length !== 0 && <Editor />}</div>
-              </div>
-            </div>
-          </NoteContext.Provider>
-        </NotesContext.Provider>
+              </FullscreenContext.Provider>
+            </NoteContext.Provider>
+          </NotesContext.Provider>
+        </SortFilterContext.Provider>
       </LoadingContext.Provider>
     </>
   );
