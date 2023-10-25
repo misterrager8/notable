@@ -1,6 +1,6 @@
 .env
 *.pyc
-MarkdownLab.egg-info/
+notable.egg-info/
 .DS_Store
 Notes/
 *.db

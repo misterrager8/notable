@@ -1,34 +1,20 @@
-# Markdown Lab
----
+# notable
 
-Minimalist markdown text editor, running in any web browser of your choice. Powered by Flask and JS. Also inspired by [archivy](https://github.com/archivy/archivy).
+Browser-based note taking web app
 
-![screen1](docs/screencapture1.png)
-![screen2](docs/screencapture2.png)
+- Create, view, edit your txt files
+- Runs straight from the browser
 
-- Organize markdown notes in any directory you choose
-- Save your favorite notes for quicker access
+## Installation
 
-## Installation / Usage
-1. Clone this repo
-2. Run `python3 setup.py develop` command in working directory
-3. Set config variables in `.env`:
+- Clone this repository
+- Run command: python3 setup.py develop
+- Run notable command for help and options
 
-        home_dir (directory of your choice)
+## Authors
 
-4. Run `mdlab run` command
+C.N. Joseph
 
-### Tools Used
+## License
 
-- Flask
-- React CDN
-- Pathlib
-- Click
-
-### Author
-
-[C.N. Joseph (misterrager8)](https://github.com/misterrager8)
-
-### License
-
-MIT License
+notable is under the MIT license. See LICENSE.md for details.
