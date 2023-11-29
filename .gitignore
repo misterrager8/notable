@@ -4,3 +4,4 @@ notable.egg-info/
 .DS_Store
 Notes/
 *.db
+todos.json

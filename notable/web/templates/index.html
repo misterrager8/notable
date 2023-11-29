@@ -21,6 +21,11 @@
     <title>notable</title>
   </head>
   <body>
+    {% if debug %}
+    <div class="small opacity-50 text-center p-1">
+      <i class="bi bi-bug-fill me-2"></i>Debug Mode
+    </div>
+    {% endif %}
     <div id="root"></div>
     <script
       crossorigin

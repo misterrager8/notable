@@ -611,7 +611,11 @@ function Nav() {
 
 function App() {
   const [loading, setLoading] = React.useState(false);
-  const [note, setNote] = React.useState([]);
+  const [note, setNote] = React.useState(
+    localStorage.getItem("last-opened")
+      ? JSON.parse(localStorage.getItem("last-opened"))
+      : []
+  );
   const [notes, setNotes] = React.useState([]);
   const [fullscreen, setFullscreen] = React.useState(false);
   const [sort, setSort] = React.useState("favorited");
@@ -635,6 +639,12 @@ function App() {
   React.useEffect(() => {
     getNotes();
   }, [sort, filter]);
+
+  React.useEffect(() => {
+    note.length !== 0
+      ? localStorage.setItem("last-opened", JSON.stringify(note))
+      : localStorage.removeItem("last-opened");
+  }, [note]);
 
   return (
     <>

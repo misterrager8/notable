@@ -10,7 +10,7 @@ from ..models import Folder, Note
 
 @current_app.get("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", debug=current_app.config.get("DEBUG"))
 
 
 @current_app.post("/notes")
