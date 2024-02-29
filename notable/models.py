@@ -131,7 +131,7 @@ class Note:
             x = [Note(i) for i in config.HOME_DIR.glob("**/*.txt")]
         return sorted(
             x,
-            key=attrgetter(sort),
+            key=attrgetter(sort, "last_modified"),
             reverse=sort in ["favorited", "last_modified", "date_created"],
         )
 
@@ -156,6 +156,8 @@ class Note:
             "markdown": markdown.markdown(self.content),
             "favorited": self.favorited,
             "folder": self.folder,
+            "last_modified": self.last_modified.strftime("%-m/%-d/%y @ %-I:%M %p"),
+            "date_created": self.date_created.strftime("%-m/%-d/%y @ %-I:%M %p"),
         }
 
     def __str__(self):

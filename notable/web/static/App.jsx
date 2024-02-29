@@ -1,678 +1,650 @@
-// Contexts
-const LoadingContext = React.createContext();
-const NoteContext = React.createContext();
-const NotesContext = React.createContext();
-const FoldersContext = React.createContext();
-const FullscreenContext = React.createContext();
-const SortFilterContext = React.createContext();
-
 var timer = null;
 
-function apiCall(url, params, callback) {
-  fetch(url, {
-    headers: {
-      "Content-Type": "application/json",
-    },
+const sorts = [
+  {
+    name: "name",
+    label: "Name",
+    icon: "type",
+  },
+  {
+    name: "last_modified",
+    label: "Last Modified",
+    icon: "pencil",
+  },
+  {
+    name: "date_created",
+    label: "Date Created",
+    icon: "plus-lg",
+  },
+  {
+    name: "favorited",
+    label: "Pinned",
+    icon: "pin-angle-fill",
+  },
+];
+
+const defaultSettings = {
+  theme: "light",
+  lastOpened: "",
+  mode: "split",
+  sort: "favorited",
+};
+
+const makeRequest = (url, params = {}, callback) => {
+  fetch(`/${url}`, {
+    headers: { "Content-Type": "application/json" },
     method: "POST",
     body: JSON.stringify(params),
   })
     .then((response) => response.json())
     .then((data) => callback(data));
+};
+
+// Contexts
+const LoadingContext = React.createContext();
+const SettingsContext = React.createContext();
+const SelectedNoteContext = React.createContext();
+const NotesContext = React.createContext();
+const FolderContext = React.createContext();
+
+// Atoms
+function Button(props) {
+  return (
+    <button
+      type={props.type || "button"}
+      onClick={props.target ? null : props.onClick}
+      data-bs-toggle={props.target ? "dropdown" : null}
+      data-bs-target={props.target ? `#${props.target}` : null}
+      className={
+        props.className + " btn" + (props.size === "sm" ? " btn-sm" : "")
+      }>
+      {props.icon && (
+        <Icon name={props.icon} className={props.text ? "me-2" : ""} />
+      )}
+      {props.children}
+      {props.text}
+    </button>
+  );
+}
+
+function Link(props) {
+  return <></>;
+}
+
+function Input(props) {
+  return <></>;
+}
+
+function Spinner(props) {
+  return <></>;
+}
+
+function Icon(props) {
+  return <i className={props.className + " bi bi-" + props.name}></i>;
+}
+
+function Dropdown(props) {
+  return (
+    <div className={props.className + " dropdown"}>
+      <Button
+        icon={props.icon}
+        className={props.classNameBtn + " dropdown-toggle"}
+        target={props.target}
+        text={props.text}
+      />
+      <div id={props.target} className={props.classNameMenu + " dropdown-menu"}>
+        {props.children}
+      </div>
+    </div>
+  );
 }
 
 // Forms
 
-function Editor() {
-  const [, setLoading] = React.useContext(LoadingContext);
-  const [mode, setMode] = React.useState("view");
-  const [note, setNote] = React.useContext(NoteContext);
-  const [, , getNotes] = React.useContext(NotesContext);
-  const [saved, setSaved] = React.useState(false);
-  const [copied, setCopied] = React.useState(false);
-  const [url, setUrl] = React.useState("");
-  const [saving, setSaving] = React.useState(false);
-  const [folders] = React.useContext(FoldersContext);
-
-  const onChangeUrl = (e) => setUrl(e.target.value);
-
-  const copyNote = () => {
-    navigator.clipboard.writeText(note.content);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1000);
-  };
-
-  const editNote = () => {
-    setLoading(true);
-    apiCall(
-      "/edit_note",
-      { path: note.path, content: document.getElementById("content").value },
-      (data) => {
-        setNote(data);
-        setLoading(false);
-        setSaved(true);
-        setTimeout(() => setSaved(false), 500);
-      }
-    );
-  };
-
-  const renameNote = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    apiCall(
-      "/rename_note",
-      { path: note.path, new_name: document.getElementById("note-name").value },
-      (data) => {
-        setNote(data);
-        getNotes();
-        setLoading(false);
-      }
-    );
-  };
-
-  const fixupTitle = () => {
-    setLoading(true);
-    apiCall("/fixup_title", { path: note.path }, (data) => {
-      setNote(data);
-      getNotes();
-      setLoading(false);
-    });
-  };
-
-  const changeFolder = (newFolder) => {
-    setLoading(true);
-    apiCall(
-      "/change_folder",
-      { path: note.path, new_folder: newFolder },
-      (data) => {
-        setNote(data);
-        getNotes();
-        setLoading(false);
-      }
-    );
-  };
-
-  const savePage = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    apiCall("/save_page", { path: note.path, url: url }, (data) => {
-      setNote(data);
-      setLoading(false);
-      setUrl("");
-      setSaved(true);
-      setTimeout(() => setSaved(false), 500);
-    });
-  };
-
-  React.useEffect(() => {
-    if (mode === "edit") {
-      timer = setInterval(() => editNote(), 30000);
-    } else {
-      clearInterval(timer);
-    }
-  }, [mode]);
-
-  return (
-    <>
-      <form onSubmit={(e) => renameNote(e)} className="input-group">
-        <a className="btn border-0 ps-0" onClick={() => fixupTitle()}>
-          <i className="bi bi-type"></i>
-        </a>
-        <input
-          required
-          autoComplete="off"
-          className="form-control border-0 p-0 heading fs-5"
-          defaultValue={note.name}
-          key={`${note.name}-name`}
-          id="note-name"
-        />
-      </form>
-      <div className="dropdown mb-2">
-        <a
-          className="btn btn-sm dropdown-toggle border-0"
-          data-bs-toggle="dropdown"
-          data-bs-target="#folders">
-          <i className="me-2 bi bi-folder-fill"></i>
-          {note.folder || "No Folder"}
-        </a>
-        <div id="folders" className="dropdown-menu">
-          <a onClick={() => changeFolder(null)} className="dropdown-item">
-            No Folder
-          </a>
-          {folders.map((x) => (
-            <a onClick={() => changeFolder(x)} className="dropdown-item">
-              {x}
-            </a>
-          ))}
-        </div>
-      </div>
-      <div className="btn-group mb-2">
-        <a onClick={() => copyNote()} className="btn">
-          <i className={"bi bi-clipboard" + (copied ? "-check" : "")}></i>
-        </a>
-        <a
-          className={"btn" + (mode === "view" ? " active" : "")}
-          onClick={() => setMode("view")}>
-          <i className="bi bi-eye"></i>
-        </a>
-        <a
-          className={"btn" + (mode === "edit" ? " active" : "")}
-          onClick={() => setMode("edit")}>
-          <i className="bi bi-pen"></i>
-        </a>
-        <a
-          className={"btn" + (saving ? " active" : "")}
-          onClick={() => setSaving(!saving)}>
-          <i className="bi bi-link"></i>
-        </a>
-
-        {mode === "edit" && (
-          <a className="btn" onClick={() => editNote()}>
-            <i className={"bi bi-" + (saved ? "check-lg" : "save2")}></i>
-          </a>
-        )}
-      </div>
-      {saving && (
-        <form onSubmit={savePage} className="input-group">
-          <input
-            autoComplete="off"
-            className="form-control"
-            placeholder="URL"
-            value={url}
-            onChange={onChangeUrl}
-          />
-          <button type="submit" className="btn">
-            Save
-          </button>
-        </form>
-      )}
-      <hr />
-      <div className="p-1" style={{ height: "500px", overflowY: "scroll" }}>
-        {mode === "view" ? (
-          <div
-            id="reader"
-            dangerouslySetInnerHTML={{ __html: note.markdown }}></div>
-        ) : (
-          <textarea
-            className="form-control h-100 border-0"
-            key={note.name}
-            id="content"
-            defaultValue={note.content}></textarea>
-        )}
-      </div>
-    </>
-  );
-}
-
-function NoteItem({ item }) {
-  const [, , getNotes] = React.useContext(NotesContext);
-  const [, setLoading] = React.useContext(LoadingContext);
-  const [note, setNote] = React.useContext(NoteContext);
-  const [deleting, setDeleting] = React.useState(false);
-
-  const deleteNote = () => {
-    setLoading(true);
-    apiCall("/delete_note", { path: item.path }, (data) => {
-      note.name === item.name && setNote([]);
-      setLoading(false);
-      getNotes();
-    });
-  };
-
-  const toggleFavorite = () => {
-    setLoading(true);
-    apiCall("/toggle_favorite", { path: item.path }, (data) => {
-      setLoading(false);
-      getNotes();
-    });
-  };
+// Items
+function NoteItem({ item, className = "" }) {
+  const [selectedNote, setSelectedNote] = React.useContext(SelectedNoteContext);
+  const [settings, setSettings] = React.useContext(SettingsContext);
 
   return (
     <div
       className={
-        "d-flex justify-content-between text-truncate py-1" +
-        (item.name === note.name ? " selected" : "")
-      }>
-      <div className="text-truncate heading">
-        <a title={item.name} onClick={() => setNote(item)}>
+        className +
+        " py-2 rounded px-3 item" +
+        (selectedNote.name === item.name ? " selected" : "")
+      }
+      onClick={() => setSelectedNote({ ...item })}>
+      <div className="between">
+        <div
+          className={
+            "pe-4 text-truncate fw-bold" +
+            (item.favorited && selectedNote.name !== item.name
+              ? " highlight"
+              : "")
+          }>
           {item.name}
-        </a>
-      </div>
-      <div>
-        {item.folder && (
-          <span className="badge">
-            <i className="me-1 bi bi-folder-fill"></i>
-            {item.folder}
-          </span>
-        )}
-        <div className="btn-group ps-2">
-          <button
-            className="btn text-warning border-0 px-1"
-            onClick={() => toggleFavorite()}>
-            <i className={"bi bi-star" + (item.favorited ? "-fill" : "")}></i>
-          </button>
-          {deleting && (
-            <button className="btn border-0 px-1" onClick={() => deleteNote()}>
-              <i className="bi bi-question-lg"></i>
-            </button>
-          )}
-          <button
-            className="btn border-0 px-1"
-            onClick={() => setDeleting(!deleting)}>
-            <i className="bi bi-trash2"></i>
-          </button>
         </div>
+        {item.favorited && (
+          <Icon className="py-1 small" name="pin-angle-fill" />
+        )}
+      </div>
+      <div className="between small mt-1">
+        {settings.sort === "date_created" ? (
+          <div className="opacity-75">
+            <Icon name="plus-lg" className="me-1" />
+            {item.date_created}
+          </div>
+        ) : (
+          <div className="opacity-75">
+            <Icon name="pencil" className="me-1" />
+            {item.last_modified}
+          </div>
+        )}
+        {item.folder && <div className="badge">{item.folder}</div>}
       </div>
     </div>
   );
 }
 
+// Panels
+
 function FolderItem({ item }) {
+  const [folders, setFolders, selectedFolder, setSelectedFolder, getFolders] =
+    React.useContext(FolderContext);
   const [deleting, setDeleting] = React.useState(false);
   const [editing, setEditing] = React.useState(false);
-  const [, , filter, setFilter] = React.useContext(SortFilterContext);
-  const [name, setName] = React.useState(item);
-  const [, , getFolders] = React.useContext(FoldersContext);
-  const [, , getNotes] = React.useContext(NotesContext);
+  const [name, setName] = React.useState("");
 
   const onChangeName = (e) => setName(e.target.value);
 
-  const deleteFolder = () => {
-    apiCall("/delete_folder", { name: item }, (data) => getFolders());
-  };
+  const deleteFolder = () =>
+    makeRequest("delete_folder", { name: item }, (data) => getFolders());
 
   const renameFolder = (e) => {
     e.preventDefault();
-    apiCall("/rename_folder", { name: item, new_name: name }, (data) => {
+    makeRequest("rename_folder", { name: item, new_name: name }, (data) => {
       setEditing(false);
       getFolders();
-      getNotes();
+      // getNotes();
     });
   };
 
+  React.useEffect(() => {
+    setName(item);
+  }, []);
+
   return (
-    <div
-      className={
-        "d-flex justify-content-between py-1" +
-        (item === filter ? " selected" : "")
-      }>
-      <div>
-        {editing ? (
-          <form onSubmit={(e) => renameFolder(e)}>
-            <input
-              autoComplete="off"
-              className="form-control form-control-sm"
-              value={name}
-              onChange={onChangeName}
-            />
-          </form>
-        ) : (
-          <a onClick={() => setFilter(item)} className="heading">
-            {item}
-          </a>
-        )}
-      </div>
-      <div className="btn-group">
-        <a onClick={() => setEditing(!editing)} className="btn px-2 border-0">
-          <i className={"ps-0 bi bi-" + (editing ? "arrow-left" : "pen")}></i>
+    <div className="small between">
+      {editing ? (
+        <form
+          className="input-group input-group-sm "
+          style={{ marginBlockEnd: 0 }}
+          onSubmit={(e) => renameFolder(e)}>
+          <input
+            onChange={onChangeName}
+            value={name}
+            className="form-control border-0 opacity-50"
+            autoComplete="off"
+            required
+          />
+        </form>
+      ) : (
+        <a className="py-1 fw-bold" onClick={() => setSelectedFolder(item)}>
+          {item}
         </a>
+      )}
+      <div className="btn-group btn-group-sm">
+        <Button
+          onClick={() => setEditing(!editing)}
+          className={"border-0"}
+          icon={editing ? "arrow-left" : "pencil"}
+        />
         {deleting && (
-          <a onClick={() => deleteFolder()} className="btn px-2 border-0">
-            <i className="bi bi-question-lg"></i>
-          </a>
+          <Button
+            onClick={() => deleteFolder()}
+            className="border-0"
+            icon="question-lg"
+          />
         )}
-        <a onClick={() => setDeleting(!deleting)} className="btn px-2 border-0">
-          <i className="bi bi-trash2"></i>
-        </a>
+        <Button
+          onClick={() => setDeleting(!deleting)}
+          className="border-0"
+          icon="trash2"
+        />
       </div>
     </div>
   );
 }
 
-function Spinner() {
-  return <span className="me-2 spinner-border spinner-border-sm"></span>;
-}
-
-function Search() {
-  const [, setLoading] = React.useContext(LoadingContext);
-  const [query, setQuery] = React.useState("");
-  const [results, setResults] = React.useState([]);
-
-  const onChangeQuery = (e) => {
-    setQuery(e.target.value);
-  };
-
-  const search = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    apiCall("/search", { query: query }, (data) => {
-      setLoading(false);
-      setResults(data.results);
-    });
-  };
-
-  return (
-    <>
-      <form className="input-group" onSubmit={(e) => search(e)}>
-        <input
-          className="form-control"
-          placeholder="Search"
-          autoComplete="off"
-          value={query}
-          onChange={onChangeQuery}
-          required
-        />
-        {results.length !== 0 && (
-          <button
-            className="btn"
-            onClick={() => {
-              setQuery("");
-              setResults([]);
-            }}>
-            <i className="bi bi-x-lg"></i>
-          </button>
-        )}
-        <button type="submit" className="btn">
-          <i className="bi bi-search"></i>
-        </button>
-      </form>
-
-      <div className="my-2">
-        {results.map((x) => (
-          <>
-            <a className="d-block heading">{x.file}</a>
-            <div className="fst-italic small opacity-50">"{x.match}"</div>
-          </>
-        ))}
-      </div>
-    </>
-  );
-}
-
-function SortAndFilter() {
-  const [folders, , getFolders] = React.useContext(FoldersContext);
-  const [sort, setSort, filter, setFilter] =
-    React.useContext(SortFilterContext);
+function NotesPanel(props) {
+  const [notes, setNotes, getNotes] = React.useContext(NotesContext);
+  const [folders, setFolders, selectedFolder, setSelectedFolder, getFolders] =
+    React.useContext(FolderContext);
+  const [settings, setSettings] = React.useContext(SettingsContext);
   const [showFolders, setShowFolders] = React.useState(false);
 
-  React.useEffect(() => {
-    getFolders();
-  }, []);
+  React.useEffect(() => getNotes(), [settings, selectedFolder]);
+  React.useEffect(() => getFolders(), []);
 
-  const sorts = [
-    "name",
-    "favorited",
-    "folder",
-    "last_modified",
-    "date_created",
-  ];
+  const addFolder = () => makeRequest("add_folder", {}, (data) => getFolders());
 
   return (
-    <>
-      <div className="d-flex justify-content-between mt-3">
-        <button
-          data-bs-target="#sort"
-          data-bs-toggle="dropdown"
-          className="btn border-0 dropdown-toggle text-capitalize">
-          <i className="me-2 bi bi-filter-right"></i>
-          {sort.replace("_", " ")}
-        </button>
-        <div id="sort" className="dropdown-menu">
+    <div className={props.className}>
+      <div className="between mb-2">
+        <Dropdown
+          classNameBtn="border-0 text-capitalize"
+          className="btn-group-sm"
+          target="sorts"
+          icon={sorts.filter((x) => x.name === settings.sort)[0].icon}
+          text={sorts.filter((x) => x.name === settings.sort)[0].label}>
           {sorts.map((x) => (
-            <>
-              {sort !== x && (
-                <button
-                  onClick={() => setSort(x)}
-                  className="dropdown-item text-capitalize">
-                  {x.replace("_", " ")}
-                </button>
-              )}
-            </>
+            <button
+              key={x.name}
+              className="dropdown-item between"
+              onClick={() => setSettings({ ...settings, sort: x.name })}>
+              <span className="">{x.label}</span>
+              <Icon name={x.icon} className="m-1" />
+            </button>
           ))}
-        </div>
-        <div className="btn-group">
-          <button
+        </Dropdown>
+        <div className="btn-group btn-group-sm">
+          <Button
             onClick={() => setShowFolders(!showFolders)}
             className={
-              "btn border-0 dropdown-toggle" + (filter ? " active" : "")
-            }>
-            <i className="me-2 bi bi-folder-fill"></i>
-            {filter ? filter : "All Notes"}
-          </button>
-          {filter !== null && (
-            <button onClick={() => setFilter(null)} className="btn border-0">
-              <i className="bi bi-x-lg"></i>
-            </button>
+              "dropdown-toggle border-0" + (showFolders ? " selected" : "")
+            }
+            icon="folder"
+            text={
+              selectedFolder ? selectedFolder.substring(0, 10) : "All Folders"
+            }
+          />
+          {selectedFolder !== null && (
+            <Button
+              onClick={() => setSelectedFolder(null)}
+              className="border-0"
+              icon="x-lg"
+            />
           )}
         </div>
       </div>
-      {showFolders && (
-        <div className="p-3">
-          {folders.map((x) => (
-            <FolderItem item={x} />
-          ))}
-        </div>
-      )}
-    </>
-  );
-}
-
-function Notes() {
-  const [, setLoading] = React.useContext(LoadingContext);
-  const [notes, , getNotes] = React.useContext(NotesContext);
-  const [, , getFolders] = React.useContext(FoldersContext);
-  const [, setNote] = React.useContext(NoteContext);
-  const [, , filter] = React.useContext(SortFilterContext);
-
-  React.useEffect(() => {
-    getNotes();
-  }, []);
-
-  const addNote = () => {
-    setLoading(true);
-    apiCall("/add_note", { folder: filter }, (data) => {
-      setLoading(false);
-      setNote(data);
-      getNotes();
-    });
-  };
-
-  const addFolder = () => {
-    setLoading(true);
-    apiCall("/add_folder", {}, (data) => {
-      getFolders();
-      setLoading(false);
-    });
-  };
-
-  return (
-    <>
-      <div className="pe-3">
-        <Search />
-        <div className="btn-group w-100">
-          <a className="btn" onClick={() => addNote()}>
-            <i className="me-2 bi bi-file-earmark-plus"></i>New Note
-          </a>
-          <a className="btn" onClick={() => addFolder()}>
-            <i className="me-2 bi bi-folder-plus"></i>New Folder
-          </a>
-        </div>
-        <SortAndFilter />
+      <div>
+        {showFolders && (
+          <div className="px-3">
+            <hr />
+            <Button
+              onClick={() => addFolder()}
+              text="New Folder"
+              icon="plus-lg"
+              className="w-100 mb-3"
+              size="sm"
+            />
+            {folders.map((x) => (
+              <React.Fragment key={x}>
+                {x !== selectedFolder && <FolderItem item={x} />}
+              </React.Fragment>
+            ))}
+            <hr />
+          </div>
+        )}
       </div>
-      <div
-        className="mt-3 pe-3"
-        style={{ overflowY: "scroll", height: "450px" }}>
+      <div>
         {notes.map((x) => (
-          <NoteItem key={`${x.name}-card`} item={x} />
+          <NoteItem className="" key={x.name} item={x} />
         ))}
       </div>
-      <hr />
-      <div className="small opacity-50">{notes.length} note(s)</div>
-    </>
+    </div>
   );
 }
 
-function Nav() {
-  const [loading] = React.useContext(LoadingContext);
-  const [fullscreen, setFullscreen] = React.useContext(FullscreenContext);
-  const [note, setNote] = React.useContext(NoteContext);
-  const [theme, setTheme] = React.useState(
-    localStorage.getItem("notable-theme") || "light"
-  );
-  const [, , , setFilter] = React.useContext(SortFilterContext);
+function Editor(props) {
+  const [selectedNote, setSelectedNote, content, setContent] =
+    React.useContext(SelectedNoteContext);
+  const [settings, setSettings] = React.useContext(SettingsContext);
+
+  const onChangeContent = (e) => setContent(e.target.value);
 
   React.useEffect(() => {
-    localStorage.setItem("notable-theme", theme);
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
+    setContent(selectedNote.length !== 0 ? selectedNote.content : "");
+    setSettings({
+      ...settings,
+      lastOpened: selectedNote.length !== 0 ? { ...selectedNote } : "",
+    });
+  }, [selectedNote]);
+
+  return (
+    <div className={props.className}>
+      <div className="row h-100 overflow-scroll">
+        {["split", "write"].includes(settings.mode) && (
+          <div
+            className={
+              "px-3 border-end col-" + (settings.mode === "write" ? "12" : "6")
+            }>
+            <textarea
+              className="form-control h-100"
+              value={content}
+              onChange={onChangeContent}
+              placeholder="..."></textarea>
+          </div>
+        )}
+        {["split", "read"].includes(settings.mode) && (
+          <div
+            className={"px-5 col-" + (settings.mode === "read" ? "12" : "6")}>
+            <div
+              id="reader"
+              dangerouslySetInnerHTML={{
+                __html: window.markdownit().render(content),
+              }}></div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Nav(props) {
+  const [settings, setSettings] = React.useContext(SettingsContext);
+  const [selectedNote, setSelectedNote, content, setContent] =
+    React.useContext(SelectedNoteContext);
+  const [folders, setFolders, selectedFolder, setSelectedFolder, getFolders] =
+    React.useContext(FolderContext);
+  const [deleting, setDeleting] = React.useState(false);
+  const [copied, setCopied] = React.useState(false);
+  const [saved, setSaved] = React.useState(false);
+  const [notes, setNotes, getNotes] = React.useContext(NotesContext);
+  const [name, setName] = React.useState("");
+
+  const onChangeName = (e) => setName(e.target.value);
+
+  React.useEffect(() => {
+    selectedNote.length !== 0 && setName(selectedNote.name);
+  }, [selectedNote]);
 
   const themes = [
     "light",
     "dark",
-    "manila",
-    "looseleaf",
-    "space",
-    "pine",
-    "quartz",
-    "licorice",
-    "magenta",
+    "caramel",
+    "ocean",
+    "violet",
+    "navy",
+    "vanilla",
+    "mint",
+    "ruby",
+    "forest",
   ];
 
+  const copyNote = () => {
+    navigator.clipboard.writeText(selectedNote.content);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  const editNote = () => {
+    makeRequest(
+      "edit_note",
+      { path: selectedNote.path, content: content },
+      (data) => {
+        setSelectedNote(data);
+        getNotes();
+        setSaved(true);
+        setTimeout(() => setSaved(false), 1500);
+      }
+    );
+  };
+
+  const deleteNote = () => {
+    makeRequest("delete_note", { path: selectedNote.path }, (data) => {
+      setSelectedNote([]);
+      getNotes();
+      setDeleting(false);
+    });
+  };
+
+  const togglePin = () => {
+    makeRequest("toggle_favorite", { path: selectedNote.path }, (data) => {
+      setSelectedNote({ ...selectedNote, favorited: !selectedNote.favorited });
+      getNotes();
+    });
+  };
+
+  const addNote = () => {
+    makeRequest("add_note", { folder: selectedFolder }, (data) => {
+      setSelectedNote(data);
+      getNotes();
+    });
+  };
+
+  const renameNote = (e) => {
+    e.preventDefault();
+    makeRequest(
+      "rename_note",
+      { path: selectedNote.path, new_name: name },
+      (data) => {
+        setSelectedNote(data);
+        getNotes();
+      }
+    );
+  };
+
+  const changeFolder = (newFolder) => {
+    makeRequest(
+      "change_folder",
+      { path: selectedNote.path, new_folder: newFolder },
+      (data) => {
+        setSelectedNote(data);
+        getNotes();
+      }
+    );
+  };
+
   return (
-    <nav className="navbar navbar-expand-lg mb-3 sticky-top">
-      <div className="container-fluid">
-        {note.length !== 0 && (
-          <a
-            onClick={() => setFullscreen(!fullscreen)}
-            className="navbar-brand">
-            <i
-              className={
-                "bi bi-layout-sidebar-inset" + (fullscreen ? "" : "-reverse")
-              }></i>
-          </a>
-        )}
-        <a
-          onClick={() => {
-            setNote([]);
-            setFilter(null);
-          }}
-          className="navbar-brand">
-          {!loading ? (
-            <img width="20" height="20" src="./static/favicon.svg"></img>
-          ) : (
-            <Spinner />
-          )}
-        </a>
-        <a
-          class="nav-item navbar-toggler"
-          data-bs-target="#nav-content"
-          data-bs-toggle="collapse"
-          type="button">
-          <i class="bi bi-list"></i>
-        </a>
-        <div className="collapse navbar-collapse" id="nav-content">
-          <ul className="navbar-nav ms-auto">
-            <li className="nav-item dropdown text-capitalize">
-              <a
-                data-bs-toggle="dropdown"
-                data-bs-target="#themes"
-                className="nav-link dropdown-toggle">
-                <i className="me-2 bi bi-paint-bucket"></i>
-                {theme}
-              </a>
-              <div id="themes" className="dropdown-menu">
-                {themes.map((x) => (
-                  <>
-                    {theme !== x && (
-                      <a
-                        key={x}
-                        onClick={() => setTheme(x)}
-                        className="dropdown-item">
-                        {x}
-                      </a>
-                    )}
-                  </>
-                ))}
-              </div>
-            </li>
-            <li className="nav-item">
-              <a
-                target="_blank"
-                href="https://github.com/misterrager8/notable"
-                className="nav-link">
-                <i className="me-2 bi bi-info-circle"></i>About
-              </a>
-            </li>
-          </ul>
+    <div className={props.className + " row"}>
+      <div className="col-2">
+        <div className="between">
+          <Button
+            onClick={() => {
+              setSelectedNote([]);
+              setSettings({ ...settings, lastOpened: "" });
+            }}
+            className={"border-0 btn-sm"}
+            text={"notable"}>
+            <img
+              className="me-2 pb-1"
+              src="static/favicon.svg"
+              width={20}
+              height={20}
+            />
+          </Button>
+          <Button
+            onClick={() => addNote()}
+            className={"btn-sm"}
+            text={"New Note"}
+            icon={"plus-lg"}
+          />
         </div>
       </div>
-    </nav>
+      <div className="col-5">
+        {selectedNote.length !== 0 && (
+          <form
+            className="input-group input-group-sm"
+            onSubmit={(e) => renameNote(e)}>
+            <input
+              value={name}
+              onChange={onChangeName}
+              className="form-control fst-italic border-0 "
+              style={{ letterSpacing: "2px" }}
+            />
+            <Dropdown
+              icon="folder"
+              className="btn-group-sm"
+              classNameBtn="border-0"
+              target="note-folder"
+              text={selectedNote.folder ? selectedNote.folder : "No Folder"}>
+              <button
+                onClick={() => changeFolder(null)}
+                type="button"
+                className="dropdown-item">
+                No Folder
+              </button>
+              {folders.map((x) => (
+                <button
+                  key={`${x}-2`}
+                  onClick={() => changeFolder(x)}
+                  type="button"
+                  className="dropdown-item">
+                  {x}
+                </button>
+              ))}
+            </Dropdown>
+            <div className="btn-group btn-group-sm ms-2">
+              <Button
+                className={settings.mode === "read" ? "active" : ""}
+                onClick={() => setSettings({ ...settings, mode: "read" })}
+                icon="eye-fill"
+              />
+              <Button
+                className={settings.mode === "write" ? "active" : ""}
+                onClick={() => setSettings({ ...settings, mode: "write" })}
+                icon="pencil"
+              />
+              <Button
+                className={settings.mode === "split" ? "active" : ""}
+                onClick={() => setSettings({ ...settings, mode: "split" })}
+                icon="layout-split"
+              />
+            </div>
+          </form>
+        )}
+      </div>
+      <div className="col-5">
+        <div className="between">
+          <div className="btn-group btn-group-sm">
+            {selectedNote.length !== 0 && (
+              <>
+                {settings.mode !== "read" && (
+                  <Button
+                    onClick={() => editNote()}
+                    text={saved ? "Saved." : "Save"}
+                    icon={saved ? "check-lg" : "floppy2-fill"}
+                  />
+                )}
+                <Button
+                  onClick={() => togglePin()}
+                  text={selectedNote.favorited ? "Unpin" : "Pin"}
+                  icon={"pin-angle" + (selectedNote.favorited ? "-fill" : "")}
+                  className={selectedNote.favorited ? "active" : ""}
+                />
+                <Button
+                  onClick={() => copyNote()}
+                  text={"Copy"}
+                  icon={"clipboard" + (copied ? "-check" : "")}
+                />
+                <Button
+                  onClick={() => setDeleting(!deleting)}
+                  text={"Delete"}
+                  icon={"trash2"}
+                />
+                {deleting && (
+                  <Button
+                    onClick={() => deleteNote()}
+                    text={"Delete"}
+                    icon={"question-lg"}
+                  />
+                )}
+              </>
+            )}
+          </div>
+
+          <div className="btn-group btn-group-sm">
+            <Dropdown
+              icon={"paint-bucket"}
+              className="btn-group btn-group-sm"
+              classNameBtn="text-capitalize"
+              text={settings.theme}
+              target="themes">
+              {themes.map((x) => (
+                <React.Fragment key={x}>
+                  {settings.theme !== x && (
+                    <button
+                      onClick={() => setSettings({ ...settings, theme: x })}
+                      className="dropdown-item text-capitalize">
+                      {x}
+                    </button>
+                  )}
+                </React.Fragment>
+              ))}
+            </Dropdown>
+            <a
+              target="_blank"
+              className="btn"
+              href="https://github.com/misterrager8/notable">
+              <i className="bi bi-info-circle me-2"></i>About
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
 function App() {
-  const [loading, setLoading] = React.useState(false);
-  const [note, setNote] = React.useState(
-    localStorage.getItem("last-opened")
-      ? JSON.parse(localStorage.getItem("last-opened"))
-      : []
+  const [settings, setSettings] = React.useState(
+    JSON.parse(localStorage.getItem("notable")) || defaultSettings
   );
+  const [selectedNote, setSelectedNote] = React.useState([]);
   const [notes, setNotes] = React.useState([]);
-  const [fullscreen, setFullscreen] = React.useState(false);
-  const [sort, setSort] = React.useState("favorited");
-  const [filter, setFilter] = React.useState(null);
+  const [content, setContent] = React.useState("");
+
   const [folders, setFolders] = React.useState([]);
+  const [selectedFolder, setSelectedFolder] = React.useState(null);
 
-  const getNotes = () => {
-    setLoading(true);
-    apiCall("/notes", { sort: sort, filter_: filter }, (data) => {
-      setNotes(data.notes);
-      setLoading(false);
-    });
-  };
+  const getNotes = () =>
+    makeRequest(
+      "notes",
+      { sort: settings.sort, filter_: selectedFolder },
+      (data) => setNotes(data.notes)
+    );
 
-  const getFolders = () => {
-    apiCall("/folders", {}, (data) => {
+  const getFolders = () =>
+    makeRequest("folders", {}, (data) => {
       setFolders(data.folders);
     });
-  };
 
   React.useEffect(() => {
-    getNotes();
-  }, [sort, filter]);
+    localStorage.setItem("notable", JSON.stringify(settings));
+
+    document.documentElement.setAttribute("data-theme", settings.theme);
+  }, [settings]);
 
   React.useEffect(() => {
-    note.length !== 0
-      ? localStorage.setItem("last-opened", JSON.stringify(note))
-      : localStorage.removeItem("last-opened");
-  }, [note]);
+    settings.lastOpened !== "" && setSelectedNote({ ...settings.lastOpened });
+  }, []);
 
   return (
-    <>
-      <LoadingContext.Provider value={[loading, setLoading]}>
-        <FoldersContext.Provider value={[folders, setFolders, getFolders]}>
-          <SortFilterContext.Provider
-            value={[sort, setSort, filter, setFilter]}>
-            <NotesContext.Provider value={[notes, setNotes, getNotes]}>
-              <NoteContext.Provider value={[note, setNote]}>
-                <FullscreenContext.Provider value={[fullscreen, setFullscreen]}>
-                  <div className="p-4">
-                    <Nav />
-                    <div className="row">
-                      <div className={fullscreen ? "d-none" : "col-xl-3"}>
-                        <Notes />
-                      </div>
-                      <div className={"col-xl-" + (fullscreen ? "12" : "9")}>
-                        {note.length !== 0 && <Editor />}
-                      </div>
-                    </div>
-                  </div>
-                </FullscreenContext.Provider>
-              </NoteContext.Provider>
-            </NotesContext.Provider>
-          </SortFilterContext.Provider>
-        </FoldersContext.Provider>
-      </LoadingContext.Provider>
-    </>
+    <SettingsContext.Provider value={[settings, setSettings]}>
+      <FolderContext.Provider
+        value={[
+          folders,
+          setFolders,
+          selectedFolder,
+          setSelectedFolder,
+          getFolders,
+        ]}>
+        <NotesContext.Provider value={[notes, setNotes, getNotes]}>
+          <SelectedNoteContext.Provider
+            value={[selectedNote, setSelectedNote, content, setContent]}>
+            <div className="p-4">
+              <Nav className="mb-3" />
+              <div className="row view">
+                <NotesPanel className="col-2 border-end h-100 overflow-scroll" />
+                {selectedNote.length !== 0 && (
+                  <Editor className="col-10 h-100" />
+                )}
+              </div>
+            </div>
+          </SelectedNoteContext.Provider>
+        </NotesContext.Provider>
+      </FolderContext.Provider>
+    </SettingsContext.Provider>
   );
 }
 
