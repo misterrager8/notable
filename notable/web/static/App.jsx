@@ -30,7 +30,7 @@ const defaultSettings = {
   sort: "favorited",
 };
 
-const makeRequest = (url, params = {}, callback) => {
+const api = (url, params = {}, callback) => {
   fetch(`/${url}`, {
     headers: { "Content-Type": "application/json" },
     method: "POST",
@@ -47,7 +47,6 @@ const SelectedNoteContext = React.createContext();
 const NotesContext = React.createContext();
 const FolderContext = React.createContext();
 
-// Atoms
 function Button(props) {
   return (
     <button
@@ -71,8 +70,28 @@ function Link(props) {
   return <></>;
 }
 
-function Input(props) {
-  return <></>;
+function Input({
+  className,
+  onChange,
+  value,
+  placeholder,
+  required,
+  type_,
+  size,
+}) {
+  return (
+    <input
+      onChange={onChange}
+      value={value}
+      className={
+        className + " form-control" + (size === "sm" ? " form-control-sm" : "")
+      }
+      placeholder={placeholder}
+      required={required}
+      autoComplete="off"
+      type={type_}
+    />
+  );
 }
 
 function Spinner(props) {
@@ -99,9 +118,6 @@ function Dropdown(props) {
   );
 }
 
-// Forms
-
-// Items
 function NoteItem({ item, className = "" }) {
   const [selectedNote, setSelectedNote] = React.useContext(SelectedNoteContext);
   const [settings, setSettings] = React.useContext(SettingsContext);
@@ -146,8 +162,6 @@ function NoteItem({ item, className = "" }) {
   );
 }
 
-// Panels
-
 function FolderItem({ item }) {
   const [folders, setFolders, selectedFolder, setSelectedFolder, getFolders] =
     React.useContext(FolderContext);
@@ -158,11 +172,11 @@ function FolderItem({ item }) {
   const onChangeName = (e) => setName(e.target.value);
 
   const deleteFolder = () =>
-    makeRequest("delete_folder", { name: item }, (data) => getFolders());
+    api("delete_folder", { name: item }, (data) => getFolders());
 
   const renameFolder = (e) => {
     e.preventDefault();
-    makeRequest("rename_folder", { name: item, new_name: name }, (data) => {
+    api("rename_folder", { name: item, new_name: name }, (data) => {
       setEditing(false);
       getFolders();
       // getNotes();
@@ -217,20 +231,31 @@ function FolderItem({ item }) {
 }
 
 function NotesPanel(props) {
-  const [notes, setNotes, getNotes] = React.useContext(NotesContext);
+  const [notes, setNotes, getNotes, getNote] = React.useContext(NotesContext);
   const [folders, setFolders, selectedFolder, setSelectedFolder, getFolders] =
     React.useContext(FolderContext);
   const [settings, setSettings] = React.useContext(SettingsContext);
   const [showFolders, setShowFolders] = React.useState(false);
+  const [search, setSearch] = React.useState("");
+  const [searchResults, setSearchResults] = React.useState([]);
 
   React.useEffect(() => getNotes(), [settings, selectedFolder]);
   React.useEffect(() => getFolders(), []);
 
-  const addFolder = () => makeRequest("add_folder", {}, (data) => getFolders());
+  const addFolder = () => api("add_folde/r", {}, (data) => getFolders());
+
+  const onChangeSearch = (e) => setSearch(e.target.value);
+
+  const searchNotes = (e) => {
+    e.preventDefault();
+    api("search", { query: search }, (data) => {
+      setSearchResults(data.results);
+    });
+  };
 
   return (
     <div className={props.className}>
-      <div className="between mb-2">
+      <div className="between">
         <Dropdown
           classNameBtn="border-0 text-capitalize"
           className="btn-group-sm"
@@ -267,6 +292,35 @@ function NotesPanel(props) {
           )}
         </div>
       </div>
+      <form onSubmit={searchNotes} className="input-group input-group-sm my-3">
+        <Input placeholder="Search" onChange={onChangeSearch} value={search} />
+        {searchResults.length !== 0 && (
+          <Button
+            type_="button"
+            onClick={() => {
+              setSearchResults([]);
+              setSearch("");
+            }}
+            className="border-0"
+            icon="x-circle"
+          />
+        )}
+      </form>
+      {searchResults.length !== 0 && (
+        <div className="px-2">
+          {searchResults.map((x) => (
+            <div className="mb-3">
+              <a
+                onClick={() => getNote(x.path)}
+                className="d-block fw-bold mb-1">
+                {x.file}
+              </a>
+              <div className="fst-italic small opacity-50">"{x.match}"</div>
+            </div>
+          ))}
+          <hr />
+        </div>
+      )}
       <div>
         {showFolders && (
           <div className="px-3">
@@ -379,20 +433,16 @@ function Nav(props) {
   };
 
   const editNote = () => {
-    makeRequest(
-      "edit_note",
-      { path: selectedNote.path, content: content },
-      (data) => {
-        setSelectedNote(data);
-        getNotes();
-        setSaved(true);
-        setTimeout(() => setSaved(false), 1500);
-      }
-    );
+    api("edit_note", { path: selectedNote.path, content: content }, (data) => {
+      setSelectedNote(data);
+      getNotes();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 1500);
+    });
   };
 
   const deleteNote = () => {
-    makeRequest("delete_note", { path: selectedNote.path }, (data) => {
+    api("delete_note", { path: selectedNote.path }, (data) => {
       setSelectedNote([]);
       getNotes();
       setDeleting(false);
@@ -400,14 +450,14 @@ function Nav(props) {
   };
 
   const togglePin = () => {
-    makeRequest("toggle_favorite", { path: selectedNote.path }, (data) => {
+    api("toggle_favorite", { path: selectedNote.path }, (data) => {
       setSelectedNote({ ...selectedNote, favorited: !selectedNote.favorited });
       getNotes();
     });
   };
 
   const addNote = () => {
-    makeRequest("add_note", { folder: selectedFolder }, (data) => {
+    api("add_note", { folder: selectedFolder }, (data) => {
       setSelectedNote(data);
       getNotes();
     });
@@ -415,18 +465,14 @@ function Nav(props) {
 
   const renameNote = (e) => {
     e.preventDefault();
-    makeRequest(
-      "rename_note",
-      { path: selectedNote.path, new_name: name },
-      (data) => {
-        setSelectedNote(data);
-        getNotes();
-      }
-    );
+    api("rename_note", { path: selectedNote.path, new_name: name }, (data) => {
+      setSelectedNote(data);
+      getNotes();
+    });
   };
 
   const changeFolder = (newFolder) => {
-    makeRequest(
+    api(
       "change_folder",
       { path: selectedNote.path, new_folder: newFolder },
       (data) => {
@@ -598,14 +644,15 @@ function App() {
   const [selectedFolder, setSelectedFolder] = React.useState(null);
 
   const getNotes = () =>
-    makeRequest(
-      "notes",
-      { sort: settings.sort, filter_: selectedFolder },
-      (data) => setNotes(data.notes)
+    api("notes", { sort: settings.sort, filter_: selectedFolder }, (data) =>
+      setNotes(data.notes)
     );
 
+  const getNote = (path) =>
+    api("note", { path: path }, (data) => setSelectedNote(data));
+
   const getFolders = () =>
-    makeRequest("folders", {}, (data) => {
+    api("folders", {}, (data) => {
       setFolders(data.folders);
     });
 
@@ -629,7 +676,7 @@ function App() {
           setSelectedFolder,
           getFolders,
         ]}>
-        <NotesContext.Provider value={[notes, setNotes, getNotes]}>
+        <NotesContext.Provider value={[notes, setNotes, getNotes, getNote]}>
           <SelectedNoteContext.Provider
             value={[selectedNote, setSelectedNote, content, setContent]}>
             <div className="p-4">

@@ -198,7 +198,8 @@ class Folder:
 class SearchResult:
     def __init__(self, line: str):
         self.file = Path(line.split(":")[0]).stem
+        self.path = Path(line.split(":")[0])
         self.match = line.split(":")[1]
 
     def to_dict(self) -> dict:
-        return {"file": self.file, "match": self.match}
+        return {"file": self.file, "path": str(self.path), "match": self.match}
