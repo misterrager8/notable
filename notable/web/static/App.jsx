@@ -1,5 +1,3 @@
-var timer = null;
-
 const sorts = [
   {
     name: "name",
@@ -30,44 +28,33 @@ const defaultSettings = {
   sort: "favorited",
 };
 
-const api = (url, params = {}, callback) => {
-  fetch(`/${url}`, {
-    headers: { "Content-Type": "application/json" },
+const MultiContext = React.createContext();
+
+const api = (url, params, callback) =>
+  fetch("/" + url, {
+    headers: {
+      "Content-Type": "application/json",
+    },
     method: "POST",
     body: JSON.stringify(params),
   })
     .then((response) => response.json())
     .then((data) => callback(data));
-};
 
-// Contexts
-const LoadingContext = React.createContext();
-const SettingsContext = React.createContext();
-const SelectedNoteContext = React.createContext();
-const NotesContext = React.createContext();
-const FolderContext = React.createContext();
-
-function Button(props) {
-  return (
-    <button
-      type={props.type || "button"}
-      onClick={props.target ? null : props.onClick}
-      data-bs-toggle={props.target ? "dropdown" : null}
-      data-bs-target={props.target ? `#${props.target}` : null}
-      className={
-        props.className + " btn" + (props.size === "sm" ? " btn-sm" : "")
-      }>
-      {props.icon && (
-        <Icon name={props.icon} className={props.text ? "me-2" : ""} />
-      )}
-      {props.children}
-      {props.text}
-    </button>
-  );
+function Icon({ className, name }) {
+  return <i className={className + " bi bi-" + name}></i>;
 }
 
-function Link(props) {
-  return <></>;
+function Button({ className, type_ = "button", onClick, icon, text, size }) {
+  return (
+    <button
+      type={type_}
+      className={className + " btn" + (size === "sm" ? " btn-sm" : "")}
+      onClick={onClick}>
+      {icon && <i className={"bi bi-" + icon + (text ? " me-1" : "")}></i>}
+      {text}
+    </button>
+  );
 }
 
 function Input({
@@ -94,47 +81,159 @@ function Input({
   );
 }
 
-function Spinner(props) {
-  return <></>;
-}
-
-function Icon(props) {
-  return <i className={props.className + " bi bi-" + props.name}></i>;
-}
-
-function Dropdown(props) {
+function ButtonGroup({ className, size, children }) {
   return (
-    <div className={props.className + " dropdown"}>
-      <Button
-        icon={props.icon}
-        className={props.classNameBtn + " dropdown-toggle"}
-        target={props.target}
-        text={props.text}
-      />
-      <div id={props.target} className={props.classNameMenu + " dropdown-menu"}>
-        {props.children}
+    <div
+      className={
+        className + " btn-group" + (size === "sm" ? " btn-group-sm" : "")
+      }>
+      {children}
+    </div>
+  );
+}
+
+function InputGroup({ className, size, children }) {
+  return (
+    <div
+      className={
+        className + " input-group" + (size === "sm" ? " input-group-sm" : "")
+      }>
+      {children}
+    </div>
+  );
+}
+
+function Spinner({ className }) {
+  return (
+    <span className={className + " spinner-border spinner-border-sm"}></span>
+  );
+}
+
+function Badge({ className, icon, text }) {
+  return (
+    <span className={className + " badge"}>
+      {icon && <i className={"bi bi-" + icon + (text ? " me-1" : "")}></i>}
+      {text}
+    </span>
+  );
+}
+
+function Dropdown({
+  className,
+  classNameBtn,
+  classNameMenu,
+  target,
+  icon,
+  children,
+  text,
+}) {
+  return (
+    <div className={className + " dropdown"}>
+      <a
+        data-bs-target={"#" + target}
+        data-bs-toggle="dropdown"
+        className={classNameBtn + " dropdown-toggle"}>
+        {icon && <Icon name={icon} className="me-1" />}
+        {text}
+      </a>
+      <div id={target} className={classNameMenu + " dropdown-menu"}>
+        {children}
       </div>
     </div>
   );
 }
 
+function Heading({ className, size = 1, icon, text }) {
+  return (
+    <div className={className + " text-center h" + size}>
+      {icon && <Icon name={icon} className="me-3" />}
+      {text}
+    </div>
+  );
+}
+
+function HomePage({ className }) {
+  const multiCtx = React.useContext(MultiContext);
+
+  return (
+    <div className={className}>
+      <div className="row view">
+        <NotesPanel className="col-2 border-end h-100 overflow-scroll" />
+        {multiCtx.currentNote.length !== 0 && (
+          <Editor className="col-10 h-100" />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SettingsPage({ className }) {
+  const multiCtx = React.useContext(MultiContext);
+
+  return (
+    <div className={className}>
+      <Heading icon="gear" text="Settings" className="mb-4" />
+      <div style={{ whiteSpace: "pre-wrap" }}>
+        {JSON.stringify(multiCtx.settings, null, 4)}
+      </div>
+    </div>
+  );
+}
+
+function AboutPage({ className }) {
+  const multiCtx = React.useContext(MultiContext);
+  const [readme, setReadme] = React.useState("");
+
+  React.useEffect(() => {
+    multiCtx.setLoading(true);
+    api("about", {}, (data) => {
+      setReadme(data.readme);
+      multiCtx.setLoading(false);
+    });
+  }, []);
+
+  return (
+    <div className={className}>
+      <div
+        dangerouslySetInnerHTML={{
+          __html: window.markdownit().render(readme),
+        }}></div>
+    </div>
+  );
+}
+
+function Display({ className }) {
+  const multiCtx = React.useContext(MultiContext);
+
+  return (
+    <div className={className + " py-4"}>
+      {multiCtx.currentPage === "settings" ? (
+        <SettingsPage />
+      ) : multiCtx.currentPage === "about" ? (
+        <AboutPage />
+      ) : (
+        <HomePage />
+      )}
+    </div>
+  );
+}
+
 function NoteItem({ item, className = "" }) {
-  const [selectedNote, setSelectedNote] = React.useContext(SelectedNoteContext);
-  const [settings, setSettings] = React.useContext(SettingsContext);
+  const multiCtx = React.useContext(MultiContext);
 
   return (
     <div
       className={
         className +
         " py-2 rounded px-3 item" +
-        (selectedNote.name === item.name ? " selected" : "")
+        (multiCtx.currentNote.name === item.name ? " selected" : "")
       }
-      onClick={() => setSelectedNote({ ...item })}>
+      onClick={() => multiCtx.setCurrentNote({ ...item })}>
       <div className="between">
         <div
           className={
             "pe-4 text-truncate fw-bold" +
-            (item.favorited && selectedNote.name !== item.name
+            (item.favorited && multiCtx.currentNote.name !== item.name
               ? " highlight"
               : "")
           }>
@@ -145,7 +244,7 @@ function NoteItem({ item, className = "" }) {
         )}
       </div>
       <div className="between small mt-1">
-        {settings.sort === "date_created" ? (
+        {multiCtx.settings.sort === "date_created" ? (
           <div className="opacity-75">
             <Icon name="plus-lg" className="me-1" />
             {item.date_created}
@@ -156,32 +255,20 @@ function NoteItem({ item, className = "" }) {
             {item.last_modified}
           </div>
         )}
-        {item.folder && <div className="badge">{item.folder}</div>}
+        {item.folder && <Badge text={item.folder} />}
       </div>
     </div>
   );
 }
 
 function FolderItem({ item }) {
-  const [folders, setFolders, selectedFolder, setSelectedFolder, getFolders] =
-    React.useContext(FolderContext);
+  const multiCtx = React.useContext(MultiContext);
+
   const [deleting, setDeleting] = React.useState(false);
   const [editing, setEditing] = React.useState(false);
   const [name, setName] = React.useState("");
 
   const onChangeName = (e) => setName(e.target.value);
-
-  const deleteFolder = () =>
-    api("delete_folder", { name: item }, (data) => getFolders());
-
-  const renameFolder = (e) => {
-    e.preventDefault();
-    api("rename_folder", { name: item, new_name: name }, (data) => {
-      setEditing(false);
-      getFolders();
-      // getNotes();
-    });
-  };
 
   React.useEffect(() => {
     setName(item);
@@ -193,21 +280,21 @@ function FolderItem({ item }) {
         <form
           className="input-group input-group-sm "
           style={{ marginBlockEnd: 0 }}
-          onSubmit={(e) => renameFolder(e)}>
-          <input
+          onSubmit={(e) => multiCtx.renameFolder(e, item, name)}>
+          <Input
             onChange={onChangeName}
             value={name}
-            className="form-control border-0 opacity-50"
-            autoComplete="off"
-            required
+            className="border-0 opacity-50"
           />
         </form>
       ) : (
-        <a className="py-1 fw-bold" onClick={() => setSelectedFolder(item)}>
+        <a
+          className="py-1 fw-bold"
+          onClick={() => multiCtx.setCurrentFolder(item)}>
           {item}
         </a>
       )}
-      <div className="btn-group btn-group-sm">
+      <ButtonGroup size="sm">
         <Button
           onClick={() => setEditing(!editing)}
           className={"border-0"}
@@ -215,7 +302,7 @@ function FolderItem({ item }) {
         />
         {deleting && (
           <Button
-            onClick={() => deleteFolder()}
+            onClick={() => multiCtx.deleteFolder(item)}
             className="border-0"
             icon="question-lg"
           />
@@ -225,24 +312,22 @@ function FolderItem({ item }) {
           className="border-0"
           icon="trash2"
         />
-      </div>
+      </ButtonGroup>
     </div>
   );
 }
 
-function NotesPanel(props) {
-  const [notes, setNotes, getNotes, getNote] = React.useContext(NotesContext);
-  const [folders, setFolders, selectedFolder, setSelectedFolder, getFolders] =
-    React.useContext(FolderContext);
-  const [settings, setSettings] = React.useContext(SettingsContext);
+function NotesPanel({ className }) {
+  const multiCtx = React.useContext(MultiContext);
   const [showFolders, setShowFolders] = React.useState(false);
   const [search, setSearch] = React.useState("");
   const [searchResults, setSearchResults] = React.useState([]);
 
-  React.useEffect(() => getNotes(), [settings, selectedFolder]);
-  React.useEffect(() => getFolders(), []);
-
-  const addFolder = () => api("add_folde/r", {}, (data) => getFolders());
+  React.useEffect(
+    () => multiCtx.getNotes(),
+    [multiCtx.settings, multiCtx.currentFolder]
+  );
+  React.useEffect(() => multiCtx.getFolders(), []);
 
   const onChangeSearch = (e) => setSearch(e.target.value);
 
@@ -254,25 +339,29 @@ function NotesPanel(props) {
   };
 
   return (
-    <div className={props.className}>
+    <div className={className}>
       <div className="between">
         <Dropdown
-          classNameBtn="border-0 text-capitalize"
+          classNameBtn="btn border-0 text-capitalize"
           className="btn-group-sm"
           target="sorts"
-          icon={sorts.filter((x) => x.name === settings.sort)[0].icon}
-          text={sorts.filter((x) => x.name === settings.sort)[0].label}>
+          icon={sorts.filter((x) => x.name === multiCtx.settings.sort)[0]?.icon}
+          text={
+            sorts.filter((x) => x.name === multiCtx.settings.sort)[0]?.label
+          }>
           {sorts.map((x) => (
             <button
               key={x.name}
               className="dropdown-item between"
-              onClick={() => setSettings({ ...settings, sort: x.name })}>
-              <span className="">{x.label}</span>
-              <Icon name={x.icon} className="m-1" />
+              onClick={() =>
+                multiCtx.setSettings({ ...multiCtx.settings, sort: x.name })
+              }>
+              <span className="">{x?.label}</span>
+              <Icon name={x?.icon} className="m-1" />
             </button>
           ))}
         </Dropdown>
-        <div className="btn-group btn-group-sm">
+        <ButtonGroup size="sm">
           <Button
             onClick={() => setShowFolders(!showFolders)}
             className={
@@ -280,17 +369,19 @@ function NotesPanel(props) {
             }
             icon="folder"
             text={
-              selectedFolder ? selectedFolder.substring(0, 10) : "All Folders"
+              multiCtx.currentFolder
+                ? multiCtx.currentFolder.substring(0, 10)
+                : "All Folders"
             }
           />
-          {selectedFolder !== null && (
+          {multiCtx.currentFolder !== null && (
             <Button
-              onClick={() => setSelectedFolder(null)}
+              onClick={() => multiCtx.setCurrentFolder(null)}
               className="border-0"
               icon="x-lg"
             />
           )}
-        </div>
+        </ButtonGroup>
       </div>
       <form onSubmit={searchNotes} className="input-group input-group-sm my-3">
         <Input placeholder="Search" onChange={onChangeSearch} value={search} />
@@ -311,7 +402,7 @@ function NotesPanel(props) {
           {searchResults.map((x) => (
             <div className="mb-3">
               <a
-                onClick={() => getNote(x.path)}
+                onClick={() => multiCtx.getNote(x.path)}
                 className="d-block fw-bold mb-1">
                 {x.file}
               </a>
@@ -326,15 +417,15 @@ function NotesPanel(props) {
           <div className="px-3">
             <hr />
             <Button
-              onClick={() => addFolder()}
+              onClick={() => multiCtx.addFolder()}
               text="New Folder"
               icon="plus-lg"
               className="w-100 mb-3"
               size="sm"
             />
-            {folders.map((x) => (
+            {multiCtx.folders.map((x) => (
               <React.Fragment key={x}>
-                {x !== selectedFolder && <FolderItem item={x} />}
+                {x !== multiCtx.currentFolder && <FolderItem item={x} />}
               </React.Fragment>
             ))}
             <hr />
@@ -342,7 +433,7 @@ function NotesPanel(props) {
         )}
       </div>
       <div>
-        {notes.map((x) => (
+        {multiCtx.notes.map((x) => (
           <NoteItem className="" key={x.name} item={x} />
         ))}
       </div>
@@ -350,43 +441,69 @@ function NotesPanel(props) {
   );
 }
 
-function Editor(props) {
-  const [selectedNote, setSelectedNote, content, setContent] =
-    React.useContext(SelectedNoteContext);
-  const [settings, setSettings] = React.useContext(SettingsContext);
+function Editor({ className }) {
+  const multiCtx = React.useContext(MultiContext);
 
-  const onChangeContent = (e) => setContent(e.target.value);
+  const onChangeContent = (e) => multiCtx.setContent(e.target.value);
+
+  const [selection, setSelection] = React.useState({
+    start: 0,
+    end: 0,
+    selected: "",
+  });
+
+  const getSelection = () => {
+    let elem = document.getElementById("editor");
+
+    let start = elem.selectionStart;
+    let end = elem.selectionEnd;
+    let selected = multiCtx.content.substring(start, end);
+
+    setSelection({ start: start, end: end, selected: selected });
+  };
 
   React.useEffect(() => {
-    setContent(selectedNote.length !== 0 ? selectedNote.content : "");
-    setSettings({
-      ...settings,
-      lastOpened: selectedNote.length !== 0 ? { ...selectedNote } : "",
+    multiCtx.setContent(
+      multiCtx.currentNote.length !== 0 ? multiCtx.currentNote.content : ""
+    );
+    multiCtx.setSettings({
+      ...multiCtx.settings,
+      lastOpened:
+        multiCtx.currentNote.length !== 0 ? { ...multiCtx.currentNote } : "",
     });
-  }, [selectedNote]);
+  }, [multiCtx.currentNote]);
 
   return (
-    <div className={props.className}>
+    <div className={className}>
+      {multiCtx.settings.mode !== "read" && (
+        <Toolbar selection={selection} className="mb-3" />
+      )}
       <div className="row h-100 overflow-scroll">
-        {["split", "write"].includes(settings.mode) && (
+        {["split", "write"].includes(multiCtx.settings.mode) && (
           <div
             className={
-              "px-3 border-end col-" + (settings.mode === "write" ? "12" : "6")
+              "px-3 border-end col-" +
+              (multiCtx.settings.mode === "write" ? "12" : "6")
             }>
             <textarea
-              className="form-control h-100"
-              value={content}
+              onMouseUp={() => getSelection()}
+              id="editor"
+              className="form-control my-1"
+              style={{ height: "98%" }}
+              value={multiCtx.content}
               onChange={onChangeContent}
               placeholder="..."></textarea>
           </div>
         )}
-        {["split", "read"].includes(settings.mode) && (
+        {["split", "read"].includes(multiCtx.settings.mode) && (
           <div
-            className={"px-5 col-" + (settings.mode === "read" ? "12" : "6")}>
+            className={
+              "px-5 col-" + (multiCtx.settings.mode === "read" ? "12" : "6")
+            }>
             <div
               id="reader"
               dangerouslySetInnerHTML={{
-                __html: window.markdownit().render(content),
+                __html: window.markdownit().render(multiCtx.content),
               }}></div>
           </div>
         )}
@@ -395,236 +512,322 @@ function Editor(props) {
   );
 }
 
-function Nav(props) {
-  const [settings, setSettings] = React.useContext(SettingsContext);
-  const [selectedNote, setSelectedNote, content, setContent] =
-    React.useContext(SelectedNoteContext);
-  const [folders, setFolders, selectedFolder, setSelectedFolder, getFolders] =
-    React.useContext(FolderContext);
+function Toolbar({ selection, className }) {
+  const multiCtx = React.useContext(MultiContext);
+
+  const formats = [
+    {
+      label: "bold",
+      format: `**${selection.selected}**`,
+    },
+    {
+      label: "italic",
+      format: `*${selection.selected}*`,
+    },
+    {
+      label: "heading",
+      format: `\n### ${selection.selected}`,
+    },
+    {
+      label: "hrule",
+      format: "\n---\n",
+    },
+    {
+      label: "num-list",
+      format: `\n1. ${selection.selected}`,
+    },
+    {
+      label: "bullet-list",
+      format: `\n- ${selection.selected}\n`,
+    },
+    {
+      label: "code",
+      format: `\`\`\`${selection.selected}\`\`\``,
+    },
+    {
+      label: "image",
+      format: `\n![${selection.selected}]()\n`,
+    },
+    {
+      label: "link",
+      format: `[${selection.selected}]()`,
+    },
+    {
+      label: "capitalize",
+      format: `${
+        selection.selected.charAt(0).toUpperCase() + selection.selected.slice(1)
+      }`,
+    },
+    {
+      label: "indent",
+      format: `    ${selection.selected}`,
+    },
+  ];
+
+  const copyFormat = (format) => {
+    let format_ = formats.filter((x) => x.label === format)[0];
+    let new_ =
+      multiCtx.content.substring(0, selection.start) +
+      format_.format +
+      multiCtx.content.substring(selection.end, multiCtx.content.length);
+    multiCtx.setContent(new_);
+  };
+
+  return (
+    <div className={className}>
+      <ButtonGroup>
+        <Button onClick={() => copyFormat("bold")} icon="type-bold" />
+        <Button onClick={() => copyFormat("italic")} icon="type-italic" />
+        <Button onClick={() => copyFormat("heading")} icon="type-h1" />
+        <Button onClick={() => copyFormat("hrule")} icon="hr" />
+        <Button onClick={() => copyFormat("num-list")} icon="list-ol" />
+        <Button onClick={() => copyFormat("bullet-list")} icon="list-ul" />
+        <Button onClick={() => copyFormat("code")} icon="code-slash" />
+        <Button onClick={() => copyFormat("image")} icon="image" />
+        <Button onClick={() => copyFormat("link")} icon="link-45deg" />
+        <Button onClick={() => copyFormat("capitalize")} icon="type" />
+        <Button onClick={() => copyFormat("indent")} icon="indent" />
+      </ButtonGroup>
+    </div>
+  );
+}
+
+function Nav({ className }) {
+  const multiCtx = React.useContext(MultiContext);
+  const [name, setName] = React.useState("");
+
   const [deleting, setDeleting] = React.useState(false);
   const [copied, setCopied] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
-  const [notes, setNotes, getNotes] = React.useContext(NotesContext);
-  const [name, setName] = React.useState("");
 
   const onChangeName = (e) => setName(e.target.value);
 
   React.useEffect(() => {
-    selectedNote.length !== 0 && setName(selectedNote.name);
-  }, [selectedNote]);
-
-  const themes = [
-    "light",
-    "dark",
-    "caramel",
-    "ocean",
-    "violet",
-    "navy",
-    "vanilla",
-    "mint",
-    "ruby",
-    "forest",
-  ];
+    multiCtx.currentNote.length !== 0 && setName(multiCtx.currentNote.name);
+  }, [multiCtx.currentNote]);
 
   const copyNote = () => {
-    navigator.clipboard.writeText(selectedNote.content);
+    navigator.clipboard.writeText(multiCtx.currentNote.content);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
 
-  const editNote = () => {
-    api("edit_note", { path: selectedNote.path, content: content }, (data) => {
-      setSelectedNote(data);
-      getNotes();
-      setSaved(true);
-      setTimeout(() => setSaved(false), 1500);
-    });
-  };
-
-  const deleteNote = () => {
-    api("delete_note", { path: selectedNote.path }, (data) => {
-      setSelectedNote([]);
-      getNotes();
-      setDeleting(false);
-    });
-  };
-
-  const togglePin = () => {
-    api("toggle_favorite", { path: selectedNote.path }, (data) => {
-      setSelectedNote({ ...selectedNote, favorited: !selectedNote.favorited });
-      getNotes();
-    });
-  };
-
-  const addNote = () => {
-    api("add_note", { folder: selectedFolder }, (data) => {
-      setSelectedNote(data);
-      getNotes();
-    });
-  };
-
-  const renameNote = (e) => {
-    e.preventDefault();
-    api("rename_note", { path: selectedNote.path, new_name: name }, (data) => {
-      setSelectedNote(data);
-      getNotes();
-    });
-  };
-
-  const changeFolder = (newFolder) => {
-    api(
-      "change_folder",
-      { path: selectedNote.path, new_folder: newFolder },
-      (data) => {
-        setSelectedNote(data);
-        getNotes();
-      }
-    );
-  };
+  const themes = [
+    "light",
+    "dark",
+    "scarlet-light",
+    "scarlet-dark",
+    "manila-light",
+    "manila-dark",
+    "mint-light",
+    "mint-dark",
+    "ocean-light",
+    "ocean-dark",
+    "lavender-light",
+    "lavender-dark",
+  ];
 
   return (
-    <div className={props.className + " row"}>
-      <div className="col-2">
-        <div className="between">
-          <Button
-            onClick={() => {
-              setSelectedNote([]);
-              setSettings({ ...settings, lastOpened: "" });
-            }}
-            className={"border-0 btn-sm"}
-            text={"notable"}>
-            <img
-              className="me-2 pb-1"
-              src="static/favicon.svg"
-              width={20}
-              height={20}
+    <div className={className}>
+      <div className="row">
+        <div className="col-2">
+          <div className="between">
+            <ButtonGroup size="sm">
+              {multiCtx.loading && (
+                <button className="btn border-0">
+                  <Spinner />
+                </button>
+              )}
+              <a
+                onClick={() => {
+                  multiCtx.setCurrentPage("");
+                  multiCtx.setCurrentNote([]);
+                  multiCtx.setSettings({ ...settings, lastOpened: "" });
+                }}
+                className="btn border-0">
+                <img
+                  className="me-2 pb-1"
+                  src="static/favicon.svg"
+                  width={20}
+                  height={20}
+                />
+                notable
+              </a>
+            </ButtonGroup>
+            <Button
+              size="sm"
+              onClick={() => multiCtx.addNote()}
+              text="New Note"
+              icon="plus-lg"
             />
-          </Button>
-          <Button
-            onClick={() => addNote()}
-            className={"btn-sm"}
-            text={"New Note"}
-            icon={"plus-lg"}
-          />
+          </div>
         </div>
-      </div>
-      <div className="col-5">
-        {selectedNote.length !== 0 && (
-          <form
-            className="input-group input-group-sm"
-            onSubmit={(e) => renameNote(e)}>
-            <input
-              value={name}
-              onChange={onChangeName}
-              className="form-control fst-italic border-0 "
-              style={{ letterSpacing: "2px" }}
-            />
-            <Dropdown
-              icon="folder"
-              className="btn-group-sm"
-              classNameBtn="border-0"
-              target="note-folder"
-              text={selectedNote.folder ? selectedNote.folder : "No Folder"}>
-              <button
-                onClick={() => changeFolder(null)}
-                type="button"
-                className="dropdown-item">
-                No Folder
-              </button>
-              {folders.map((x) => (
+        <div className="col-5">
+          {multiCtx.currentNote.length !== 0 && multiCtx.currentPage === "" && (
+            <form
+              className="input-group input-group-sm"
+              onSubmit={(e) =>
+                multiCtx.renameNote(e, multiCtx.currentNote.path, name)
+              }>
+              <input
+                value={name}
+                onChange={onChangeName}
+                className="form-control fst-italic border-0 "
+                style={{ letterSpacing: "2px" }}
+              />
+              <Dropdown
+                icon="folder"
+                className="btn-group btn-group-sm"
+                classNameBtn="btn border-0"
+                target="note-folder"
+                text={
+                  multiCtx.currentNote.folder
+                    ? multiCtx.currentNote.folder
+                    : "No Folder"
+                }>
                 <button
-                  key={`${x}-2`}
-                  onClick={() => changeFolder(x)}
+                  onClick={() => multiCtx.changeFolder(null)}
                   type="button"
                   className="dropdown-item">
-                  {x}
+                  No Folder
                 </button>
-              ))}
-            </Dropdown>
-            <div className="btn-group btn-group-sm ms-2">
-              <Button
-                className={settings.mode === "read" ? "active" : ""}
-                onClick={() => setSettings({ ...settings, mode: "read" })}
-                icon="eye-fill"
-              />
-              <Button
-                className={settings.mode === "write" ? "active" : ""}
-                onClick={() => setSettings({ ...settings, mode: "write" })}
-                icon="pencil"
-              />
-              <Button
-                className={settings.mode === "split" ? "active" : ""}
-                onClick={() => setSettings({ ...settings, mode: "split" })}
-                icon="layout-split"
-              />
-            </div>
-          </form>
-        )}
-      </div>
-      <div className="col-5">
-        <div className="between">
-          <div className="btn-group btn-group-sm">
-            {selectedNote.length !== 0 && (
-              <>
-                {settings.mode !== "read" && (
-                  <Button
-                    onClick={() => editNote()}
-                    text={saved ? "Saved." : "Save"}
-                    icon={saved ? "check-lg" : "floppy2-fill"}
-                  />
+                {multiCtx.folders.map((x) => (
+                  <button
+                    key={`${x}-2`}
+                    onClick={() => multiCtx.changeFolder(x)}
+                    type="button"
+                    className="dropdown-item">
+                    {x}
+                  </button>
+                ))}
+              </Dropdown>
+              <ButtonGroup className="ms-2" size="sm">
+                <Button
+                  className={multiCtx.settings.mode === "read" ? "active" : ""}
+                  onClick={() =>
+                    multiCtx.setSettings({
+                      ...multiCtx.settings,
+                      mode: "read",
+                    })
+                  }
+                  icon="eye-fill"
+                />
+                <Button
+                  className={multiCtx.settings.mode === "write" ? "active" : ""}
+                  onClick={() =>
+                    multiCtx.setSettings({
+                      ...multiCtx.settings,
+                      mode: "write",
+                    })
+                  }
+                  icon="pencil"
+                />
+                <Button
+                  className={multiCtx.settings.mode === "split" ? "active" : ""}
+                  onClick={() =>
+                    multiCtx.setSettings({
+                      ...multiCtx.settings,
+                      mode: "split",
+                    })
+                  }
+                  icon="layout-split"
+                />
+              </ButtonGroup>
+            </form>
+          )}
+        </div>
+        <div className="col-5">
+          <div className="between">
+            <ButtonGroup size="sm">
+              {multiCtx.currentNote.length !== 0 &&
+                multiCtx.currentPage === "" && (
+                  <>
+                    {multiCtx.settings.mode !== "read" && (
+                      <Button
+                        onClick={() => {
+                          multiCtx.editNote(
+                            multiCtx.currentNote.path,
+                            multiCtx.content
+                          );
+                          setSaved(true);
+                          setTimeout(() => setSaved(false), 1500);
+                        }}
+                        text={saved ? "Saved." : "Save"}
+                        icon={saved ? "check-lg" : "floppy2-fill"}
+                      />
+                    )}
+                    <Button
+                      onClick={() =>
+                        multiCtx.pinNote(multiCtx.currentNote.path)
+                      }
+                      text={multiCtx.currentNote.favorited ? "Unpin" : "Pin"}
+                      icon={
+                        "pin-angle" +
+                        (multiCtx.currentNote.favorited ? "-fill" : "")
+                      }
+                      className={multiCtx.currentNote.favorited ? "active" : ""}
+                    />
+                    <Button
+                      onClick={() => copyNote()}
+                      text={"Copy"}
+                      icon={"clipboard" + (copied ? "-check" : "")}
+                    />
+                    <Button
+                      onClick={() => setDeleting(!deleting)}
+                      text={"Delete"}
+                      icon={"trash2"}
+                    />
+                    {deleting && (
+                      <Button
+                        onClick={() => {
+                          multiCtx.deleteNote(multiCtx.currentNote.path);
+                          multiCtx.setCurrentNote([]);
+                          setDeleting(false);
+                        }}
+                        text={"Delete"}
+                        icon={"question-lg"}
+                      />
+                    )}
+                  </>
                 )}
-                <Button
-                  onClick={() => togglePin()}
-                  text={selectedNote.favorited ? "Unpin" : "Pin"}
-                  icon={"pin-angle" + (selectedNote.favorited ? "-fill" : "")}
-                  className={selectedNote.favorited ? "active" : ""}
-                />
-                <Button
-                  onClick={() => copyNote()}
-                  text={"Copy"}
-                  icon={"clipboard" + (copied ? "-check" : "")}
-                />
-                <Button
-                  onClick={() => setDeleting(!deleting)}
-                  text={"Delete"}
-                  icon={"trash2"}
-                />
-                {deleting && (
-                  <Button
-                    onClick={() => deleteNote()}
-                    text={"Delete"}
-                    icon={"question-lg"}
-                  />
-                )}
-              </>
-            )}
-          </div>
-
-          <div className="btn-group btn-group-sm">
-            <Dropdown
-              icon={"paint-bucket"}
-              className="btn-group btn-group-sm"
-              classNameBtn="text-capitalize"
-              text={settings.theme}
-              target="themes">
-              {themes.map((x) => (
-                <React.Fragment key={x}>
-                  {settings.theme !== x && (
-                    <button
-                      onClick={() => setSettings({ ...settings, theme: x })}
-                      className="dropdown-item text-capitalize">
-                      {x}
-                    </button>
-                  )}
-                </React.Fragment>
-              ))}
-            </Dropdown>
-            <a
-              target="_blank"
-              className="btn"
-              href="https://github.com/misterrager8/notable">
-              <i className="bi bi-info-circle me-2"></i>About
-            </a>
+            </ButtonGroup>
+            <ButtonGroup size="sm">
+              <Dropdown
+                className="btn-group btn-group-sm"
+                icon="paint-bucket"
+                text={multiCtx.settings.theme}
+                classNameMenu="text-center"
+                classNameBtn="btn text-capitalize">
+                {themes.map((x) => (
+                  <React.Fragment key={x}>
+                    {multiCtx.settings.theme !== x && (
+                      <button
+                        className="dropdown-item text-capitalize small"
+                        onClick={() =>
+                          multiCtx.setSettings({
+                            ...multiCtx.settings,
+                            theme: x,
+                          })
+                        }>
+                        {x}
+                      </button>
+                    )}
+                  </React.Fragment>
+                ))}
+              </Dropdown>
+              <Button
+                text="Settings"
+                icon="gear"
+                className={multiCtx.currentPage === "settings" ? " active" : ""}
+                onClick={() => multiCtx.setCurrentPage("settings")}
+              />
+              <Button
+                className={multiCtx.currentPage === "about" ? " active" : ""}
+                text="About"
+                icon="info-circle"
+                onClick={() => multiCtx.setCurrentPage("about")}
+              />
+            </ButtonGroup>
           </div>
         </div>
       </div>
@@ -633,28 +836,139 @@ function Nav(props) {
 }
 
 function App() {
+  const [currentPage, setCurrentPage] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
   const [settings, setSettings] = React.useState(
     JSON.parse(localStorage.getItem("notable")) || defaultSettings
   );
-  const [selectedNote, setSelectedNote] = React.useState([]);
+
   const [notes, setNotes] = React.useState([]);
-  const [content, setContent] = React.useState("");
+  const [currentNote, setCurrentNote] = React.useState([]);
 
   const [folders, setFolders] = React.useState([]);
-  const [selectedFolder, setSelectedFolder] = React.useState(null);
+  const [currentFolder, setCurrentFolder] = React.useState(null);
 
-  const getNotes = () =>
-    api("notes", { sort: settings.sort, filter_: selectedFolder }, (data) =>
-      setNotes(data.notes)
-    );
+  const [content, setContent] = React.useState("");
 
-  const getNote = (path) =>
-    api("note", { path: path }, (data) => setSelectedNote(data));
+  const addNote = () => {
+    api("add_note", { folder: currentFolder }, (data) => {
+      setCurrentNote(data);
+      getNotes();
+    });
+  };
 
-  const getFolders = () =>
+  const getNote = (path) => {
+    api("note", { path: path }, (data) => {
+      setCurrentNote(data);
+    });
+  };
+
+  const getNotes = () => {
+    api("notes", { sort: settings.sort, filter_: currentFolder }, (data) => {
+      setNotes(data.notes);
+    });
+  };
+
+  const editNote = (path, content) => {
+    api("edit_note", { path: path, content: content }, (data) => {
+      setCurrentNote(data);
+      getNotes();
+    });
+  };
+
+  const deleteNote = (path) => {
+    api("delete_note", { path: path }, (data) => {
+      getNotes();
+    });
+  };
+
+  const renameNote = (e, path, newName) => {
+    e.preventDefault();
+    api("rename_note", { path: path, new_name: newName }, (data) => {
+      setCurrentNote(data);
+      getNotes();
+    });
+  };
+
+  const pinNote = (path) => {
+    api("toggle_favorite", { path: path }, (data) => {
+      setCurrentNote({ ...currentNote, favorited: !currentNote.favorited });
+      getNotes();
+    });
+  };
+
+  const addFolder = () => {
+    api("add_folder", {}, (data) => {
+      getFolders();
+    });
+  };
+
+  const getFolders = () => {
     api("folders", {}, (data) => {
       setFolders(data.folders);
     });
+  };
+
+  const deleteFolder = (name) => {
+    api("delete_folder", { name: name }, (data) => {
+      getFolders();
+    });
+  };
+
+  const renameFolder = (e, name, newName) => {
+    e.preventDefault();
+    api("rename_folder", { name: name, new_name: newName }, (data) => {
+      getFolders();
+    });
+  };
+
+  const changeFolder = (newFolder) => {
+    api(
+      "change_folder",
+      { path: currentNote.path, new_folder: newFolder },
+      (data) => {
+        setCurrentNote(data);
+        getNotes();
+      }
+    );
+  };
+
+  const contextValue = {
+    loading: loading,
+    setLoading: setLoading,
+    settings: settings,
+    setSettings: setSettings,
+    currentPage: currentPage,
+    setCurrentPage: setCurrentPage,
+
+    notes: notes,
+    setNotes: setNotes,
+
+    currentNote: currentNote,
+    setCurrentNote: setCurrentNote,
+    content: content,
+    setContent: setContent,
+
+    folders: folders,
+    setFolders: setFolders,
+
+    currentFolder: currentFolder,
+    setCurrentFolder: setCurrentFolder,
+
+    addNote: addNote,
+    getNote: getNote,
+    getNotes: getNotes,
+    editNote: editNote,
+    deleteNote: deleteNote,
+    renameNote: renameNote,
+    pinNote: pinNote,
+
+    addFolder: addFolder,
+    getFolders: getFolders,
+    deleteFolder: deleteFolder,
+    renameFolder: renameFolder,
+    changeFolder: changeFolder,
+  };
 
   React.useEffect(() => {
     localStorage.setItem("notable", JSON.stringify(settings));
@@ -663,35 +977,16 @@ function App() {
   }, [settings]);
 
   React.useEffect(() => {
-    settings.lastOpened !== "" && setSelectedNote({ ...settings.lastOpened });
+    settings.lastOpened !== "" && setCurrentNote({ ...settings.lastOpened });
   }, []);
 
   return (
-    <SettingsContext.Provider value={[settings, setSettings]}>
-      <FolderContext.Provider
-        value={[
-          folders,
-          setFolders,
-          selectedFolder,
-          setSelectedFolder,
-          getFolders,
-        ]}>
-        <NotesContext.Provider value={[notes, setNotes, getNotes, getNote]}>
-          <SelectedNoteContext.Provider
-            value={[selectedNote, setSelectedNote, content, setContent]}>
-            <div className="p-4">
-              <Nav className="mb-3" />
-              <div className="row view">
-                <NotesPanel className="col-2 border-end h-100 overflow-scroll" />
-                {selectedNote.length !== 0 && (
-                  <Editor className="col-10 h-100" />
-                )}
-              </div>
-            </div>
-          </SelectedNoteContext.Provider>
-        </NotesContext.Provider>
-      </FolderContext.Provider>
-    </SettingsContext.Provider>
+    <MultiContext.Provider value={contextValue}>
+      <div className="p-4">
+        <Nav className="" />
+        <Display />
+      </div>
+    </MultiContext.Provider>
   );
 }
 

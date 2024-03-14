@@ -131,7 +131,11 @@ class Note:
             x = [Note(i) for i in config.HOME_DIR.glob("**/*.txt")]
         return sorted(
             x,
-            key=attrgetter(sort, "last_modified"),
+            key=(
+                attrgetter(sort, "last_modified")
+                if sort != "name"
+                else lambda y: y.name.lower()
+            ),
             reverse=sort in ["favorited", "last_modified", "date_created"],
         )
 

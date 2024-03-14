@@ -13,60 +13,74 @@ html[data-theme="dark"] {
   --btn-hover-text: #1a1a1a;
 }
 
-html[data-theme="caramel"] {
-  --primary-bg: #e4beaf;
+html[data-theme="scarlet-light"] {
+  --primary-bg: #ea9599;
   --primary-txt: #1a1a1a;
   --btn-color: #1a1a1a;
-  --btn-hover-text: #e4beaf;
+  --btn-hover-text: #ea9599;
 }
 
-html[data-theme="ocean"] {
-  --primary-bg: #cccccc;
-  --primary-txt: #4558a3;
-  --btn-color: #4558a3;
-  --btn-hover-text: #cccccc;
-}
-
-html[data-theme="violet"] {
-  --primary-bg: #cccccc;
-  --primary-txt: #7a4864;
-  --btn-color: #7a4864;
-  --btn-hover-text: #cccccc;
-}
-
-html[data-theme="navy"] {
-  --primary-bg: #10334c;
+html[data-theme="scarlet-dark"] {
+  --primary-bg: #582930;
   --primary-txt: #cccccc;
   --btn-color: #cccccc;
-  --btn-hover-text: #10334c;
+  --btn-hover-text: #582930;
 }
 
-html[data-theme="vanilla"] {
-  --primary-bg: #1a1a1a;
-  --primary-txt: #c1a357;
-  --btn-color: #c1a357;
-  --btn-hover-text: #1a1a1a;
+html[data-theme="manila-light"] {
+  --primary-bg: #c1b58a;
+  --primary-txt: #1a1a1a;
+  --btn-color: #1a1a1a;
+  --btn-hover-text: #c1b58a;
 }
 
-html[data-theme="mint"] {
-  --primary-bg: #1a1a1a;
-  --primary-txt: #75cd73;
-  --btn-color: #75cd73;
-  --btn-hover-text: #1a1a1a;
+html[data-theme="manila-dark"] {
+  --primary-bg: #6a4c3f;
+  --primary-txt: #cccccc;
+  --btn-color: #cccccc;
+  --btn-hover-text: #6a4c3f;
 }
 
-html[data-theme="ruby"] {
-  --primary-bg: #cccccc;
-  --primary-txt: #8b3041;
-  --btn-color: #8b3041;
-  --btn-hover-text: #cccccc;
+html[data-theme="mint-light"] {
+  --primary-bg: #9eba75;
+  --primary-txt: #1a1a1a;
+  --btn-color: #1a1a1a;
+  --btn-hover-text: #9eba75;
 }
 
-html[data-theme="forest"] {
-  --primary-bg: #cccccc;
-  --primary-txt: #2c5c36;
-  --btn-color: #2c5c36;
-  --btn-hover-text: #cccccc;
+html[data-theme="mint-dark"] {
+  --primary-bg: #415641;
+  --primary-txt: #cccccc;
+  --btn-color: #cccccc;
+  --btn-hover-text: #415641;
+}
+
+html[data-theme="ocean-light"] {
+  --primary-bg: #5e8a9f;
+  --primary-txt: #1a1a1a;
+  --btn-color: #1a1a1a;
+  --btn-hover-text: #5e8a9f;
+}
+
+html[data-theme="ocean-dark"] {
+  --primary-bg: #263380;
+  --primary-txt: #cccccc;
+  --btn-color: #cccccc;
+  --btn-hover-text: #263380;
+}
+
+html[data-theme="lavender-light"] {
+  --primary-bg: #bf85c8;
+  --primary-txt: #1a1a1a;
+  --btn-color: #1a1a1a;
+  --btn-hover-text: #bf85c8;
+}
+
+html[data-theme="lavender-dark"] {
+  --primary-bg: #5d2a5e;
+  --primary-txt: #cccccc;
+  --btn-color: #cccccc;
+  --btn-hover-text: #5d2a5e;
 }
 
 body {
