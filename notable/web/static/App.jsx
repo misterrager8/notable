@@ -126,12 +126,14 @@ function Dropdown({
   icon,
   children,
   text,
+  autoClose = true,
 }) {
   return (
     <div className={className + " dropdown"}>
       <a
         data-bs-target={"#" + target}
         data-bs-toggle="dropdown"
+        data-bs-auto-close={autoClose}
         className={classNameBtn + " dropdown-toggle"}>
         {icon && <Icon name={icon} className="me-1" />}
         {text}
@@ -158,7 +160,7 @@ function HomePage({ className }) {
   return (
     <div className={className}>
       <div className="row view">
-        <NotesPanel className="col-2 border-end h-100 overflow-scroll" />
+        <NotesPanel className="col-2 border-end h-100" />
         {multiCtx.currentNote.length !== 0 && (
           <Editor className="col-10 h-100" />
         )}
@@ -432,7 +434,7 @@ function NotesPanel({ className }) {
           </div>
         )}
       </div>
-      <div>
+      <div className="overflow-scroll" style={{ height: "650px" }}>
         {multiCtx.notes.map((x) => (
           <NoteItem className="" key={x.name} item={x} />
         ))}
@@ -562,6 +564,26 @@ function Toolbar({ selection, className }) {
       label: "indent",
       format: `    ${selection.selected}`,
     },
+    {
+      label: "parentheses",
+      format: `(${selection.selected})`,
+    },
+    {
+      label: "curly-braces",
+      format: `{${selection.selected}}`,
+    },
+    {
+      label: "square-brackets",
+      format: `[${selection.selected}]`,
+    },
+    {
+      label: "single-quotes",
+      format: `'${selection.selected}'`,
+    },
+    {
+      label: "double-quotes",
+      format: `"${selection.selected}"`,
+    },
   ];
 
   const copyFormat = (format) => {
@@ -587,6 +609,40 @@ function Toolbar({ selection, className }) {
         <Button onClick={() => copyFormat("link")} icon="link-45deg" />
         <Button onClick={() => copyFormat("capitalize")} icon="type" />
         <Button onClick={() => copyFormat("indent")} icon="indent" />
+        <Dropdown
+          classNameBtn="btn"
+          target="other-formats"
+          className="btn-group"
+          icon="three-dots"
+          autoClose={false}>
+          <ButtonGroup size="sm" className="p-1">
+            <Button
+              onClick={() => copyFormat("parentheses")}
+              className="border-0"
+              text="()"
+            />
+            <Button
+              onClick={() => copyFormat("curly-braces")}
+              className="border-0"
+              text="{}"
+            />
+            <Button
+              onClick={() => copyFormat("square-brackets")}
+              className="border-0"
+              text="[]"
+            />
+            <Button
+              onClick={() => copyFormat("single-quotes")}
+              className="border-0"
+              text="''"
+            />
+            <Button
+              onClick={() => copyFormat("double-quotes")}
+              className="border-0"
+              text='""'
+            />
+          </ButtonGroup>
+        </Dropdown>
       </ButtonGroup>
     </div>
   );
@@ -613,18 +669,26 @@ function Nav({ className }) {
   };
 
   const themes = [
+    "sitter-red",
+    "mustard-gold",
+    "praline",
+    "sleet",
+    "purple-cabbage",
+    "goddess-of-dawn",
+    "mincemeat",
+    "hole-in-one",
+    "thallium-flame",
+    "tanzine",
+    "bright-nori",
+    "granite-green",
+    "catawba",
+    "crushed-pineapple",
+    "broccoli",
+    "xoxo",
+    "brescian-blue",
+    "tropical-hibiscus",
     "light",
     "dark",
-    "scarlet-light",
-    "scarlet-dark",
-    "manila-light",
-    "manila-dark",
-    "mint-light",
-    "mint-dark",
-    "ocean-light",
-    "ocean-dark",
-    "lavender-light",
-    "lavender-dark",
   ];
 
   return (
@@ -799,20 +863,20 @@ function Nav({ className }) {
                 classNameMenu="text-center"
                 classNameBtn="btn text-capitalize">
                 {themes.map((x) => (
-                  <React.Fragment key={x}>
-                    {multiCtx.settings.theme !== x && (
-                      <button
-                        className="dropdown-item text-capitalize small"
-                        onClick={() =>
-                          multiCtx.setSettings({
-                            ...multiCtx.settings,
-                            theme: x,
-                          })
-                        }>
-                        {x}
-                      </button>
-                    )}
-                  </React.Fragment>
+                  <button
+                    key={x}
+                    className={
+                      "dropdown-item text-capitalize small" +
+                      (multiCtx.settings.theme === x ? " selected2" : "")
+                    }
+                    onClick={() =>
+                      multiCtx.setSettings({
+                        ...multiCtx.settings,
+                        theme: x,
+                      })
+                    }>
+                    {x}
+                  </button>
                 ))}
               </Dropdown>
               <Button
