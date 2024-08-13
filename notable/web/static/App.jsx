@@ -341,7 +341,7 @@ function NotesPanel({ className }) {
   };
 
   return (
-    <div className={className}>
+    <div className={className} id="notes-panel">
       <div className="between">
         <Dropdown
           classNameBtn="btn border-0 text-capitalize"
@@ -447,6 +447,7 @@ function Editor({ className }) {
   const multiCtx = React.useContext(MultiContext);
 
   const onChangeContent = (e) => multiCtx.setContent(e.target.value);
+  const [saved, setSaved] = React.useState(false);
 
   const [selection, setSelection] = React.useState({
     start: 0,
@@ -480,9 +481,22 @@ function Editor({ className }) {
       {multiCtx.settings.mode !== "read" && (
         <Toolbar selection={selection} className="mb-3" />
       )}
+      <div id="save-sm">
+        <Button
+          className="mb-1 w-100"
+          onClick={() => {
+            multiCtx.editNote(multiCtx.currentNote.path, multiCtx.content);
+            setSaved(true);
+            setTimeout(() => setSaved(false), 1500);
+          }}
+          // text={saved ? "Saved." : "Save"}
+          icon={saved ? "check-lg" : "floppy2-fill"}
+        />
+      </div>
       <div className="row h-100 overflow-scroll">
         {["split", "write"].includes(multiCtx.settings.mode) && (
           <div
+            id="editor-parent"
             className={
               "px-3 border-end col-" +
               (multiCtx.settings.mode === "write" ? "12" : "6")
@@ -517,6 +531,31 @@ function Editor({ className }) {
 function Toolbar({ selection, className }) {
   const multiCtx = React.useContext(MultiContext);
 
+  const weekday = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
   const formats = [
     {
       label: "bold",
@@ -528,7 +567,7 @@ function Toolbar({ selection, className }) {
     },
     {
       label: "heading",
-      format: `\n### ${selection.selected}`,
+      format: `### ${selection.selected}`,
     },
     {
       label: "hrule",
@@ -536,11 +575,19 @@ function Toolbar({ selection, className }) {
     },
     {
       label: "num-list",
-      format: `\n1. ${selection.selected}`,
+      format: `1. ${selection.selected}`,
     },
     {
       label: "bullet-list",
-      format: `\n- ${selection.selected}\n`,
+      format: `- ${selection.selected}`,
+    },
+    {
+      label: "checklist",
+      format: `**[​　]** ${selection.selected}`,
+    },
+    {
+      label: "check",
+      format: `✓`,
     },
     {
       label: "code",
@@ -548,7 +595,7 @@ function Toolbar({ selection, className }) {
     },
     {
       label: "image",
-      format: `\n![${selection.selected}]()\n`,
+      format: `![${selection.selected}]()`,
     },
     {
       label: "link",
@@ -584,6 +631,22 @@ function Toolbar({ selection, className }) {
       label: "double-quotes",
       format: `"${selection.selected}"`,
     },
+    {
+      label: "date-1",
+      format: `${new Date().getDate()} ${monthNames[new Date().getMonth()]}`,
+    },
+    {
+      label: "date-2",
+      format: `${weekday[new Date().getDay()]}`,
+    },
+    {
+      label: "date-3",
+      format: `${new Date().toLocaleTimeString()}`,
+    },
+    {
+      label: "date-4",
+      format: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}`,
+    },
   ];
 
   const copyFormat = (format) => {
@@ -595,15 +658,26 @@ function Toolbar({ selection, className }) {
     multiCtx.setContent(new_);
   };
 
+  const formatDate = (format) => {
+    let format_ = formats.filter((x) => x.label === format)[0];
+    let new_ =
+      multiCtx.content.substring(0, selection.start) +
+      format_.format +
+      multiCtx.content.substring(selection.end, multiCtx.content.length);
+    multiCtx.setContent(new_);
+  };
+
   return (
-    <div className={className}>
+    <div className={className} id="toolbar">
       <ButtonGroup>
         <Button onClick={() => copyFormat("bold")} icon="type-bold" />
         <Button onClick={() => copyFormat("italic")} icon="type-italic" />
         <Button onClick={() => copyFormat("heading")} icon="type-h1" />
         <Button onClick={() => copyFormat("hrule")} icon="hr" />
-        <Button onClick={() => copyFormat("num-list")} icon="list-ol" />
+        <Button onClick={() => copyFormat("num-list")} icon="123" />
         <Button onClick={() => copyFormat("bullet-list")} icon="list-ul" />
+        <Button onClick={() => copyFormat("checklist")} icon="ui-checks" />
+        <Button onClick={() => copyFormat("check")} icon="check-circle-fill" />
         <Button onClick={() => copyFormat("code")} icon="code-slash" />
         <Button onClick={() => copyFormat("image")} icon="image" />
         <Button onClick={() => copyFormat("link")} icon="link-45deg" />
@@ -643,6 +717,35 @@ function Toolbar({ selection, className }) {
             />
           </ButtonGroup>
         </Dropdown>
+        <Dropdown
+          classNameBtn="btn"
+          target="date-formats"
+          className="btn-group"
+          icon="calendar-date"
+          autoClose={false}>
+          <ButtonGroup size="sm" className="p-1">
+            <Button
+              onClick={() => copyFormat("date-1")}
+              className="border-0"
+              text="'22 May'"
+            />
+            <Button
+              onClick={() => copyFormat("date-2")}
+              className="border-0"
+              text="'Wednesday'"
+            />
+            <Button
+              onClick={() => copyFormat("date-3")}
+              className="border-0"
+              text="'3:33 AM'"
+            />
+            <Button
+              onClick={() => copyFormat("date-4")}
+              className="border-0"
+              text="'2024-05-22'"
+            />
+          </ButtonGroup>
+        </Dropdown>
       </ButtonGroup>
     </div>
   );
@@ -669,30 +772,26 @@ function Nav({ className }) {
   };
 
   const themes = [
-    "sitter-red",
-    "mustard-gold",
-    "praline",
-    "sleet",
-    "purple-cabbage",
-    "goddess-of-dawn",
-    "mincemeat",
-    "hole-in-one",
-    "thallium-flame",
-    "tanzine",
-    "bright-nori",
-    "granite-green",
-    "catawba",
-    "crushed-pineapple",
-    "broccoli",
-    "xoxo",
-    "brescian-blue",
-    "tropical-hibiscus",
+    "greek-sea-dark",
+    "pyrite-green-light",
+    "mullen-pink-light",
+    "bright-nori-light",
+    "shrimp-cocktail-dark",
+    "private-tone-light",
+    "lamiaceae-dark",
+    "forgotten-purple-dark",
+    "banana-bombshell-dark",
+    "berry-blackmail-light",
+    "winter-shadow-light",
+    "tropical-tone-dark",
+    "alamosa-green-dark",
+    "camel-toe-dark",
     "light",
     "dark",
   ];
 
   return (
-    <div className={className}>
+    <div className={className} id="nav">
       <div className="row">
         <div className="col-2">
           <div className="between">
@@ -859,7 +958,7 @@ function Nav({ className }) {
               <Dropdown
                 className="btn-group btn-group-sm"
                 icon="paint-bucket"
-                text={multiCtx.settings.theme}
+                text={"..."}
                 classNameMenu="text-center"
                 classNameBtn="btn text-capitalize">
                 {themes.map((x) => (
