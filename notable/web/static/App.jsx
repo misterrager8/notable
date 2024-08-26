@@ -434,7 +434,7 @@ function NotesPanel({ className }) {
           </div>
         )}
       </div>
-      <div className="overflow-scroll" style={{ height: "650px" }}>
+      <div className="overflow-auto" style={{ height: "650px" }}>
         {multiCtx.notes.map((x) => (
           <NoteItem className="" key={x.name} item={x} />
         ))}
@@ -493,7 +493,7 @@ function Editor({ className }) {
           icon={saved ? "check-lg" : "floppy2-fill"}
         />
       </div>
-      <div className="row h-100 overflow-scroll">
+      <div className="row h-100 overflow-auto">
         {["split", "write"].includes(multiCtx.settings.mode) && (
           <div
             id="editor-parent"
@@ -575,15 +575,17 @@ function Toolbar({ selection, className }) {
     },
     {
       label: "num-list",
-      format: `1. ${selection.selected}`,
+      format: `1. ${selection.selected.split("\n").join("\n1. ")}`,
     },
     {
       label: "bullet-list",
-      format: `- ${selection.selected}`,
+      format: `- ${selection.selected.split("\n").join("\n- ")}`,
     },
     {
       label: "checklist",
-      format: `**[​　]** ${selection.selected}`,
+      format: `- **[​　]** ${selection.selected
+        .split("\n")
+        .join("\n- **[​　]** ")}`,
     },
     {
       label: "check",
