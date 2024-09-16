@@ -247,12 +247,12 @@ function NoteItem({ item, className = "" }) {
       </div>
       <div className="between small mt-1">
         {multiCtx.settings.sort === "date_created" ? (
-          <div className="opacity-75">
+          <div className="opacity-75 text-truncate">
             <Icon name="plus-lg" className="me-1" />
             {item.date_created}
           </div>
         ) : (
-          <div className="opacity-75">
+          <div className="opacity-75 text-truncate">
             <Icon name="pencil" className="me-1" />
             {item.last_modified}
           </div>
