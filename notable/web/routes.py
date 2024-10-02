@@ -131,6 +131,11 @@ def delete_note():
     return {"status": "done"}
 
 
+@current_app.post("/duplicate_note")
+def duplicate_note():
+    return Note(request.json.get("path")).duplicate().to_dict()
+
+
 @current_app.post("/toggle_favorite")
 def toggle_favorite():
     Note(request.json.get("path")).toggle_favorite()

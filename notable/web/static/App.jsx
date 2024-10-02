@@ -917,7 +917,7 @@ function Nav({ className }) {
                           setSaved(true);
                           setTimeout(() => setSaved(false), 1500);
                         }}
-                        text={saved ? "Saved." : "Save"}
+                        // text={saved ? "Saved." : "Save"}
                         icon={saved ? "check-lg" : "floppy2-fill"}
                       />
                     )}
@@ -938,6 +938,13 @@ function Nav({ className }) {
                       icon={"clipboard" + (copied ? "-check" : "")}
                     />
                     <Button
+                      onClick={() =>
+                        multiCtx.duplicateNote(multiCtx.currentNote.path)
+                      }
+                      text={"Duplicate"}
+                      icon="copy"
+                    />
+                    <Button
                       onClick={() => setDeleting(!deleting)}
                       text={"Delete"}
                       icon={"trash2"}
@@ -949,7 +956,7 @@ function Nav({ className }) {
                           multiCtx.setCurrentNote([]);
                           setDeleting(false);
                         }}
-                        text={"Delete"}
+                        // text={"Delete"}
                         icon={"question-lg"}
                       />
                     )}
@@ -1047,6 +1054,13 @@ function App() {
     });
   };
 
+  const duplicateNote = (path) => {
+    api("duplicate_note", { path: path }, (data) => {
+      setCurrentNote(data);
+      getNotes();
+    });
+  };
+
   const renameNote = (e, path, newName) => {
     e.preventDefault();
     api("rename_note", { path: path, new_name: newName }, (data) => {
@@ -1125,6 +1139,7 @@ function App() {
     getNotes: getNotes,
     editNote: editNote,
     deleteNote: deleteNote,
+    duplicateNote: duplicateNote,
     renameNote: renameNote,
     pinNote: pinNote,
 

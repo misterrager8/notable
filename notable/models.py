@@ -82,6 +82,12 @@ class Note:
     def delete(self):
         self.path.unlink()
 
+    def duplicate(self):
+        _ = Note.add(self.name, self.folder)
+        _.edit(self.content)
+
+        return _
+
     def fixup_title(self):
         return self.rename(self.name.title())
 
