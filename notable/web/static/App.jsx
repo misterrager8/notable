@@ -578,6 +578,18 @@ function Toolbar({ selection, className }) {
       format: `1. ${selection.selected.split("\n").join("\n1. ")}`,
     },
     {
+      label: "sort",
+      format: `${selection.selected.split("\n").toSorted().join("\n")}`,
+    },
+    {
+      label: "sort-reverse",
+      format: `${selection.selected
+        .split("\n")
+        .toSorted()
+        .reverse()
+        .join("\n")}`,
+    },
+    {
       label: "bullet-list",
       format: `- ${selection.selected.split("\n").join("\n- ")}`,
     },
@@ -685,6 +697,11 @@ function Toolbar({ selection, className }) {
         <Button onClick={() => copyFormat("link")} icon="link-45deg" />
         <Button onClick={() => copyFormat("capitalize")} icon="type" />
         <Button onClick={() => copyFormat("indent")} icon="indent" />
+        <Button onClick={() => copyFormat("sort")} icon="sort-alpha-down" />
+        <Button
+          onClick={() => copyFormat("sort-reverse")}
+          icon="sort-alpha-up-alt"
+        />
         <Dropdown
           classNameBtn="btn"
           target="other-formats"
