@@ -171,11 +171,13 @@ body {
 #reader code {
   font-family: monospace;
   color: var(--btn-color);
+  opacity: 60%;
 }
 
 #reader a {
   color: var(--btn-color);
   font-style: italic;
+  text-decoration: underline;
 }
 
 #reader img {
