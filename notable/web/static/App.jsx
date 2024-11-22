@@ -50,7 +50,8 @@ function Button({ className, type_ = "button", onClick, icon, text, size }) {
     <button
       type={type_}
       className={className + " btn" + (size === "sm" ? " btn-sm" : "")}
-      onClick={onClick}>
+      onClick={onClick}
+    >
       {icon && <i className={"bi bi-" + icon + (text ? " me-1" : "")}></i>}
       {text}
     </button>
@@ -86,7 +87,8 @@ function ButtonGroup({ className, size, children }) {
     <div
       className={
         className + " btn-group" + (size === "sm" ? " btn-group-sm" : "")
-      }>
+      }
+    >
       {children}
     </div>
   );
@@ -97,7 +99,8 @@ function InputGroup({ className, size, children }) {
     <div
       className={
         className + " input-group" + (size === "sm" ? " input-group-sm" : "")
-      }>
+      }
+    >
       {children}
     </div>
   );
@@ -134,7 +137,8 @@ function Dropdown({
         data-bs-target={"#" + target}
         data-bs-toggle="dropdown"
         data-bs-auto-close={autoClose}
-        className={classNameBtn + " dropdown-toggle"}>
+        className={classNameBtn + " dropdown-toggle"}
+      >
         {icon && <Icon name={icon} className="me-1" />}
         {text}
       </a>
@@ -199,7 +203,8 @@ function AboutPage({ className }) {
       <div
         dangerouslySetInnerHTML={{
           __html: window.markdownit().render(readme),
-        }}></div>
+        }}
+      ></div>
     </div>
   );
 }
@@ -230,7 +235,8 @@ function NoteItem({ item, className = "" }) {
         " py-2 rounded px-3 item" +
         (multiCtx.currentNote.name === item.name ? " selected" : "")
       }
-      onClick={() => multiCtx.setCurrentNote({ ...item })}>
+      onClick={() => multiCtx.setCurrentNote({ ...item })}
+    >
       <div className="between">
         <div
           className={
@@ -238,7 +244,8 @@ function NoteItem({ item, className = "" }) {
             (item.favorited && multiCtx.currentNote.name !== item.name
               ? " highlight"
               : "")
-          }>
+          }
+        >
           {item.name}
         </div>
         {item.favorited && (
@@ -282,7 +289,8 @@ function FolderItem({ item }) {
         <form
           className="input-group input-group-sm "
           style={{ marginBlockEnd: 0 }}
-          onSubmit={(e) => multiCtx.renameFolder(e, item, name)}>
+          onSubmit={(e) => multiCtx.renameFolder(e, item, name)}
+        >
           <Input
             onChange={onChangeName}
             value={name}
@@ -292,7 +300,8 @@ function FolderItem({ item }) {
       ) : (
         <a
           className="py-1 fw-bold"
-          onClick={() => multiCtx.setCurrentFolder(item)}>
+          onClick={() => multiCtx.setCurrentFolder(item)}
+        >
           {item}
         </a>
       )}
@@ -350,14 +359,16 @@ function NotesPanel({ className }) {
           icon={sorts.filter((x) => x.name === multiCtx.settings.sort)[0]?.icon}
           text={
             sorts.filter((x) => x.name === multiCtx.settings.sort)[0]?.label
-          }>
+          }
+        >
           {sorts.map((x) => (
             <button
               key={x.name}
               className="dropdown-item between"
               onClick={() =>
                 multiCtx.setSettings({ ...multiCtx.settings, sort: x.name })
-              }>
+              }
+            >
               <span className="">{x?.label}</span>
               <Icon name={x?.icon} className="m-1" />
             </button>
@@ -405,7 +416,8 @@ function NotesPanel({ className }) {
             <div className="mb-3">
               <a
                 onClick={() => multiCtx.getNote(x.path)}
-                className="d-block fw-bold mb-1">
+                className="d-block fw-bold mb-1"
+              >
                 {x.file}
               </a>
               <div className="fst-italic small opacity-50">"{x.match}"</div>
@@ -500,7 +512,8 @@ function Editor({ className }) {
             className={
               "px-3 border-end col-" +
               (multiCtx.settings.mode === "write" ? "12" : "6")
-            }>
+            }
+          >
             <textarea
               onMouseUp={() => getSelection()}
               id="editor"
@@ -508,19 +521,22 @@ function Editor({ className }) {
               style={{ height: "98%" }}
               value={multiCtx.content}
               onChange={onChangeContent}
-              placeholder="..."></textarea>
+              placeholder="..."
+            ></textarea>
           </div>
         )}
         {["split", "read"].includes(multiCtx.settings.mode) && (
           <div
             className={
               "px-5 col-" + (multiCtx.settings.mode === "read" ? "12" : "6")
-            }>
+            }
+          >
             <div
               id="reader"
               dangerouslySetInnerHTML={{
                 __html: window.markdownit().render(multiCtx.content),
-              }}></div>
+              }}
+            ></div>
           </div>
         )}
       </div>
@@ -530,6 +546,17 @@ function Editor({ className }) {
 
 function Toolbar({ selection, className }) {
   const multiCtx = React.useContext(MultiContext);
+  const [url, setUrl] = React.useState("");
+  const [showURL, setShowURL] = React.useState(false);
+
+  const onChangeURL = (e) => setUrl(e.target.value);
+
+  const savePage = (e) => {
+    e.preventDefault();
+    api("save_page", { path: multiCtx.currentNote.path, url: url }, (data) =>
+      multiCtx.setCurrentNote(data)
+    );
+  };
 
   const weekday = [
     "Sunday",
@@ -684,88 +711,110 @@ function Toolbar({ selection, className }) {
   return (
     <div className={className} id="toolbar">
       <ButtonGroup>
-        <Button onClick={() => copyFormat("bold")} icon="type-bold" />
-        <Button onClick={() => copyFormat("italic")} icon="type-italic" />
-        <Button onClick={() => copyFormat("heading")} icon="type-h1" />
-        <Button onClick={() => copyFormat("hrule")} icon="hr" />
-        <Button onClick={() => copyFormat("num-list")} icon="123" />
-        <Button onClick={() => copyFormat("bullet-list")} icon="list-ul" />
-        <Button onClick={() => copyFormat("checklist")} icon="ui-checks" />
-        <Button onClick={() => copyFormat("check")} icon="check-circle-fill" />
-        <Button onClick={() => copyFormat("code")} icon="code-slash" />
-        <Button onClick={() => copyFormat("image")} icon="image" />
-        <Button onClick={() => copyFormat("link")} icon="link-45deg" />
-        <Button onClick={() => copyFormat("capitalize")} icon="type" />
-        <Button onClick={() => copyFormat("indent")} icon="indent" />
-        <Button onClick={() => copyFormat("sort")} icon="sort-alpha-down" />
-        <Button
-          onClick={() => copyFormat("sort-reverse")}
-          icon="sort-alpha-up-alt"
-        />
-        <Dropdown
-          classNameBtn="btn"
-          target="other-formats"
-          className="btn-group"
-          icon="three-dots"
-          autoClose={false}>
-          <ButtonGroup size="sm" className="p-1">
-            <Button
-              onClick={() => copyFormat("parentheses")}
-              className="border-0"
-              text="()"
-            />
-            <Button
-              onClick={() => copyFormat("curly-braces")}
-              className="border-0"
-              text="{}"
-            />
-            <Button
-              onClick={() => copyFormat("square-brackets")}
-              className="border-0"
-              text="[]"
-            />
-            <Button
-              onClick={() => copyFormat("single-quotes")}
-              className="border-0"
-              text="''"
-            />
-            <Button
-              onClick={() => copyFormat("double-quotes")}
-              className="border-0"
-              text='""'
-            />
-          </ButtonGroup>
-        </Dropdown>
-        <Dropdown
-          classNameBtn="btn"
-          target="date-formats"
-          className="btn-group"
-          icon="calendar-date"
-          autoClose={false}>
-          <ButtonGroup size="sm" className="p-1">
-            <Button
-              onClick={() => copyFormat("date-1")}
-              className="border-0"
-              text="'22 May'"
-            />
-            <Button
-              onClick={() => copyFormat("date-2")}
-              className="border-0"
-              text="'Wednesday'"
-            />
-            <Button
-              onClick={() => copyFormat("date-3")}
-              className="border-0"
-              text="'3:33 AM'"
-            />
-            <Button
-              onClick={() => copyFormat("date-4")}
-              className="border-0"
-              text="'2024-05-22'"
-            />
-          </ButtonGroup>
-        </Dropdown>
+        <ButtonGroup className="">
+          <Button onClick={() => copyFormat("bold")} icon="type-bold" />
+          <Button onClick={() => copyFormat("italic")} icon="type-italic" />
+          <Button onClick={() => copyFormat("heading")} icon="type-h1" />
+          <Button onClick={() => copyFormat("hrule")} icon="hr" />
+          <Button onClick={() => copyFormat("num-list")} icon="123" />
+          <Button onClick={() => copyFormat("bullet-list")} icon="list-ul" />
+          <Button onClick={() => copyFormat("checklist")} icon="ui-checks" />
+          <Button
+            onClick={() => copyFormat("check")}
+            icon="check-circle-fill"
+          />
+          <Button onClick={() => copyFormat("code")} icon="code-slash" />
+          <Button onClick={() => copyFormat("image")} icon="image" />
+          <Button onClick={() => copyFormat("link")} icon="link-45deg" />
+          <Button onClick={() => copyFormat("capitalize")} icon="type" />
+          <Button onClick={() => copyFormat("indent")} icon="indent" />
+          <Button onClick={() => copyFormat("sort")} icon="sort-alpha-down" />
+          <Button
+            onClick={() => copyFormat("sort-reverse")}
+            icon="sort-alpha-up-alt"
+          />
+          <Dropdown
+            classNameBtn="btn"
+            target="other-formats"
+            className="btn-group"
+            icon="three-dots"
+            autoClose={false}
+          >
+            <ButtonGroup size="sm" className="p-1">
+              <Button
+                onClick={() => copyFormat("parentheses")}
+                className="border-0"
+                text="()"
+              />
+              <Button
+                onClick={() => copyFormat("curly-braces")}
+                className="border-0"
+                text="{}"
+              />
+              <Button
+                onClick={() => copyFormat("square-brackets")}
+                className="border-0"
+                text="[]"
+              />
+              <Button
+                onClick={() => copyFormat("single-quotes")}
+                className="border-0"
+                text="''"
+              />
+              <Button
+                onClick={() => copyFormat("double-quotes")}
+                className="border-0"
+                text='""'
+              />
+            </ButtonGroup>
+          </Dropdown>
+          <Dropdown
+            classNameBtn="btn"
+            target="date-formats"
+            className="btn-group"
+            icon="calendar-date"
+            autoClose={false}
+          >
+            <ButtonGroup size="sm" className="p-1">
+              <Button
+                onClick={() => copyFormat("date-1")}
+                className="border-0"
+                text="'22 May'"
+              />
+              <Button
+                onClick={() => copyFormat("date-2")}
+                className="border-0"
+                text="'Wednesday'"
+              />
+              <Button
+                onClick={() => copyFormat("date-3")}
+                className="border-0"
+                text="'3:33 AM'"
+              />
+              <Button
+                onClick={() => copyFormat("date-4")}
+                className="border-0"
+                text="'2024-05-22'"
+              />
+            </ButtonGroup>
+          </Dropdown>
+          <Button
+            className={showURL ? "active" : ""}
+            icon="file-earmark-arrow-down"
+            onClick={() => setShowURL(!showURL)}
+          />
+        </ButtonGroup>
       </ButtonGroup>
+      {showURL && (
+        <form onSubmit={(e) => savePage(e)} className="mt-3 w-50">
+          <Input
+            className="form-control-sm"
+            placeholder="URL"
+            onChange={onChangeURL}
+            value={url}
+          />
+        </form>
+      )}
     </div>
   );
 }
@@ -826,7 +875,8 @@ function Nav({ className }) {
                   multiCtx.setCurrentNote([]);
                   multiCtx.setSettings({ ...settings, lastOpened: "" });
                 }}
-                className="btn border-0">
+                className="btn border-0"
+              >
                 <img
                   className="me-2 pb-1"
                   src="static/favicon.svg"
@@ -850,7 +900,8 @@ function Nav({ className }) {
               className="input-group input-group-sm"
               onSubmit={(e) =>
                 multiCtx.renameNote(e, multiCtx.currentNote.path, name)
-              }>
+              }
+            >
               <input
                 value={name}
                 onChange={onChangeName}
@@ -866,11 +917,13 @@ function Nav({ className }) {
                   multiCtx.currentNote.folder
                     ? multiCtx.currentNote.folder
                     : "No Folder"
-                }>
+                }
+              >
                 <button
                   onClick={() => multiCtx.changeFolder(null)}
                   type="button"
-                  className="dropdown-item">
+                  className="dropdown-item"
+                >
                   No Folder
                 </button>
                 {multiCtx.folders.map((x) => (
@@ -878,7 +931,8 @@ function Nav({ className }) {
                     key={`${x}-2`}
                     onClick={() => multiCtx.changeFolder(x)}
                     type="button"
-                    className="dropdown-item">
+                    className="dropdown-item"
+                  >
                     {x}
                   </button>
                 ))}
@@ -986,7 +1040,8 @@ function Nav({ className }) {
                 icon="paint-bucket"
                 text={"..."}
                 classNameMenu="text-center"
-                classNameBtn="btn text-capitalize">
+                classNameBtn="btn text-capitalize"
+              >
                 {themes.map((x) => (
                   <button
                     key={x}
@@ -999,7 +1054,8 @@ function Nav({ className }) {
                         ...multiCtx.settings,
                         theme: x,
                       })
-                    }>
+                    }
+                  >
                     {x}
                   </button>
                 ))}
