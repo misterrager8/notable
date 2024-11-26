@@ -173,19 +173,6 @@ function HomePage({ className }) {
   );
 }
 
-function SettingsPage({ className }) {
-  const multiCtx = React.useContext(MultiContext);
-
-  return (
-    <div className={className}>
-      <Heading icon="gear" text="Settings" className="mb-4" />
-      <div style={{ whiteSpace: "pre-wrap" }}>
-        {JSON.stringify(multiCtx.settings, null, 4)}
-      </div>
-    </div>
-  );
-}
-
 function AboutPage({ className }) {
   const multiCtx = React.useContext(MultiContext);
   const [readme, setReadme] = React.useState("");
@@ -214,13 +201,7 @@ function Display({ className }) {
 
   return (
     <div className={className + " py-4"}>
-      {multiCtx.currentPage === "settings" ? (
-        <SettingsPage />
-      ) : multiCtx.currentPage === "about" ? (
-        <AboutPage />
-      ) : (
-        <HomePage />
-      )}
+      {multiCtx.currentPage === "about" ? <AboutPage /> : <HomePage />}
     </div>
   );
 }
@@ -339,6 +320,7 @@ function NotesPanel({ className }) {
     [multiCtx.settings, multiCtx.currentFolder]
   );
   React.useEffect(() => multiCtx.getFolders(), []);
+  React.useEffect(() => setShowFolders(false), [multiCtx.currentFolder]);
 
   const onChangeSearch = (e) => setSearch(e.target.value);
 
@@ -410,6 +392,10 @@ function NotesPanel({ className }) {
           />
         )}
       </form>
+      <div className="opacity-50 fst-italic mb-3 text-center">
+        <Icon name="record-fill" className="me-2" />
+        <small className="">{multiCtx.notes.length} notes</small>
+      </div>
       {searchResults.length !== 0 && (
         <div className="px-2">
           {searchResults.map((x) => (
@@ -649,6 +635,14 @@ function Toolbar({ selection, className }) {
       }`,
     },
     {
+      label: "allcaps",
+      format: `${selection.selected.toUpperCase()}`,
+    },
+    {
+      label: "alllower",
+      format: `${selection.selected.toLowerCase()}`,
+    },
+    {
       label: "indent",
       format: `    ${selection.selected}`,
     },
@@ -726,7 +720,31 @@ function Toolbar({ selection, className }) {
           <Button onClick={() => copyFormat("code")} icon="code-slash" />
           <Button onClick={() => copyFormat("image")} icon="image" />
           <Button onClick={() => copyFormat("link")} icon="link-45deg" />
-          <Button onClick={() => copyFormat("capitalize")} icon="type" />
+          <Dropdown
+            classNameBtn="btn"
+            target="other-formats"
+            className="btn-group"
+            icon="type"
+            autoClose={false}
+          >
+            <ButtonGroup size="sm" className="p-1">
+              <Button
+                onClick={() => copyFormat("capitalize")}
+                icon="type"
+                text="Capitalize"
+              />
+              <Button
+                onClick={() => copyFormat("allcaps")}
+                icon="type"
+                text="All Caps"
+              />
+              <Button
+                onClick={() => copyFormat("alllower")}
+                icon="type"
+                text="All Lowercase"
+              />
+            </ButtonGroup>
+          </Dropdown>{" "}
           <Button onClick={() => copyFormat("indent")} icon="indent" />
           <Button onClick={() => copyFormat("sort")} icon="sort-alpha-down" />
           <Button
@@ -1060,12 +1078,6 @@ function Nav({ className }) {
                   </button>
                 ))}
               </Dropdown>
-              <Button
-                text="Settings"
-                icon="gear"
-                className={multiCtx.currentPage === "settings" ? " active" : ""}
-                onClick={() => multiCtx.setCurrentPage("settings")}
-              />
               <Button
                 className={multiCtx.currentPage === "about" ? " active" : ""}
                 text="About"
