@@ -50,8 +50,7 @@ function Button({ className, type_ = "button", onClick, icon, text, size }) {
     <button
       type={type_}
       className={className + " btn" + (size === "sm" ? " btn-sm" : "")}
-      onClick={onClick}
-    >
+      onClick={onClick}>
       {icon && <i className={"bi bi-" + icon + (text ? " me-1" : "")}></i>}
       {text}
     </button>
@@ -87,8 +86,7 @@ function ButtonGroup({ className, size, children }) {
     <div
       className={
         className + " btn-group" + (size === "sm" ? " btn-group-sm" : "")
-      }
-    >
+      }>
       {children}
     </div>
   );
@@ -99,8 +97,7 @@ function InputGroup({ className, size, children }) {
     <div
       className={
         className + " input-group" + (size === "sm" ? " input-group-sm" : "")
-      }
-    >
+      }>
       {children}
     </div>
   );
@@ -137,8 +134,7 @@ function Dropdown({
         data-bs-target={"#" + target}
         data-bs-toggle="dropdown"
         data-bs-auto-close={autoClose}
-        className={classNameBtn + " dropdown-toggle"}
-      >
+        className={classNameBtn + " dropdown-toggle"}>
         {icon && <Icon name={icon} className="me-1" />}
         {text}
       </a>
@@ -190,8 +186,7 @@ function AboutPage({ className }) {
       <div
         dangerouslySetInnerHTML={{
           __html: window.markdownit().render(readme),
-        }}
-      ></div>
+        }}></div>
     </div>
   );
 }
@@ -216,8 +211,7 @@ function NoteItem({ item, className = "" }) {
         " py-2 rounded px-3 item" +
         (multiCtx.currentNote.name === item.name ? " selected" : "")
       }
-      onClick={() => multiCtx.setCurrentNote({ ...item })}
-    >
+      onClick={() => multiCtx.setCurrentNote({ ...item })}>
       <div className="between">
         <div
           className={
@@ -225,8 +219,7 @@ function NoteItem({ item, className = "" }) {
             (item.favorited && multiCtx.currentNote.name !== item.name
               ? " highlight"
               : "")
-          }
-        >
+          }>
           {item.name}
         </div>
         {item.favorited && (
@@ -270,8 +263,7 @@ function FolderItem({ item }) {
         <form
           className="input-group input-group-sm "
           style={{ marginBlockEnd: 0 }}
-          onSubmit={(e) => multiCtx.renameFolder(e, item, name)}
-        >
+          onSubmit={(e) => multiCtx.renameFolder(e, item, name)}>
           <Input
             onChange={onChangeName}
             value={name}
@@ -281,8 +273,7 @@ function FolderItem({ item }) {
       ) : (
         <a
           className="py-1 fw-bold"
-          onClick={() => multiCtx.setCurrentFolder(item)}
-        >
+          onClick={() => multiCtx.setCurrentFolder(item)}>
           {item}
         </a>
       )}
@@ -341,16 +332,14 @@ function NotesPanel({ className }) {
           icon={sorts.filter((x) => x.name === multiCtx.settings.sort)[0]?.icon}
           text={
             sorts.filter((x) => x.name === multiCtx.settings.sort)[0]?.label
-          }
-        >
+          }>
           {sorts.map((x) => (
             <button
               key={x.name}
               className="dropdown-item between"
               onClick={() =>
                 multiCtx.setSettings({ ...multiCtx.settings, sort: x.name })
-              }
-            >
+              }>
               <span className="">{x?.label}</span>
               <Icon name={x?.icon} className="m-1" />
             </button>
@@ -392,18 +381,13 @@ function NotesPanel({ className }) {
           />
         )}
       </form>
-      <div className="opacity-50 fst-italic mb-3 text-center">
-        <Icon name="record-fill" className="me-2" />
-        <small className="">{multiCtx.notes.length} notes</small>
-      </div>
       {searchResults.length !== 0 && (
         <div className="px-2">
           {searchResults.map((x) => (
             <div className="mb-3">
               <a
                 onClick={() => multiCtx.getNote(x.path)}
-                className="d-block fw-bold mb-1"
-              >
+                className="d-block fw-bold mb-1">
                 {x.file}
               </a>
               <div className="fst-italic small opacity-50">"{x.match}"</div>
@@ -432,11 +416,20 @@ function NotesPanel({ className }) {
           </div>
         )}
       </div>
-      <div className="overflow-auto" style={{ height: "650px" }}>
+      <div className="overflow-auto h-100">
         {multiCtx.notes.map((x) => (
           <NoteItem className="" key={x.name} item={x} />
         ))}
       </div>
+      <Badge
+        icon="record-fill"
+        className="mt-3 border-0 w-100"
+        text={
+          multiCtx.notes.length +
+          " Note" +
+          (multiCtx.notes.length === 1 ? "" : "s")
+        }
+      />
     </div>
   );
 }
@@ -498,31 +491,26 @@ function Editor({ className }) {
             className={
               "px-3 border-end col-" +
               (multiCtx.settings.mode === "write" ? "12" : "6")
-            }
-          >
+            }>
             <textarea
               onMouseUp={() => getSelection()}
               id="editor"
-              className="form-control my-1"
-              style={{ height: "98%" }}
+              className="form-control my-1 h-100"
               value={multiCtx.content}
               onChange={onChangeContent}
-              placeholder="..."
-            ></textarea>
+              placeholder="..."></textarea>
           </div>
         )}
         {["split", "read"].includes(multiCtx.settings.mode) && (
           <div
             className={
               "px-5 col-" + (multiCtx.settings.mode === "read" ? "12" : "6")
-            }
-          >
+            }>
             <div
               id="reader"
               dangerouslySetInnerHTML={{
                 __html: window.markdownit().render(multiCtx.content),
-              }}
-            ></div>
+              }}></div>
           </div>
         )}
       </div>
@@ -725,23 +713,25 @@ function Toolbar({ selection, className }) {
             target="other-formats"
             className="btn-group"
             icon="type"
-            autoClose={false}
-          >
+            autoClose={false}>
             <ButtonGroup size="sm" className="p-1">
               <Button
+                className="border-0"
                 onClick={() => copyFormat("capitalize")}
                 icon="type"
                 text="Capitalize"
               />
               <Button
+                className="border-0"
                 onClick={() => copyFormat("allcaps")}
-                icon="type"
-                text="All Caps"
+                icon="alphabet-uppercase"
+                text="Upper"
               />
               <Button
+                className="border-0"
                 onClick={() => copyFormat("alllower")}
-                icon="type"
-                text="All Lowercase"
+                icon="alphabet"
+                text="Lower"
               />
             </ButtonGroup>
           </Dropdown>{" "}
@@ -756,8 +746,7 @@ function Toolbar({ selection, className }) {
             target="other-formats"
             className="btn-group"
             icon="three-dots"
-            autoClose={false}
-          >
+            autoClose={false}>
             <ButtonGroup size="sm" className="p-1">
               <Button
                 onClick={() => copyFormat("parentheses")}
@@ -791,34 +780,37 @@ function Toolbar({ selection, className }) {
             target="date-formats"
             className="btn-group"
             icon="calendar-date"
-            autoClose={false}
-          >
-            <ButtonGroup size="sm" className="p-1">
+            autoClose={false}>
+            <div className="p-1">
               <Button
+                size="sm"
                 onClick={() => copyFormat("date-1")}
-                className="border-0"
+                className="border-0 w-100"
                 text="'22 May'"
               />
               <Button
+                size="sm"
                 onClick={() => copyFormat("date-2")}
-                className="border-0"
+                className="border-0 w-100"
                 text="'Wednesday'"
               />
               <Button
+                size="sm"
                 onClick={() => copyFormat("date-3")}
-                className="border-0"
+                className="border-0 w-100"
                 text="'3:33 AM'"
               />
               <Button
+                size="sm"
                 onClick={() => copyFormat("date-4")}
-                className="border-0"
+                className="border-0 w-100"
                 text="'2024-05-22'"
               />
-            </ButtonGroup>
+            </div>
           </Dropdown>
           <Button
             className={showURL ? "active" : ""}
-            icon="file-earmark-arrow-down"
+            icon="markdown-fill"
             onClick={() => setShowURL(!showURL)}
           />
         </ButtonGroup>
@@ -858,22 +850,22 @@ function Nav({ className }) {
   };
 
   const themes = [
-    "greek-sea-dark",
-    "pyrite-green-light",
-    "mullen-pink-light",
-    "bright-nori-light",
-    "shrimp-cocktail-dark",
-    "private-tone-light",
-    "lamiaceae-dark",
-    "forgotten-purple-dark",
-    "banana-bombshell-dark",
-    "berry-blackmail-light",
-    "winter-shadow-light",
-    "tropical-tone-dark",
-    "alamosa-green-dark",
-    "camel-toe-dark",
     "light",
     "dark",
+    "red-light",
+    "orange-light",
+    "yellow-light",
+    "green-light",
+    "blue-light",
+    "indigo-light",
+    "violet-light",
+    "red-dark",
+    "orange-dark",
+    "yellow-dark",
+    "green-dark",
+    "blue-dark",
+    "indigo-dark",
+    "violet-dark",
   ];
 
   return (
@@ -893,8 +885,7 @@ function Nav({ className }) {
                   multiCtx.setCurrentNote([]);
                   multiCtx.setSettings({ ...settings, lastOpened: "" });
                 }}
-                className="btn border-0"
-              >
+                className="btn border-0">
                 <img
                   className="me-2 pb-1"
                   src="static/favicon.svg"
@@ -918,8 +909,7 @@ function Nav({ className }) {
               className="input-group input-group-sm"
               onSubmit={(e) =>
                 multiCtx.renameNote(e, multiCtx.currentNote.path, name)
-              }
-            >
+              }>
               <input
                 value={name}
                 onChange={onChangeName}
@@ -935,13 +925,11 @@ function Nav({ className }) {
                   multiCtx.currentNote.folder
                     ? multiCtx.currentNote.folder
                     : "No Folder"
-                }
-              >
+                }>
                 <button
                   onClick={() => multiCtx.changeFolder(null)}
                   type="button"
-                  className="dropdown-item"
-                >
+                  className="dropdown-item">
                   No Folder
                 </button>
                 {multiCtx.folders.map((x) => (
@@ -949,8 +937,7 @@ function Nav({ className }) {
                     key={`${x}-2`}
                     onClick={() => multiCtx.changeFolder(x)}
                     type="button"
-                    className="dropdown-item"
-                  >
+                    className="dropdown-item">
                     {x}
                   </button>
                 ))}
@@ -1058,8 +1045,7 @@ function Nav({ className }) {
                 icon="paint-bucket"
                 text={"..."}
                 classNameMenu="text-center"
-                classNameBtn="btn text-capitalize"
-              >
+                classNameBtn="btn text-capitalize">
                 {themes.map((x) => (
                   <button
                     key={x}
@@ -1072,8 +1058,7 @@ function Nav({ className }) {
                         ...multiCtx.settings,
                         theme: x,
                       })
-                    }
-                  >
+                    }>
                     {x}
                   </button>
                 ))}
@@ -1247,7 +1232,7 @@ function App() {
 
   return (
     <MultiContext.Provider value={contextValue}>
-      <div className="p-4">
+      <div className="full p-4">
         <Nav className="" />
         <Display />
       </div>
