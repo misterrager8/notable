@@ -849,25 +849,6 @@ function Nav({ className }) {
     setTimeout(() => setCopied(false), 1500);
   };
 
-  const themes = [
-    "light",
-    "dark",
-    "red-light",
-    "orange-light",
-    "yellow-light",
-    "green-light",
-    "blue-light",
-    "indigo-light",
-    "violet-light",
-    "red-dark",
-    "orange-dark",
-    "yellow-dark",
-    "green-dark",
-    "blue-dark",
-    "indigo-dark",
-    "violet-dark",
-  ];
-
   return (
     <div className={className} id="nav">
       <div className="row">
@@ -1040,29 +1021,20 @@ function Nav({ className }) {
                 )}
             </ButtonGroup>
             <ButtonGroup size="sm">
-              <Dropdown
-                className="btn-group btn-group-sm"
-                icon="paint-bucket"
-                text={"..."}
-                classNameMenu="text-center"
-                classNameBtn="btn text-capitalize">
-                {themes.map((x) => (
-                  <button
-                    key={x}
-                    className={
-                      "dropdown-item text-capitalize small" +
-                      (multiCtx.settings.theme === x ? " selected2" : "")
-                    }
-                    onClick={() =>
-                      multiCtx.setSettings({
-                        ...multiCtx.settings,
-                        theme: x,
-                      })
-                    }>
-                    {x}
-                  </button>
-                ))}
-              </Dropdown>
+              <Button
+                onClick={() =>
+                  multiCtx.setSettings({
+                    ...multiCtx.settings,
+                    theme:
+                      multiCtx.settings.theme === "light" ? "dark" : "light",
+                  })
+                }
+                className="text-capitalize"
+                text={multiCtx.settings.theme}
+                icon={
+                  multiCtx.settings.theme === "light" ? "sun-fill" : "moon-fill"
+                }
+              />
               <Button
                 className={multiCtx.currentPage === "about" ? " active" : ""}
                 text="About"

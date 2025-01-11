@@ -1,0 +1,22 @@
+:root,
+html[data-theme="light"] {
+  --primary-bg: #F0DEA9;
+  --primary-txt: #2E2226;
+
+  --btn-color: #81594E;
+  --btn-hover-text: #F0DEA9;
+
+  --code-color: #066425;
+  --heading-color: #3c4a55;
+}
+
+html[data-theme="dark"] {
+  --primary-bg: #2E2226;
+  --primary-txt: #F0DEA9;
+
+  --btn-color: #DA7E4D;
+  --btn-hover-text: #F0DEA9;
+
+  --code-color: #51ba74;
+  --heading-color: #738592;
+}
