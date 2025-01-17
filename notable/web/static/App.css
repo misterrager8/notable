@@ -148,9 +148,13 @@ a:hover {
   }
 }
 
-.overflow-auto::-webkit-scrollbar,
-#editor::-webkit-scrollbar {
-  display: none;
+::-webkit-scrollbar {
+  width: 2px;
+  background-color: var(--primary-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--primary-txt);
 }
 
 .full {

@@ -416,7 +416,7 @@ function NotesPanel({ className }) {
           </div>
         )}
       </div>
-      <div className="overflow-auto h-100">
+      <div className="overflow-auto h-100 pe-1">
         {multiCtx.notes.map((x) => (
           <NoteItem className="" key={x.name} item={x} />
         ))}
