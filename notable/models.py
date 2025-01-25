@@ -1,3 +1,4 @@
+from calendar import Calendar
 import datetime
 import pathlib
 import shutil
@@ -5,6 +6,7 @@ import subprocess
 from operator import attrgetter
 from pathlib import Path
 
+import click
 import frontmatter
 import markdown
 
@@ -213,3 +215,36 @@ class SearchResult:
 
     def to_dict(self) -> dict:
         return {"file": self.file, "path": str(self.path), "match": self.match}
+
+
+class CustomCalendar:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def get_days(cls, month, year):
+        days_ = []
+        month_ = Calendar(6).itermonthdates(year, month)
+        for i in month_:
+            if i.month == month and i.year == year:
+                matches = []
+                for j in Note.all():
+                    if (
+                        j.date_created.year == i.year
+                        and j.date_created.month == i.month
+                        and j.date_created.day == i.day
+                    ):
+                        matches.append(j.to_dict())
+                days_.append(
+                    {
+                        "year": i.year,
+                        "month": i.month,
+                        "day": i.day,
+                        "monthLabel": i.strftime("%B %Y"),
+                        "weekdayInt": i.weekday(),
+                        "fullLabel": i.strftime("%B %-d, %Y"),
+                        "id": i.strftime("%y%m%d"),
+                        "notes": matches,
+                    }
+                )
+        return days_

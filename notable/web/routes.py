@@ -1,3 +1,4 @@
+from calendar import Calendar
 import datetime
 from pathlib import Path
 
@@ -6,7 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 from flask import current_app, render_template, request
 
-from ..models import Folder, Note
+from ..models import CustomCalendar, Folder, Note
 
 
 @current_app.get("/")
@@ -146,3 +147,11 @@ def toggle_favorite():
 @current_app.post("/search")
 def search():
     return {"results": [i.to_dict() for i in Note.search(request.json.get("query"))]}
+
+
+@current_app.post("/get_days")
+def get_days():
+    days_ = CustomCalendar.get_days(
+        int(request.json.get("month")), int(request.json.get("year"))
+    )
+    return {"days": days_}

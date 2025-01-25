@@ -29,6 +29,7 @@ const defaultSettings = {
 };
 
 const MultiContext = React.createContext();
+const CalendarContext = React.createContext();
 
 const api = (url, params, callback) =>
   fetch("/" + url, {
@@ -201,6 +202,136 @@ function Display({ className }) {
   );
 }
 
+function DayItem({ item, className = "" }) {
+  const calendarCtx = React.useContext(CalendarContext);
+  const multiCtx = React.useContext(MultiContext);
+
+  React.useEffect(() => {
+    multiCtx.setNotes(
+      calendarCtx.selectedDay ? calendarCtx.selectedDay?.notes : []
+    );
+  }, [calendarCtx.selectedDay]);
+
+  const isToday = () => {
+    let today_ = new Date();
+    return (
+      today_.getFullYear() === item.year &&
+      today_.getMonth() + 1 === item.month &&
+      today_.getDate() === item.day
+    );
+  };
+
+  return (
+    <div
+      onMouseEnter={() => calendarCtx.setHoveredDay(item)}
+      onClick={() =>
+        calendarCtx.setSelectedDay(
+          calendarCtx.selectedDay?.id === item.id ? null : item
+        )
+      }
+      className={
+        "day d-flex" +
+        (item.filler ? " filler" : "") +
+        (calendarCtx.hoveredDay?.id === item.id && !item.filler
+          ? " hovered"
+          : "") +
+        (calendarCtx.selectedDay?.id === item.id && !item.filler
+          ? " selected-day"
+          : "") +
+        (isToday() && !item.filler ? " today" : "")
+      }>
+      <span className="m-auto small">
+        {item.notes?.length > 0 && item.notes?.length}
+      </span>
+    </div>
+  );
+}
+
+function Month({ className = "" }) {
+  const multiCtx = React.useContext(MultiContext);
+
+  const [currrentMonth, setCurrrentMonth] = React.useState(
+    new Date().getMonth() + 1
+  );
+  const [currrentYear, setCurrrentYear] = React.useState(
+    new Date().getFullYear()
+  );
+  const [hoveredDay, setHoveredDay] = React.useState(null);
+  const [selectedDay, setSelectedDay] = React.useState(null);
+
+  const [days, setDays] = React.useState([]);
+
+  const getDays = () => {
+    multiCtx.setLoading(true);
+    api("get_days", { month: currrentMonth, year: currrentYear }, (data) => {
+      let days_ = [...data.days];
+
+      let offset = days_[0]?.weekdayInt;
+      let filler = Array(offset + 1).fill({ filler: true });
+
+      setDays(offset + 1 < 7 ? filler.concat(days_) : days_);
+      multiCtx.setLoading(false);
+    });
+  };
+
+  React.useEffect(() => {
+    getDays();
+  }, [currrentMonth, currrentYear]);
+
+  const contextValue = {
+    hoveredDay: hoveredDay,
+    selectedDay: selectedDay,
+    setHoveredDay: setHoveredDay,
+    setSelectedDay: setSelectedDay,
+  };
+
+  return (
+    <CalendarContext.Provider value={contextValue}>
+      <div className="text-center h5 mb-2">
+        {hoveredDay?.fullLabel ||
+          selectedDay?.fullLabel ||
+          days[days.length - 1]?.monthLabel}
+        &nbsp;
+      </div>
+      <div className="between mb-3">
+        <Button
+          onClick={() => {
+            let month_ = currrentMonth - 1;
+            if (month_ === 0) {
+              setCurrrentYear(currrentYear - 1);
+              setCurrrentMonth(12);
+            } else {
+              setCurrrentMonth(month_);
+            }
+          }}
+          icon="arrow-left"
+          className="border-0"
+        />
+        <Button
+          onClick={() => {
+            let month_ = currrentMonth + 1;
+            if (month_ === 13) {
+              setCurrrentYear(currrentYear + 1);
+              setCurrrentMonth(1);
+            } else {
+              setCurrrentMonth(month_);
+            }
+          }}
+          icon="arrow-right"
+          className="border-0"
+        />
+      </div>
+      <div
+        onMouseLeave={() => setHoveredDay(null)}
+        className={"month " + className}>
+        {days.map((x) => (
+          <DayItem item={x} />
+        ))}
+      </div>
+    </CalendarContext.Provider>
+  );
+}
+
 function NoteItem({ item, className = "" }) {
   const multiCtx = React.useContext(MultiContext);
 
@@ -366,6 +497,9 @@ function NotesPanel({ className }) {
             />
           )}
         </ButtonGroup>
+      </div>
+      <div className="my-4">
+        <Month />
       </div>
       <form onSubmit={searchNotes} className="input-group input-group-sm my-3">
         <Input placeholder="Search" onChange={onChangeSearch} value={search} />
