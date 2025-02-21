@@ -41,9 +41,6 @@ export default function Editor({ className }) {
 
   return (
     <div className={className}>
-      {multiCtx.settings.mode !== "read" && (
-        <Toolbar selection={selection} className="mb-3" />
-      )}
       <div id="save-sm">
         <div className="between mb-3">
           <ButtonGroup className="" size="sm">
@@ -71,7 +68,12 @@ export default function Editor({ className }) {
           <div>
             {["write"].includes(multiCtx.settings.mode) && (
               <Button
-                className="green me-2"
+                className={
+                  "me-2" +
+                  (multiCtx.currentNote.content === multiCtx.content
+                    ? " green"
+                    : " orange")
+                }
                 onClick={() => {
                   multiCtx.editNote(
                     multiCtx.currentNote.path,
@@ -80,7 +82,6 @@ export default function Editor({ className }) {
                   setSaved(true);
                   setTimeout(() => setSaved(false), 1500);
                 }}
-                // text={saved ? "Saved." : "Save"}
                 icon={saved ? "check-lg" : "floppy2-fill"}
               />
             )}
@@ -91,8 +92,6 @@ export default function Editor({ className }) {
                   theme: multiCtx.settings.theme === "light" ? "dark" : "light",
                 })
               }
-              // className="text-capitalize"
-              // text={multiCtx.settings.theme}
               icon={
                 multiCtx.settings.theme === "light" ? "sun-fill" : "moon-fill"
               }
@@ -100,6 +99,9 @@ export default function Editor({ className }) {
           </div>
         </div>
       </div>
+      {multiCtx.settings.mode !== "read" && (
+        <Toolbar selection={selection} className="mb-3" />
+      )}
       <div className="row h-100 overflow-auto">
         {["split", "write"].includes(multiCtx.settings.mode) && (
           <div
