@@ -126,7 +126,7 @@ export default function NotesPanel({ className }) {
           </div>
         )}
       </div>
-      <div className="overflow-auto" style={{ height: "70vh" }}>
+      <div className="overflow-auto note-list" style={{ height: "70vh" }}>
         {multiCtx.notes.map((x) => (
           <NoteItem className="" key={x.name} item={x} />
         ))}
