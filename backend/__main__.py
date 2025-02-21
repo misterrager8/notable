@@ -4,9 +4,9 @@ import webbrowser
 import click
 import pyperclip
 
-from notable import config
-from notable.models import Note
-from notable.web import create_app
+from . import config
+from .models import Note
+from . import create_app
 
 
 @click.group()

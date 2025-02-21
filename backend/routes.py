@@ -4,15 +4,14 @@ from pathlib import Path
 import html2text
 import requests
 from bs4 import BeautifulSoup
-from flask import current_app, render_template, request
+from flask import current_app, render_template, request, send_from_directory
 
-from ..models import Folder, Note
+from .models import Folder, Note
 
 
-@current_app.get("/")
+@current_app.route("/")
 def index():
-    return render_template("index.html", debug=current_app.config.get("DEBUG"))
-
+    return send_from_directory(current_app.static_folder, "index.html")
 
 @current_app.post("/about")
 def about():
