@@ -24,7 +24,7 @@ export const sorts = [
 export const defaultSettings = {
   theme: "light",
   lastOpened: "",
-  mode: "split",
+  mode: "write",
   sort: "favorited",
 };
 

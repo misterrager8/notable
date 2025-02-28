@@ -124,16 +124,6 @@ export default function Nav({ className }) {
                   }
                   icon="pencil"
                 />
-                <Button
-                  className={multiCtx.settings.mode === "split" ? "active" : ""}
-                  onClick={() =>
-                    multiCtx.setSettings({
-                      ...multiCtx.settings,
-                      mode: "split",
-                    })
-                  }
-                  icon="layout-split"
-                />
               </ButtonGroup>
             </form>
           )}

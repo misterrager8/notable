@@ -1,32 +1,45 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { MultiContext } from "../../App";
-import Button from "../atoms/Button";
+import Quill from "quill";
+import "quill/dist/quill.snow.css";
 
-import markdownit from "markdown-it";
-import Toolbar from "./Toolbar";
 import ButtonGroup from "../molecules/ButtonGroup";
+import Button from "../atoms/Button";
 
 export default function Editor({ className }) {
   const multiCtx = useContext(MultiContext);
+  const editorRef = useRef(null);
+  const quillInstance = useRef(null);
 
-  const onChangeContent = (e) => multiCtx.setContent(e.target.value);
   const [saved, setSaved] = useState(false);
 
-  const [selection, setSelection] = useState({
-    start: 0,
-    end: 0,
-    selected: "",
-  });
+  useEffect(() => {
+    if (!quillInstance.current) {
+      quillInstance.current = new Quill(editorRef.current, {
+        theme: "snow",
+        modules: {
+          toolbar: [
+            [{ header: [1, 2, 3, false] }], // Heading levels
+            [{ font: [] }], // Font selection
+            [{ size: ["small", false, "large", "huge"] }], // Font sizes
+            ["bold", "italic", "underline", "strike"], // Basic formatting
+            [{ color: [] }, { background: [] }], // Text and background colors
+            [{ script: "sub" }, { script: "super" }], // Subscript / superscript
+            [{ list: "ordered" }, { list: "bullet" }], // Lists
+            [{ indent: "-1" }, { indent: "+1" }], // Indentation
+            [{ align: [] }], // Text alignment
+            ["blockquote", "code-block"], // Block elements
+            ["link", "image", "video"], // Media embedding
+            ["clean"], // Remove formatting button
+          ],
+        },
+      });
 
-  const getSelection = () => {
-    let elem = document.getElementById("editor");
-
-    let start = elem.selectionStart;
-    let end = elem.selectionEnd;
-    let selected = multiCtx.content.substring(start, end);
-
-    setSelection({ start: start, end: end, selected: selected });
-  };
+      quillInstance.current.on("text-change", () => {
+        multiCtx.setContent(quillInstance.current.root.innerHTML);
+      });
+    }
+  }, [multiCtx.setContent]);
 
   useEffect(() => {
     multiCtx.setContent(
@@ -39,8 +52,22 @@ export default function Editor({ className }) {
     });
   }, [multiCtx.currentNote]);
 
+  useEffect(() => {
+    const quill = quillInstance.current;
+    if (quill) {
+      const editorContent = quill.root.innerHTML;
+
+      if (multiCtx.content !== editorContent) {
+        quill.root.innerHTML = multiCtx.content;
+      }
+    }
+  }, [multiCtx.content]);
+
   return (
-    <div className={className}>
+    <div
+      className={
+        className + (multiCtx.settings.mode === "write" ? "" : " hide-tools")
+      }>
       <div id="save-sm">
         <div className="between mb-3">
           <ButtonGroup className="" size="sm">
@@ -68,12 +95,7 @@ export default function Editor({ className }) {
           <div>
             {["write"].includes(multiCtx.settings.mode) && (
               <Button
-                className={
-                  "me-2" +
-                  (multiCtx.currentNote.content === multiCtx.content
-                    ? " green"
-                    : " orange")
-                }
+                className="green me-2"
                 onClick={() => {
                   multiCtx.editNote(
                     multiCtx.currentNote.path,
@@ -99,39 +121,7 @@ export default function Editor({ className }) {
           </div>
         </div>
       </div>
-      {multiCtx.settings.mode !== "read" && (
-        <Toolbar selection={selection} className="mb-3" />
-      )}
-      <div className="row h-100 overflow-auto">
-        {["split", "write"].includes(multiCtx.settings.mode) && (
-          <div
-            id="editor-parent"
-            className={
-              "px-3 border-end col-" +
-              (multiCtx.settings.mode === "write" ? "12" : "6")
-            }>
-            <textarea
-              onMouseUp={() => getSelection()}
-              id="editor"
-              className="form-control my-1 h-100"
-              value={multiCtx.content}
-              onChange={onChangeContent}
-              placeholder="..."></textarea>
-          </div>
-        )}
-        {["split", "read"].includes(multiCtx.settings.mode) && (
-          <div
-            className={
-              "px-5 col-" + (multiCtx.settings.mode === "read" ? "12" : "6")
-            }>
-            <div
-              id="reader"
-              dangerouslySetInnerHTML={{
-                __html: markdownit({ html: true }).render(multiCtx.content),
-              }}></div>
-          </div>
-        )}
-      </div>
+      <div id="reader" ref={editorRef} />
     </div>
   );
 }
