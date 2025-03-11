@@ -3,9 +3,9 @@ html[data-theme="light"] {
   --primary-bg: #cccccc;
   --primary-txt: #1a1a1a;
 
-  --secondary-bg: #b1b1b1;
+  --secondary-bg: #c1c1c1;
 
-  --btn-color: hsl(226, 32%, 40%);
+  --btn-color: #313030;
   --btn-hover-text: #cccccc;
 
   --red: #ac4141;
@@ -14,17 +14,17 @@ html[data-theme="light"] {
   --blue: #5151ff;
   --purple: #6e346e;
 
-  --code-color: hsl(226, 32%, 40%);
-  --heading-color: hsl(226, 32%, 40%);
+  --code-color: #313030;
+  --heading-color: #313030;
 }
 
 html[data-theme="dark"] {
   --primary-bg: #1a1a1a;
   --primary-txt: #cccccc;
 
-  --secondary-bg: #242424;
+  --secondary-bg: #202020;
 
-  --btn-color: hsl(230, 57%, 60%);
+  --btn-color: #bdbdbd;
   --btn-hover-text: #1a1a1a;
 
   --red: #de5858;
@@ -33,6 +33,6 @@ html[data-theme="dark"] {
   --blue: #5f5fd6;
   --purple: #b882b8;
 
-  --code-color: hsl(230, 57%, 60%);
-  --heading-color: hsl(230, 57%, 60%);
+  --code-color: #cccccc;
+  --heading-color: #cccccc;
 }

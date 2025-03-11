@@ -1,5 +1,4 @@
 import { Fragment, useContext, useEffect, useState } from "react";
-import { MultiContext } from "../../App";
 import Dropdown from "../molecules/Dropdown";
 import Icon from "../atoms/Icon";
 import ButtonGroup from "../molecules/ButtonGroup";
@@ -9,19 +8,15 @@ import Badge from "../atoms/Badge";
 import FolderItem from "./FolderItem";
 import NoteItem from "./NoteItem";
 import { api, sorts } from "../../util";
+import { MultiContext } from "../../MultiContext";
 
 export default function NotesPanel({ className }) {
   const multiCtx = useContext(MultiContext);
-  const [showFolders, setShowFolders] = useState(false);
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
 
-  useEffect(
-    () => multiCtx.getNotes(),
-    [multiCtx.settings, multiCtx.currentFolder]
-  );
-  useEffect(() => multiCtx.getFolders(), []);
-  useEffect(() => setShowFolders(false), [multiCtx.currentFolder]);
+  useEffect(() => multiCtx.getNotes(), [multiCtx.sort, multiCtx.currentFolder]);
+  useEffect(() => multiCtx.getAll(), []);
 
   const onChangeSearch = (e) => setSearch(e.target.value);
 
@@ -39,35 +34,51 @@ export default function NotesPanel({ className }) {
           classNameBtn="btn border-0 text-capitalize"
           className="btn-group-sm"
           target="sorts"
-          icon={sorts.filter((x) => x.name === multiCtx.settings.sort)[0]?.icon}
-          text={
-            sorts.filter((x) => x.name === multiCtx.settings.sort)[0]?.label
-          }>
+          icon={sorts.filter((x) => x.name === multiCtx.sort)[0]?.icon}
+          text={sorts.filter((x) => x.name === multiCtx.sort)[0]?.label}>
           {sorts.map((x) => (
             <button
               key={x.name}
-              className="dropdown-item between"
-              onClick={() =>
-                multiCtx.setSettings({ ...multiCtx.settings, sort: x.name })
-              }>
+              className={
+                "dropdown-item between" +
+                (x.name === multiCtx.sort ? " active" : "")
+              }
+              onClick={() => multiCtx.setSort(x.name)}>
               <span className="">{x?.label}</span>
               <Icon name={x?.icon} className="m-1" />
             </button>
           ))}
         </Dropdown>
-        <ButtonGroup size="sm">
-          <Button
-            onClick={() => setShowFolders(!showFolders)}
-            className={
-              "dropdown-toggle border-0" + (showFolders ? " selected" : "")
-            }
+        <ButtonGroup>
+          <Dropdown
+            style={{ width: "250px" }}
+            autoClose={false}
+            className="btn btn-sm border-0"
             icon="folder"
+            target="folders"
             text={
               multiCtx.currentFolder
                 ? multiCtx.currentFolder.substring(0, 10)
                 : "All Folders"
-            }
-          />
+            }>
+            <div className="px-2 mb-2">
+              <Button
+                onClick={() => multiCtx.addFolder()}
+                text="New Folder"
+                icon="plus-lg"
+                className="green w-100"
+                size="sm"
+              />
+            </div>
+
+            {multiCtx.folders.map((x) => (
+              <FolderItem
+                className={multiCtx.currentFolder === x ? "active" : ""}
+                key={x}
+                item={x}
+              />
+            ))}
+          </Dropdown>
           {multiCtx.currentFolder !== null && (
             <Button
               onClick={() => multiCtx.setCurrentFolder(null)}
@@ -106,27 +117,7 @@ export default function NotesPanel({ className }) {
           <hr />
         </div>
       )}
-      <div>
-        {showFolders && (
-          <div className="px-3">
-            <hr />
-            <Button
-              onClick={() => multiCtx.addFolder()}
-              text="New Folder"
-              icon="plus-lg"
-              className="w-100 mb-3"
-              size="sm"
-            />
-            {multiCtx.folders.map((x) => (
-              <Fragment key={x}>
-                {x !== multiCtx.currentFolder && <FolderItem item={x} />}
-              </Fragment>
-            ))}
-            <hr />
-          </div>
-        )}
-      </div>
-      <div className="overflow-auto" style={{ height: "70vh" }}>
+      <div className="overflow-auto" style={{ height: "68vh" }}>
         {multiCtx.notes.map((x) => (
           <NoteItem className="" key={x.name} item={x} />
         ))}

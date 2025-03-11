@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from "react";
-import { MultiContext } from "../../App";
 import Button from "../atoms/Button";
 
 import markdownit from "markdown-it";
 import Toolbar from "./Toolbar";
 import ButtonGroup from "../molecules/ButtonGroup";
+import { MultiContext } from "../../MultiContext";
 
 export default function Editor({ className }) {
   const multiCtx = useContext(MultiContext);
@@ -32,46 +32,42 @@ export default function Editor({ className }) {
     multiCtx.setContent(
       multiCtx.currentNote.length !== 0 ? multiCtx.currentNote.content : ""
     );
-    multiCtx.setSettings({
-      ...multiCtx.settings,
-      lastOpened:
-        multiCtx.currentNote.length !== 0 ? { ...multiCtx.currentNote } : "",
-    });
+    localStorage.setItem(
+      "notable-last-opened",
+      JSON.stringify(multiCtx.currentNote)
+    );
   }, [multiCtx.currentNote]);
 
   return (
     <div className={className}>
-      {multiCtx.settings.mode !== "read" && (
-        <Toolbar selection={selection} className="mb-3" />
-      )}
       <div id="save-sm">
         <div className="between mb-3">
           <ButtonGroup className="" size="sm">
             <Button
-              className={multiCtx.settings.mode === "read" ? "active" : ""}
-              onClick={() =>
-                multiCtx.setSettings({
-                  ...multiCtx.settings,
-                  mode: "read",
-                })
-              }
+              className={multiCtx.mode === "read" ? "active" : ""}
+              onClick={() => multiCtx.setMode("read")}
               icon="eye-fill"
             />
             <Button
-              className={multiCtx.settings.mode === "write" ? "active" : ""}
-              onClick={() =>
-                multiCtx.setSettings({
-                  ...multiCtx.settings,
-                  mode: "write",
-                })
-              }
+              className={multiCtx.mode === "write" ? "active" : ""}
+              onClick={() => multiCtx.setMode("write")}
               icon="pencil"
+            />
+            <Button
+              className={multiCtx.mode === "split" ? "active" : ""}
+              onClick={() => multiCtx.setMode("split")}
+              icon="layout-split"
             />
           </ButtonGroup>
           <div>
-            {["write"].includes(multiCtx.settings.mode) && (
+            {["write", "split"].includes(multiCtx.mode) && (
               <Button
-                className="green me-2"
+                className={
+                  "me-2" +
+                  (multiCtx.currentNote.content === multiCtx.content
+                    ? " green"
+                    : " orange")
+                }
                 onClick={() => {
                   multiCtx.editNote(
                     multiCtx.currentNote.path,
@@ -80,47 +76,44 @@ export default function Editor({ className }) {
                   setSaved(true);
                   setTimeout(() => setSaved(false), 1500);
                 }}
-                // text={saved ? "Saved." : "Save"}
                 icon={saved ? "check-lg" : "floppy2-fill"}
               />
             )}
             <Button
               onClick={() =>
-                multiCtx.setSettings({
-                  ...multiCtx.settings,
-                  theme: multiCtx.settings.theme === "light" ? "dark" : "light",
-                })
+                multiCtx.setTheme(multiCtx.theme === "light" ? "dark" : "light")
               }
-              // className="text-capitalize"
-              // text={multiCtx.settings.theme}
-              icon={
-                multiCtx.settings.theme === "light" ? "sun-fill" : "moon-fill"
-              }
+              icon={multiCtx.theme === "light" ? "sun-fill" : "moon-fill"}
             />
           </div>
         </div>
       </div>
-      <div className="row h-100 overflow-auto">
-        {["split", "write"].includes(multiCtx.settings.mode) && (
+      {multiCtx.mode !== "read" && (
+        <Toolbar selection={selection} className="mb-3" />
+      )}
+      <div className="row">
+        {["split", "write"].includes(multiCtx.mode) && (
           <div
             id="editor-parent"
             className={
-              "px-3 border-end col-" +
-              (multiCtx.settings.mode === "write" ? "12" : "6")
+              "px-3 border-end col-" + (multiCtx.mode === "write" ? "12" : "6")
             }>
             <textarea
+              style={{ height: "77vh" }}
               onMouseUp={() => getSelection()}
               id="editor"
-              className="form-control my-1 h-100"
+              className="form-control"
               value={multiCtx.content}
               onChange={onChangeContent}
               placeholder="..."></textarea>
           </div>
         )}
-        {["split", "read"].includes(multiCtx.settings.mode) && (
+        {["split", "read"].includes(multiCtx.mode) && (
           <div
+            style={{ height: "77vh" }}
             className={
-              "px-5 col-" + (multiCtx.settings.mode === "read" ? "12" : "6")
+              "overflow-auto px-5 col-" +
+              (multiCtx.mode === "read" ? "12" : "6")
             }>
             <div
               id="reader"

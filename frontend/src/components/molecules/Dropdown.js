@@ -9,6 +9,7 @@ export default function Dropdown({
   children,
   text,
   autoClose = true,
+  style = null,
 }) {
   return (
     <div className={className + " dropdown"}>
@@ -20,7 +21,10 @@ export default function Dropdown({
         {icon && <Icon name={icon} className="me-1" />}
         {text}
       </a>
-      <div id={target} className={classNameMenu + " dropdown-menu"}>
+      <div
+        style={style}
+        id={target}
+        className={classNameMenu + " dropdown-menu"}>
         {children}
       </div>
     </div>

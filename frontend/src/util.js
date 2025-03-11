@@ -21,13 +21,6 @@ export const sorts = [
   },
 ];
 
-export const defaultSettings = {
-  theme: "light",
-  lastOpened: "",
-  mode: "split",
-  sort: "favorited",
-};
-
 export const api = (url, params, callback) =>
   fetch("/" + url, {
     headers: {

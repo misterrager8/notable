@@ -19,10 +19,6 @@ body {
   color: var(--btn-hover-text);
 }
 
-.view {
-  height: 80vh;
-}
-
 .border-end {
   border-color: var(--btn-color) !important;
   border-right-style: dotted !important;
@@ -60,12 +56,15 @@ body {
 
 #reader code {
   font-family: monospace;
-  color: var(--purple);
+  color: var(--btn-color);
 }
 
 #reader pre {
   width: 75%;
-  margin: 10px auto;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: var(--secondary-bg);
 }
 
 #reader a {
@@ -85,7 +84,7 @@ body {
 #reader h4,
 #reader h5 {
   color: var(--heading-color);
-  text-align: center;
+  /* text-align: center; */
   font-weight: lighter;
   letter-spacing: 1px;
 }
@@ -104,8 +103,14 @@ body {
 }
 
 .dropdown-item:hover,
+.dropdown-item.active,
 .selected2 {
   background-color: var(--btn-color);
+  color: var(--btn-hover-text);
+}
+
+.dropdown-item.active .btn,
+.dropdown-item:hover .btn {
   color: var(--btn-hover-text);
 }
 
@@ -146,13 +151,12 @@ a:hover {
 }
 
 @media screen and (max-width: 900px) {
-  #notes-panel,
+  /* #notes-panel, */
   #nav {
     display: none;
   }
 
   .px-5 {
-    overflow-y: auto;
     width: 100%;
   }
 
@@ -161,7 +165,6 @@ a:hover {
   }
 
   #editor-parent {
-    height: 95%;
     width: 100% !important;
     border: none !important;
     /* padding: 0px 5px !important; */
@@ -170,10 +173,11 @@ a:hover {
   .col-10 {
     width: 100% !important;
   }
-}
 
-.full {
-  height: 100vh;
+  .col-2.border-end {
+    width: 100%;
+    margin-bottom: 20px;
+  }
 }
 
 .red {

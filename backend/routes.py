@@ -13,6 +13,7 @@ from .models import Folder, Note
 def index():
     return send_from_directory(current_app.static_folder, "index.html")
 
+
 @current_app.post("/about")
 def about():
     success = True
@@ -44,6 +45,14 @@ def folders():
     return {"folders": [i.name for i in Folder.all()]}
 
 
+@current_app.post("/get_all")
+def get_all():
+    return {
+        "folders": [i.name for i in Folder.all()],
+        "notes": [i.to_dict() for i in Note.all()],
+    }
+
+
 @current_app.post("/save_page")
 def save_page():
     note_ = Note(request.json.get("path"))
@@ -61,14 +70,18 @@ def add_note():
         request.json.get("folder"),
     )
 
-    return note_.to_dict()
+    return {"note": note_.to_dict(), "notes": [i.to_dict() for i in Note.all()]}
 
 
 @current_app.post("/add_folder")
 def add_folder():
     folder_ = Folder.add(f"{datetime.datetime.now().strftime('%y%m%d')}, folder")
 
-    return {"status": "done"}
+    return {
+        "status": "done",
+        "folder": folder_.name,
+        "folders": [i.name for i in Folder.all()],
+    }
 
 
 @current_app.post("/delete_folder")
@@ -76,7 +89,10 @@ def delete_folder():
     folder_ = Folder(request.json.get("name"))
     folder_.delete()
 
-    return {"status": "done"}
+    return {
+        "status": "done",
+        "folders": [i.name for i in Folder.all()],
+    }
 
 
 @current_app.post("/note")
@@ -91,14 +107,17 @@ def edit_note():
     note_ = Note(request.json.get("path"))
     note_.edit(request.json.get("content"))
 
-    return note_.to_dict()
+    return {"note": note_.to_dict(), "notes": [i.to_dict() for i in Note.all()]}
 
 
 @current_app.post("/rename_note")
 def rename_note():
     note_ = Note(request.json.get("path"))
 
-    return note_.rename(request.json.get("new_name")).to_dict()
+    return {
+        "note": note_.rename(request.json.get("new_name")).to_dict(),
+        "notes": [i.to_dict() for i in Note.all()],
+    }
 
 
 @current_app.post("/fixup_title")
@@ -112,7 +131,10 @@ def fixup_title():
 def change_folder():
     note_ = Note(request.json.get("path"))
 
-    return note_.change_folder(request.json.get("new_folder")).to_dict()
+    return {
+        "note": note_.change_folder(request.json.get("new_folder")).to_dict(),
+        "notes": [i.to_dict() for i in Note.all()],
+    }
 
 
 @current_app.post("/rename_folder")
@@ -120,14 +142,18 @@ def rename_folder():
     folder_ = Folder(request.json.get("name"))
     folder_.rename(request.json.get("new_name"))
 
-    return {"status": "done"}
+    return {
+        "status": "done",
+        "folder": folder_.name,
+        "folders": [i.name for i in Folder.all()],
+    }
 
 
 @current_app.post("/delete_note")
 def delete_note():
     Note(request.json.get("path")).delete()
 
-    return {"status": "done"}
+    return {"status": "done", "notes": [i.to_dict() for i in Note.all()]}
 
 
 @current_app.post("/duplicate_note")
@@ -137,9 +163,13 @@ def duplicate_note():
 
 @current_app.post("/toggle_favorite")
 def toggle_favorite():
-    Note(request.json.get("path")).toggle_favorite()
+    note_ = Note(request.json.get("path"))
+    note_.toggle_favorite()
 
-    return {"status": "done"}
+    return {
+        "note": note_.to_dict(),
+        "notes": [i.to_dict() for i in Note.all()],
+    }
 
 
 @current_app.post("/search")

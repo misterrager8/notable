@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
-import { MultiContext } from "../../App";
 import ButtonGroup from "../molecules/ButtonGroup";
 import Spinner from "../atoms/Spinner";
 import Button from "../atoms/Button";
 import Dropdown from "../molecules/Dropdown";
+import { MultiContext } from "../../MultiContext";
 
 export default function Nav({ className }) {
   const multiCtx = useContext(MultiContext);
@@ -40,10 +40,6 @@ export default function Nav({ className }) {
                 onClick={() => {
                   multiCtx.setCurrentPage("");
                   multiCtx.setCurrentNote([]);
-                  multiCtx.setSettings({
-                    ...multiCtx.settings,
-                    lastOpened: "",
-                  });
                 }}
                 className="btn border-0">
                 <img
@@ -105,33 +101,18 @@ export default function Nav({ className }) {
               </Dropdown>
               <ButtonGroup className="ms-2" size="sm">
                 <Button
-                  className={multiCtx.settings.mode === "read" ? "active" : ""}
-                  onClick={() =>
-                    multiCtx.setSettings({
-                      ...multiCtx.settings,
-                      mode: "read",
-                    })
-                  }
+                  className={multiCtx.mode === "read" ? "active" : ""}
+                  onClick={() => multiCtx.setMode("read")}
                   icon="eye-fill"
                 />
                 <Button
-                  className={multiCtx.settings.mode === "write" ? "active" : ""}
-                  onClick={() =>
-                    multiCtx.setSettings({
-                      ...multiCtx.settings,
-                      mode: "write",
-                    })
-                  }
+                  className={multiCtx.mode === "write" ? "active" : ""}
+                  onClick={() => multiCtx.setMode("write")}
                   icon="pencil"
                 />
                 <Button
-                  className={multiCtx.settings.mode === "split" ? "active" : ""}
-                  onClick={() =>
-                    multiCtx.setSettings({
-                      ...multiCtx.settings,
-                      mode: "split",
-                    })
-                  }
+                  className={multiCtx.mode === "split" ? "active" : ""}
+                  onClick={() => multiCtx.setMode("split")}
                   icon="layout-split"
                 />
               </ButtonGroup>
@@ -143,9 +124,14 @@ export default function Nav({ className }) {
             <div>
               {multiCtx.currentNote.length !== 0 &&
                 multiCtx.currentPage === "" &&
-                multiCtx.settings.mode !== "read" && (
+                multiCtx.mode !== "read" && (
                   <Button
-                    className="green me-2"
+                    className={
+                      "me-2" +
+                      (multiCtx.currentNote.content === multiCtx.content
+                        ? " green"
+                        : " orange")
+                    }
                     onClick={() => {
                       multiCtx.editNote(
                         multiCtx.currentNote.path,
@@ -213,17 +199,13 @@ export default function Nav({ className }) {
             <ButtonGroup size="sm">
               <Button
                 onClick={() =>
-                  multiCtx.setSettings({
-                    ...multiCtx.settings,
-                    theme:
-                      multiCtx.settings.theme === "light" ? "dark" : "light",
-                  })
+                  multiCtx.setTheme(
+                    multiCtx.theme === "light" ? "dark" : "light"
+                  )
                 }
                 className="text-capitalize"
-                text={multiCtx.settings.theme}
-                icon={
-                  multiCtx.settings.theme === "light" ? "sun-fill" : "moon-fill"
-                }
+                text={multiCtx.theme}
+                icon={multiCtx.theme === "light" ? "sun-fill" : "moon-fill"}
               />
             </ButtonGroup>
           </div>

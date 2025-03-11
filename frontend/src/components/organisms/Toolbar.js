@@ -1,10 +1,10 @@
 import { useContext, useState } from "react";
-import { MultiContext } from "../../App";
 import ButtonGroup from "../molecules/ButtonGroup";
 import Button from "../atoms/Button";
 import Dropdown from "../molecules/Dropdown";
 import Input from "../atoms/Input";
 import { api } from "../../util";
+import { MultiContext } from "../../MultiContext";
 
 export default function Toolbar({ selection, className }) {
   const multiCtx = useContext(MultiContext);
@@ -192,16 +192,17 @@ export default function Toolbar({ selection, className }) {
   };
 
   return (
-    <div className={className} id="toolbar">
-      <ButtonGroup className="toolbar">
+    <div className={className}>
+      <div className="toolbar">
         {formats.map((x) => (
           <Button
+            className="m-1"
             icon={x.icon}
             text={x.text}
             onClick={() => copyFormat(x.label)}
           />
         ))}
-      </ButtonGroup>
+      </div>
     </div>
   );
 }

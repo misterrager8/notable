@@ -1,7 +1,7 @@
 import { useContext } from "react";
-import { MultiContext } from "../../App";
 import Icon from "../atoms/Icon";
 import Badge from "../atoms/Badge";
+import { MultiContext } from "../../MultiContext";
 
 export default function NoteItem({ item, className = "" }) {
   const multiCtx = useContext(MultiContext);
@@ -29,7 +29,7 @@ export default function NoteItem({ item, className = "" }) {
         )}
       </div>
       <div className="between small mt-1">
-        {multiCtx.settings.sort === "date_created" ? (
+        {multiCtx.sort === "date_created" ? (
           <div className="opacity-75 text-truncate">
             <Icon name="plus-lg" className="me-1" />
             {item.date_created}

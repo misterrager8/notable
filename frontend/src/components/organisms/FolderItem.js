@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from "react";
-import { MultiContext } from "../../App";
 import Input from "../atoms/Input";
 import ButtonGroup from "../molecules/ButtonGroup";
 import Button from "../atoms/Button";
+import { MultiContext } from "../../MultiContext";
 
-export default function FolderItem({ item }) {
+export default function FolderItem({ item, className = "" }) {
   const multiCtx = useContext(MultiContext);
 
   const [deleting, setDeleting] = useState(false);
@@ -18,7 +18,7 @@ export default function FolderItem({ item }) {
   }, []);
 
   return (
-    <div className="small between">
+    <div className={className + " dropdown-item between"}>
       {editing ? (
         <form
           className="input-group input-group-sm "
@@ -31,9 +31,7 @@ export default function FolderItem({ item }) {
           />
         </form>
       ) : (
-        <a
-          className="py-1 fw-bold"
-          onClick={() => multiCtx.setCurrentFolder(item)}>
+        <a className="py-1" onClick={() => multiCtx.setCurrentFolder(item)}>
           {item}
         </a>
       )}
