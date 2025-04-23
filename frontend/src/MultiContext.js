@@ -43,10 +43,10 @@ export default function MultiProvider({ children }) {
   };
 
   const getAll = () => {
-    api("get_all", {}, (data) => {
-      setFolders(data.folders);
-      setNotes(data.notes);
-    });
+    // api("get_all", {}, (data) => {
+    //   setFolders(data.folders);
+    //   setNotes(data.notes);
+    // });
   };
 
   const getNote = (path) => {

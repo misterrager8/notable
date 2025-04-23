@@ -16,7 +16,7 @@ export default function NotesPanel({ className }) {
   const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => multiCtx.getNotes(), [multiCtx.sort, multiCtx.currentFolder]);
-  useEffect(() => multiCtx.getAll(), []);
+  useEffect(() => multiCtx.getFolders(), []);
 
   const onChangeSearch = (e) => setSearch(e.target.value);
 
