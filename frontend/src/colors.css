@@ -13,9 +13,6 @@ html[data-theme="light"] {
   --green: #4f7d4f;
   --blue: #5151ff;
   --purple: #6e346e;
-
-  --code-color: #313030;
-  --heading-color: #313030;
 }
 
 html[data-theme="dark"] {
@@ -26,13 +23,104 @@ html[data-theme="dark"] {
 
   --btn-color: #bdbdbd;
   --btn-hover-text: #1a1a1a;
+}
 
-  --red: #de5858;
-  --orange: #d68b00;
-  --green: #72a172;
-  --blue: #5f5fd6;
-  --purple: #b882b8;
+html[data-theme="lavender"] {
+  --primary-bg: #1a1a1a;
+  --primary-txt: #cccccc;
 
-  --code-color: #cccccc;
-  --heading-color: #cccccc;
+  --secondary-bg: #202020;
+
+  --btn-color: #8381bf;
+  --btn-hover-text: #1a1a1a;
+}
+
+html[data-theme="forestry"] {
+  --primary-bg: #1a1a1a;
+  --primary-txt: #cccccc;
+
+  --secondary-bg: #202020;
+
+  --btn-color: #69b78a;
+  --btn-hover-text: #1a1a1a;
+}
+
+html[data-theme="cotton-candy"] {
+  --primary-bg: #1a1a1a;
+  --primary-txt: #cccccc;
+
+  --secondary-bg: #202020;
+
+  --btn-color: #d78488;
+  --btn-hover-text: #1a1a1a;
+}
+
+html[data-theme="sky"] {
+  --primary-bg: #1a1a1a;
+  --primary-txt: #cccccc;
+
+  --secondary-bg: #202020;
+
+  --btn-color: #72a6ad;
+  --btn-hover-text: #1a1a1a;
+}
+
+html[data-theme="traffic-cone"] {
+  --primary-bg: #1a1a1a;
+  --primary-txt: #cccccc;
+
+  --secondary-bg: #202020;
+
+  --btn-color: #e8874a;
+  --btn-hover-text: #1a1a1a;
+}
+
+html[data-theme="lemon"] {
+  --primary-bg: #1a1a1a;
+  --primary-txt: #cccccc;
+
+  --secondary-bg: #202020;
+
+  --btn-color: #c0d453;
+  --btn-hover-text: #1a1a1a;
+}
+
+html[data-theme="royal"] {
+  --primary-bg: #cccccc;
+  --primary-txt: #1a1a1a;
+
+  --secondary-bg: #c1c1c1;
+
+  --btn-color: #2b39a1;
+  --btn-hover-text: #cccccc;
+}
+
+html[data-theme="maroon"] {
+  --primary-bg: #cccccc;
+  --primary-txt: #1a1a1a;
+
+  --secondary-bg: #c1c1c1;
+
+  --btn-color: #99001c;
+  --btn-hover-text: #cccccc;
+}
+
+html[data-theme="sunset"] {
+  --primary-bg: #cccccc;
+  --primary-txt: #1a1a1a;
+
+  --secondary-bg: #c1c1c1;
+
+  --btn-color: #ac5d20;
+  --btn-hover-text: #cccccc;
+}
+
+html[data-theme="green-apple"] {
+  --primary-bg: #cccccc;
+  --primary-txt: #1a1a1a;
+
+  --secondary-bg: #c1c1c1;
+
+  --btn-color: #366c44;
+  --btn-hover-text: #cccccc;
 }

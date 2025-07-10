@@ -22,7 +22,7 @@ export const sorts = [
 ];
 
 export const api = (url, params, callback) =>
-  fetch("/" + url, {
+  fetch("http://localhost:5001/" + url, {
     headers: {
       "Content-Type": "application/json",
     },

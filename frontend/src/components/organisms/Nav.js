@@ -4,6 +4,8 @@ import Spinner from "../atoms/Spinner";
 import Button from "../atoms/Button";
 import Dropdown from "../molecules/Dropdown";
 import { MultiContext } from "../../MultiContext";
+import Icon from "../atoms/Icon";
+import Input from "../atoms/Input";
 
 export default function Nav({ className }) {
   const multiCtx = useContext(MultiContext);
@@ -16,8 +18,17 @@ export default function Nav({ className }) {
   const onChangeName = (e) => setName(e.target.value);
 
   useEffect(() => {
-    multiCtx.currentNote.length !== 0 && setName(multiCtx.currentNote.name);
+    setName(multiCtx.currentNote ? multiCtx.currentNote.name : "");
   }, [multiCtx.currentNote]);
+
+  useEffect(() => {
+    multiCtx.getNotes();
+  }, [multiCtx.currentFolder]);
+
+  useEffect(() => {
+    multiCtx.getNotes();
+    multiCtx.getFolders();
+  }, []);
 
   const copyNote = () => {
     navigator.clipboard.writeText(multiCtx.currentNote.content);
@@ -26,190 +37,112 @@ export default function Nav({ className }) {
   };
 
   return (
-    <div className={className} id="nav">
-      <div className="row">
-        <div className="col-2">
-          <div className="between">
-            <ButtonGroup size="sm">
-              {multiCtx.loading && (
-                <button className="btn border-0">
-                  <Spinner />
-                </button>
-              )}
-              <a
-                onClick={() => {
-                  multiCtx.setCurrentPage("");
-                  multiCtx.setCurrentNote([]);
-                }}
-                className="btn border-0">
-                <img
-                  className="me-2 pb-1"
-                  src="favicon.svg"
-                  width={20}
-                  height={20}
-                />
-                notable
-              </a>
-            </ButtonGroup>
-            <Button
-              className="green"
-              size="sm"
-              onClick={() => multiCtx.addNote()}
-              text="New Note"
-              icon="plus-lg"
-            />
-          </div>
-        </div>
-        <div className="col-5">
-          {multiCtx.currentNote.length !== 0 && multiCtx.currentPage === "" && (
-            <form
-              className="input-group input-group-sm"
-              onSubmit={(e) =>
-                multiCtx.renameNote(e, multiCtx.currentNote.path, name)
-              }>
-              <input
-                value={name}
-                onChange={onChangeName}
-                className="form-control fst-italic border-0 "
-                style={{ letterSpacing: "2px" }}
-              />
-              <Dropdown
-                icon="folder"
-                className="btn-group btn-group-sm"
-                classNameBtn="btn border-0"
-                target="note-folder"
-                text={
-                  multiCtx.currentNote.folder
-                    ? multiCtx.currentNote.folder
-                    : "No Folder"
-                }>
-                <button
-                  onClick={() => multiCtx.changeFolder(null)}
-                  type="button"
-                  className="dropdown-item">
-                  No Folder
-                </button>
-                {multiCtx.folders.map((x) => (
-                  <button
-                    key={`${x}-2`}
-                    onClick={() => multiCtx.changeFolder(x)}
-                    type="button"
-                    className="dropdown-item">
-                    {x}
-                  </button>
-                ))}
-              </Dropdown>
-              <ButtonGroup className="ms-2" size="sm">
-                <Button
-                  className={multiCtx.mode === "read" ? "active" : ""}
-                  onClick={() => multiCtx.setMode("read")}
-                  icon="eye-fill"
-                />
-                <Button
-                  className={multiCtx.mode === "write" ? "active" : ""}
-                  onClick={() => multiCtx.setMode("write")}
-                  icon="pencil"
-                />
-                <Button
-                  className={multiCtx.mode === "split" ? "active" : ""}
-                  onClick={() => multiCtx.setMode("split")}
-                  icon="layout-split"
-                />
-              </ButtonGroup>
-            </form>
-          )}
-        </div>
-        <div className="col-5">
-          <div className="between">
-            <div>
-              {multiCtx.currentNote.length !== 0 &&
-                multiCtx.currentPage === "" &&
-                multiCtx.mode !== "read" && (
-                  <Button
-                    className={
-                      "me-2" +
-                      (multiCtx.currentNote.content === multiCtx.content
-                        ? " green"
-                        : " orange")
-                    }
-                    onClick={() => {
-                      multiCtx.editNote(
-                        multiCtx.currentNote.path,
-                        multiCtx.content
-                      );
-                      setSaved(true);
-                      setTimeout(() => setSaved(false), 1500);
-                    }}
-                    // text={saved ? "Saved." : "Save"}
-                    icon={saved ? "check-lg" : "floppy2-fill"}
-                  />
-                )}
-              <ButtonGroup size="sm">
-                {multiCtx.currentNote.length !== 0 &&
-                  multiCtx.currentPage === "" && (
-                    <>
-                      <Button
-                        onClick={() =>
-                          multiCtx.pinNote(multiCtx.currentNote.path)
-                        }
-                        text={multiCtx.currentNote.favorited ? "Unpin" : "Pin"}
-                        icon={
-                          "pin-angle" +
-                          (multiCtx.currentNote.favorited ? "-fill" : "")
-                        }
-                        className={
-                          "orange" +
-                          (multiCtx.currentNote.favorited ? " active" : "")
-                        }
-                      />
-                      <Button
-                        onClick={() => copyNote()}
-                        text={"Copy"}
-                        icon={"clipboard" + (copied ? "-check" : "")}
-                      />
-                      <Button
-                        onClick={() =>
-                          multiCtx.duplicateNote(multiCtx.currentNote.path)
-                        }
-                        text={"Duplicate"}
-                        icon="copy"
-                      />
-                      <Button
-                        className="red"
-                        onClick={() => setDeleting(!deleting)}
-                        text={"Delete"}
-                        icon={"trash2"}
-                      />
-                      {deleting && (
-                        <Button
-                          className="red"
-                          onClick={() => {
-                            multiCtx.deleteNote(multiCtx.currentNote.path);
-                            multiCtx.setCurrentNote([]);
-                            setDeleting(false);
-                          }}
-                          // text={"Delete"}
-                          icon={"question-lg"}
-                        />
-                      )}
-                    </>
-                  )}
-              </ButtonGroup>
-            </div>
-            <ButtonGroup size="sm">
+    <div className={className + " between"}>
+      <ButtonGroup>
+        <a
+          onClick={() => {
+            multiCtx.setCurrentPage("");
+            multiCtx.setCurrentNote(null);
+          }}
+          className="btn btn-sm border-0">
+          <img className="me-2" src="favicon.svg" width={20} height={20} />
+          notable
+        </a>
+        <Dropdown
+          autoClose="inside"
+          icon="folder2"
+          className="btn-group"
+          classNameBtn="btn btn-sm border-0"
+          target="folders"
+          text={multiCtx.currentFolder}>
+          <a
+            onClick={() => multiCtx.setCurrentFolder(null)}
+            className="dropdown-item mb-2">
+            All Notes
+          </a>
+          {multiCtx.folders.map((x) => (
+            <a
+              onClick={() => multiCtx.setCurrentFolder(x)}
+              className="dropdown-item">
+              {x}
+            </a>
+          ))}
+        </Dropdown>
+        <Button className="non-btn px-0" icon="slash-lg" />
+        <ButtonGroup>
+          <Dropdown
+            autoClose="outside"
+            icon="file-earmark"
+            className="btn-group"
+            classNameBtn="btn btn-sm border-0"
+            target="notes">
+            <div className="px-2 mb-2">
               <Button
-                onClick={() =>
-                  multiCtx.setTheme(
-                    multiCtx.theme === "light" ? "dark" : "light"
-                  )
-                }
-                className="text-capitalize"
-                text={multiCtx.theme}
-                icon={multiCtx.theme === "light" ? "sun-fill" : "moon-fill"}
+                onClick={() => multiCtx.addNote()}
+                className="green w-100"
+                icon="plus-lg"
+                text="New Note"
               />
-            </ButtonGroup>
-          </div>
-        </div>
+            </div>
+            {multiCtx.notes.map((x) => (
+              <a
+                onClick={() => multiCtx.setCurrentNote(x)}
+                className={
+                  "dropdown-item" +
+                  (multiCtx.currentNote?.path === x.path ? " active" : "")
+                }>
+                <Icon
+                  name="pin-angle-fill"
+                  className={"orange me-2" + (x.favorited ? "" : " invisible")}
+                />
+                {x.name}
+              </a>
+            ))}
+          </Dropdown>
+          {multiCtx.currentNote && (
+            <Input
+              className="fst-italic"
+              style={{ width: "500px" }}
+              value={name}
+              onChange={onChangeName}
+            />
+          )}
+        </ButtonGroup>
+      </ButtonGroup>
+      <div>
+        {multiCtx.currentNote && (
+          <ButtonGroup className="me-2">
+            <Button
+              active={multiCtx.currentNote.favorited}
+              onClick={() => multiCtx.pinNote(multiCtx.currentNote.path)}
+              className="orange"
+              icon={
+                "pin-angle" + (multiCtx.currentNote.favorited ? "-fill" : "")
+              }
+            />
+            {deleting && (
+              <Button
+                onClick={() => {
+                  multiCtx.deleteNote(multiCtx.currentNote.path);
+                  setDeleting(false);
+                }}
+                className="red"
+                icon="question-lg"
+              />
+            )}
+            <Button
+              onClick={() => setDeleting(!deleting)}
+              className="red"
+              icon="trash2"
+            />
+          </ButtonGroup>
+        )}
+        <Button
+          onClick={() =>
+            multiCtx.setTheme(multiCtx.theme === "light" ? "dark" : "light")
+          }
+          icon={multiCtx.theme === "light" ? "sun-fill" : "moon-fill"}
+        />
       </div>
     </div>
   );

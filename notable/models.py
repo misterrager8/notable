@@ -70,9 +70,9 @@ class Note:
     def add(cls, name: str, folder: str = None):
         name = check_duplicate(name, [i.name for i in Note.all()])
         path_ = (
-            config.HOME_DIR / folder / f"{name}.txt"
+            config.HOME_DIR / folder / f"{name}.md"
             if folder
-            else config.HOME_DIR / f"{name}.txt"
+            else config.HOME_DIR / f"{name}.md"
         )
         _ = Note(path_)
         _.path.touch()
@@ -103,9 +103,9 @@ class Note:
 
     def rename(self, new_name: str):
         new_path = (
-            config.HOME_DIR / f"{new_name}.txt"
+            config.HOME_DIR / f"{new_name}.md"
             if not self.folder
-            else config.HOME_DIR / self.folder / f"{new_name}.txt"
+            else config.HOME_DIR / self.folder / f"{new_name}.md"
         )
         self.path.rename(new_path)
 
@@ -130,11 +130,11 @@ class Note:
         if filter:
             x = [
                 Note(i)
-                for i in config.HOME_DIR.glob("**/*.txt")
+                for i in config.HOME_DIR.glob("**/*.md")
                 if i.parent.name == filter
             ]
         else:
-            x = [Note(i) for i in config.HOME_DIR.glob("**/*.txt")]
+            x = [Note(i) for i in config.HOME_DIR.glob("**/*.md")]
         return sorted(
             x,
             key=(

@@ -11,21 +11,21 @@ export default function NoteItem({ item, className = "" }) {
       className={
         className +
         " py-2 rounded px-3 item" +
-        (multiCtx.currentNote.name === item.name ? " selected" : "")
+        (multiCtx.currentNote?.name === item.name ? " selected" : "")
       }
       onClick={() => multiCtx.setCurrentNote({ ...item })}>
       <div className="between">
         <div
           className={
             "pe-4 text-truncate fw-bold" +
-            (item.favorited && multiCtx.currentNote.name !== item.name
+            (item.favorited && multiCtx.currentNote?.name !== item.name
               ? " highlight"
               : "")
           }>
           {item.name}
         </div>
         {item.favorited && (
-          <Icon className="py-1 small orange" name="pin-angle-fill" />
+          <Icon className="py-1 small purple" name="bookmark-fill" />
         )}
       </div>
       <div className="between small mt-1">

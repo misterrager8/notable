@@ -7,12 +7,17 @@ export default function Button({
   icon,
   size = "sm",
   className = "",
+  active = false,
+  style,
 }) {
   return (
     <button
+      style={style}
       onClick={onClick}
       type={type_}
-      className={className + " btn " + `btn-${size}`}>
+      className={
+        className + " btn" + ` btn-${size}` + (active ? " active" : "")
+      }>
       {icon && <i className={(text ? "me-2 " : "") + "bi bi-" + icon}></i>}
       {text}
     </button>

@@ -9,6 +9,7 @@ todos.json
 .pnp.js
 /coverage
 /frontend/build
+/frontend/dist
 .DS_Store
 .env.local
 .env.development.local

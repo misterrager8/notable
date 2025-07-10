@@ -1,8 +1,77 @@
 @import "./colors.css";
 
 body {
+  margin-left: 75px;
   background-color: var(--primary-bg);
   color: var(--primary-txt);
+}
+
+.nav-custom {
+  z-index: 100;
+  position: absolute;
+  padding: 1rem;
+  width: 75px;
+  top: 0;
+  left: 0;
+  height: 99vh;
+  background-color: var(--primary-bg);
+  border-right: 0.5px dotted var(--primary-txt);
+  overflow-y: auto;
+}
+
+.main-panel {
+  z-index: 100;
+  position: absolute;
+  padding: 0.25rem;
+  width: 91%;
+  opacity: 0;
+  visibility: hidden;
+  top: 0;
+  left: auto;
+  height: 99vh;
+  background-color: var(--primary-bg);
+  border-right: 0.5px dotted var(--primary-txt);
+  transition: opacity 0.3s;
+  overflow-y: auto;
+}
+
+.settings-panel {
+  z-index: 100;
+  position: absolute;
+  padding: 1rem;
+  width: 30%;
+  opacity: 0;
+  visibility: hidden;
+  top: 0;
+  left: auto;
+  height: 99vh;
+  background-color: var(--primary-bg);
+  border-right: 0.5px dotted var(--primary-txt);
+  transition: opacity 0.3s;
+  overflow-y: auto;
+}
+
+.main-panel.show {
+  opacity: 100%;
+  visibility: unset;
+}
+
+.settings-panel.show {
+  opacity: 100%;
+  visibility: unset;
+}
+
+.nav-custom.maximized {
+  width: 250px;
+}
+
+.bottom {
+  bottom: 0;
+  display: flex;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  padding: 1rem;
 }
 
 .btn {
@@ -22,13 +91,13 @@ body {
 .border-end {
   border-color: var(--btn-color) !important;
   border-right-style: dotted !important;
+  border-width: 0.5px !important;
 }
 
 .form-control,
 .form-control:focus {
-  background-color: var(--secondary-bg);
+  background-color: var(--primary-bg);
   color: var(--primary-txt);
-  /* border-color: var(--primary-txt); */
   border: 0;
   resize: none;
 }
@@ -54,13 +123,23 @@ body {
   color: var(--btn-hover-text);
 }
 
+.h1,
+.h2,
+.h3,
+.h4,
+.h5 {
+  color: var(--btn-color);
+  font-weight: lighter;
+  letter-spacing: 1px;
+}
+
 #reader code {
   font-family: monospace;
-  color: var(--btn-color);
+  color: var(--primary-txt);
 }
 
 #reader pre {
-  width: 75%;
+  width: 100%;
   margin: 20px auto;
   padding: 20px;
   border-radius: 10px;
@@ -83,8 +162,6 @@ body {
 #reader h3,
 #reader h4,
 #reader h5 {
-  color: var(--heading-color);
-  /* text-align: center; */
   font-weight: lighter;
   letter-spacing: 1px;
 }
@@ -103,8 +180,7 @@ body {
 }
 
 .dropdown-item:hover,
-.dropdown-item.active,
-.selected2 {
+.dropdown-item.active {
   background-color: var(--btn-color);
   color: var(--btn-hover-text);
 }
@@ -117,10 +193,6 @@ body {
 .dropdown-menu {
   border-color: var(--btn-color);
   font-size: small;
-}
-
-.dropdown-item {
-  text-align: center;
 }
 
 textarea {
@@ -148,36 +220,6 @@ a:hover {
 
 .toolbar {
   flex-wrap: wrap;
-}
-
-@media screen and (max-width: 900px) {
-  /* #notes-panel, */
-  #nav {
-    display: none;
-  }
-
-  .px-5 {
-    width: 100%;
-  }
-
-  #save-sm {
-    display: unset;
-  }
-
-  #editor-parent {
-    width: 100% !important;
-    border: none !important;
-    /* padding: 0px 5px !important; */
-  }
-
-  .col-10 {
-    width: 100% !important;
-  }
-
-  .col-2.border-end {
-    width: 100%;
-    margin-bottom: 20px;
-  }
 }
 
 .red {
@@ -254,7 +296,7 @@ a:hover {
 
 ::-webkit-scrollbar {
   background-color: var(--primary-bg);
-  width: 1px;
+  width: 2px;
   height: 1px;
 }
 
@@ -263,6 +305,11 @@ a:hover {
 }
 
 .item.selected > .between > .badge {
+  color: var(--btn-hover-text);
+  border-color: var(--btn-hover-text);
+}
+
+.item.selected .btn {
   color: var(--btn-hover-text);
   border-color: var(--btn-hover-text);
 }
@@ -277,4 +324,24 @@ a:hover {
 
 .col-5 {
   width: 40%;
+}
+
+.non-btn,
+.non-btn:hover {
+  cursor: unset;
+  border: 0;
+  background-color: transparent;
+  color: inherit;
+}
+
+.dropdown-menu {
+  max-height: 650px;
+  overflow-y: auto;
+}
+
+.hover {
+  background-color: var(--primary-bg);
+  border: 1px solid var(--primary-txt);
+  padding: 10px;
+  border-radius: 5px;
 }

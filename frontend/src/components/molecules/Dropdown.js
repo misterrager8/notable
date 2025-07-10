@@ -10,6 +10,7 @@ export default function Dropdown({
   text,
   autoClose = true,
   style = null,
+  showCaret = true,
 }) {
   return (
     <div className={className + " dropdown"}>
@@ -17,8 +18,8 @@ export default function Dropdown({
         data-bs-target={"#" + target}
         data-bs-toggle="dropdown"
         data-bs-auto-close={autoClose}
-        className={classNameBtn + " dropdown-toggle"}>
-        {icon && <Icon name={icon} className="me-1" />}
+        className={classNameBtn + (showCaret ? " dropdown-toggle" : "")}>
+        {icon && <Icon name={icon} className={text ? "me-2" : ""} />}
         {text}
       </a>
       <div

@@ -6,10 +6,12 @@ export default function Input({
   size = "sm",
   className = "",
   value,
-  placeholder = "...",
+  placeholder,
+  style = null,
 }) {
   return (
     <input
+      style={style}
       placeholder={placeholder}
       autoComplete="off"
       value={value}

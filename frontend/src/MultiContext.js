@@ -5,7 +5,6 @@ import "./App.css";
 
 import { createContext, useEffect, useState } from "react";
 import Home from "./components/pages/Home";
-import Nav from "./components/organisms/Nav";
 import { api } from "./util";
 import Button from "./components/atoms/Button";
 
@@ -21,7 +20,7 @@ export default function MultiProvider({ children }) {
 
   const [notes, setNotes] = useState([]);
   const [currentNote, setCurrentNote] = useState(
-    JSON.parse(localStorage.getItem("notable-last-opened")) || []
+    JSON.parse(localStorage.getItem("notable-last-opened")) || null
   );
 
   const [folders, setFolders] = useState([]);
@@ -71,7 +70,7 @@ export default function MultiProvider({ children }) {
   const deleteNote = (path) => {
     api("delete_note", { path: path }, (data) => {
       setNotes(data.notes);
-      setCurrentNote([]);
+      setCurrentNote(null);
     });
   };
 

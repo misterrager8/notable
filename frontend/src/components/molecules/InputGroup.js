@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 
-export default function InputGroup({ size = "sn", children, className = "" }) {
+export default function InputGroup({ size = "sm", children, className = "" }) {
   return (
-    <div className={"input-group input-group-" + size + className}>
+    <div
+      className={
+        "input-group " + (size ? `input-group-${size} ` : "") + className
+      }>
       {children}
     </div>
   );

@@ -18,7 +18,12 @@ export default function FolderItem({ item, className = "" }) {
   }, []);
 
   return (
-    <div className={className + " dropdown-item between"}>
+    <div
+      className={
+        className +
+        " between item px-3 rounded" +
+        (multiCtx.currentFolder === item ? " selected" : "")
+      }>
       {editing ? (
         <form
           className="input-group input-group-sm "
@@ -31,7 +36,9 @@ export default function FolderItem({ item, className = "" }) {
           />
         </form>
       ) : (
-        <a className="py-1" onClick={() => multiCtx.setCurrentFolder(item)}>
+        <a
+          className="py-1 text-truncate small fw-bold"
+          onClick={() => multiCtx.setCurrentFolder(item)}>
           {item}
         </a>
       )}

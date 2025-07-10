@@ -192,11 +192,11 @@ export default function Toolbar({ selection, className }) {
   };
 
   return (
-    <div className={className}>
-      <div className="toolbar">
+    <div className={className + " "}>
+      <div className="hover">
         {formats.map((x) => (
           <Button
-            className="m-1"
+            className="me-1"
             icon={x.icon}
             text={x.text}
             onClick={() => copyFormat(x.label)}
