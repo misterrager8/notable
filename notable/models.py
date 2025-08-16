@@ -204,6 +204,12 @@ class Folder:
     def all(cls):
         return [Folder(i.name) for i in config.HOME_DIR.iterdir() if i.is_dir()]
 
+    def to_dict(self) -> dict:
+        return {
+            "name": self.name,
+            "notes": len(Note.all(filter=self.name)),
+        }
+
 
 class SearchResult:
     def __init__(self, line: str):

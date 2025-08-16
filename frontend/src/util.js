@@ -1,26 +1,3 @@
-export const sorts = [
-  {
-    name: "name",
-    label: "Name",
-    icon: "type",
-  },
-  {
-    name: "last_modified",
-    label: "Last Modified",
-    icon: "pencil",
-  },
-  {
-    name: "date_created",
-    label: "Date Created",
-    icon: "plus-lg",
-  },
-  {
-    name: "favorited",
-    label: "Pinned",
-    icon: "pin-angle-fill",
-  },
-];
-
 export const api = (url, params, callback) =>
   fetch("http://localhost:5001/" + url, {
     headers: {
@@ -30,4 +7,4 @@ export const api = (url, params, callback) =>
     body: JSON.stringify(params),
   })
     .then((response) => response.json())
-    .then((data) => callback(data));
+    .then((data) => (data.success ? callback(data) : alert(data.msg)));

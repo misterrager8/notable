@@ -4,18 +4,18 @@
   "private": true,
   "proxy": "http://localhost:5001/",
   "dependencies": {
-    "bootstrap": "^5.3.3",
-    "bootstrap-icons": "^1.11.3",
-    "concurrently": "^9.1.2",
-    "cra-template": "1.2.0",
+    "bootstrap": "^5.3.7",
+    "bootstrap-icons": "^1.13.1",
+    "concurrently": "^9.2.0",
     "markdown-it": "^14.1.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-scripts": "5.0.1"
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-scripts": "5.0.1",
+    "uuid": "^11.1.0"
   },
   "scripts": {
     "start": "react-scripts start",
-    "dev": "concurrently \"python3 ../run.py\" \"react-scripts start\" ",
+    "dev": "concurrently \"python3 ../app.py\" \"react-scripts start\" ",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

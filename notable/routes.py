@@ -1,9 +1,4 @@
 import datetime
-from pathlib import Path
-
-import html2text
-import requests
-from bs4 import BeautifulSoup
 from flask import current_app, render_template, request, send_from_directory
 
 from .models import Folder, Note
@@ -14,164 +9,312 @@ def index():
     return send_from_directory(current_app.static_folder, "index.html")
 
 
-@current_app.post("/about")
-def about():
-    success = True
-    msg = ""
-    readme_ = ""
-
-    try:
-        readme_ = open(Path(__file__).parent.parent.parent / "README.md").read()
-    except Exception as e:
-        success = False
-        msg = str(e)
-
-    return {
-        "success": success,
-        "msg": msg,
-        "readme": readme_,
-    }
-
-
-@current_app.post("/notes")
-def notes():
-    sort = request.json.get("sort")
-    filter_ = request.json.get("filter_")
-    return {"notes": [i.to_dict() for i in Note.all(sort=sort, filter=filter_)]}
-
-
-@current_app.post("/folders")
-def folders():
-    return {"folders": [i.name for i in Folder.all()]}
-
-
 @current_app.post("/get_all")
 def get_all():
-    return {
-        "folders": [i.name for i in Folder.all()],
-        "notes": [i.to_dict() for i in Note.all()],
-    }
+    success = True
+    msg = ""
+    notes = []
+    folders = []
 
+    try:
+        notes = [
+            i.to_dict()
+            for i in Note.all(
+                filter=request.json.get("folder"), sort=request.json.get("sort")
+            )
+        ]
+        folders = [i.to_dict() for i in Folder.all()]
+    except Exception as e:
+        msg = str(e)
+        success = False
 
-@current_app.post("/save_page")
-def save_page():
-    note_ = Note(request.json.get("path"))
-    soup = BeautifulSoup(requests.get(request.json.get("url")).text, "html.parser")
-
-    note_.edit(html2text.html2text(str(soup), bodywidth=0))
-
-    return note_.to_dict()
+    return {"success": success, "msg": msg, "notes": notes, "folders": folders}
 
 
 @current_app.post("/add_note")
 def add_note():
-    note_ = Note.add(
-        f"{datetime.datetime.now().strftime('%y%m%d')}, note",
-        request.json.get("folder"),
-    )
+    success = True
+    msg = ""
+    notes = []
+    folders = []
+    note = None
 
-    return {"note": note_.to_dict(), "notes": [i.to_dict() for i in Note.all()]}
+    try:
+        note = Note.add(
+            f"{datetime.datetime.now().strftime('%y%m%d')}, note",
+            request.json.get("folder"),
+        )
 
-
-@current_app.post("/add_folder")
-def add_folder():
-    folder_ = Folder.add(f"{datetime.datetime.now().strftime('%y%m%d')}, folder")
+        notes = [
+            i.to_dict()
+            for i in Note.all(
+                filter=request.json.get("folder"), sort=request.json.get("sort")
+            )
+        ]
+        folders = [i.to_dict() for i in Folder.all()]
+        note = note.to_dict()
+    except Exception as e:
+        msg = str(e)
+        success = False
 
     return {
-        "status": "done",
-        "folder": folder_.name,
-        "folders": [i.name for i in Folder.all()],
+        "success": success,
+        "msg": msg,
+        "notes": notes,
+        "folders": folders,
+        "note": note,
     }
-
-
-@current_app.post("/delete_folder")
-def delete_folder():
-    folder_ = Folder(request.json.get("name"))
-    folder_.delete()
-
-    return {
-        "status": "done",
-        "folders": [i.name for i in Folder.all()],
-    }
-
-
-@current_app.post("/note")
-def note():
-    note_ = Note(request.json.get("path"))
-
-    return note_.to_dict()
 
 
 @current_app.post("/edit_note")
 def edit_note():
-    note_ = Note(request.json.get("path"))
-    note_.edit(request.json.get("content"))
+    success = True
+    msg = ""
+    notes = []
+    folders = []
+    note = None
 
-    return {"note": note_.to_dict(), "notes": [i.to_dict() for i in Note.all()]}
+    try:
+        note = Note(request.json.get("path"))
+        note.edit(request.json.get("content"))
+
+        notes = [
+            i.to_dict()
+            for i in Note.all(
+                filter=request.json.get("folder"), sort=request.json.get("sort")
+            )
+        ]
+        folders = [i.to_dict() for i in Folder.all()]
+        note = note.to_dict()
+    except Exception as e:
+        msg = str(e)
+        success = False
+
+    return {
+        "success": success,
+        "msg": msg,
+        "notes": notes,
+        "folders": folders,
+        "note": note,
+    }
 
 
 @current_app.post("/rename_note")
 def rename_note():
-    note_ = Note(request.json.get("path"))
+    success = True
+    msg = ""
+    notes = []
+    folders = []
+    note = None
+
+    try:
+        note = Note(request.json.get("path")).rename(request.json.get("new_name"))
+
+        notes = [
+            i.to_dict()
+            for i in Note.all(
+                filter=request.json.get("folder"), sort=request.json.get("sort")
+            )
+        ]
+        folders = [i.to_dict() for i in Folder.all()]
+        note = note.to_dict()
+    except Exception as e:
+        msg = str(e)
+        success = False
 
     return {
-        "note": note_.rename(request.json.get("new_name")).to_dict(),
-        "notes": [i.to_dict() for i in Note.all()],
-    }
-
-
-@current_app.post("/fixup_title")
-def fixup_title():
-    note_ = Note(request.json.get("path"))
-
-    return note_.fixup_title().to_dict()
-
-
-@current_app.post("/change_folder")
-def change_folder():
-    note_ = Note(request.json.get("path"))
-
-    return {
-        "note": note_.change_folder(request.json.get("new_folder")).to_dict(),
-        "notes": [i.to_dict() for i in Note.all()],
-    }
-
-
-@current_app.post("/rename_folder")
-def rename_folder():
-    folder_ = Folder(request.json.get("name"))
-    folder_.rename(request.json.get("new_name"))
-
-    return {
-        "status": "done",
-        "folder": folder_.name,
-        "folders": [i.name for i in Folder.all()],
+        "success": success,
+        "msg": msg,
+        "notes": notes,
+        "folders": folders,
+        "note": note,
     }
 
 
 @current_app.post("/delete_note")
 def delete_note():
-    Note(request.json.get("path")).delete()
+    success = True
+    msg = ""
+    notes = []
+    folders = []
 
-    return {"status": "done", "notes": [i.to_dict() for i in Note.all()]}
+    try:
+        note = Note(request.json.get("path"))
+        note.delete()
 
-
-@current_app.post("/duplicate_note")
-def duplicate_note():
-    return Note(request.json.get("path")).duplicate().to_dict()
-
-
-@current_app.post("/toggle_favorite")
-def toggle_favorite():
-    note_ = Note(request.json.get("path"))
-    note_.toggle_favorite()
+        notes = [
+            i.to_dict()
+            for i in Note.all(
+                filter=request.json.get("folder"), sort=request.json.get("sort")
+            )
+        ]
+        folders = [i.to_dict() for i in Folder.all()]
+    except Exception as e:
+        msg = str(e)
+        success = False
 
     return {
-        "note": note_.to_dict(),
-        "notes": [i.to_dict() for i in Note.all()],
+        "success": success,
+        "msg": msg,
+        "notes": notes,
+        "folders": folders,
     }
 
 
-@current_app.post("/search")
-def search():
-    return {"results": [i.to_dict() for i in Note.search(request.json.get("query"))]}
+@current_app.post("/change_folder")
+def change_folder():
+    success = True
+    msg = ""
+    notes = []
+    folders = []
+    note = None
+
+    try:
+        note = Note(request.json.get("path")).change_folder(
+            request.json.get("new_folder")
+        )
+
+        notes = [
+            i.to_dict()
+            for i in Note.all(
+                filter=request.json.get("folder"), sort=request.json.get("sort")
+            )
+        ]
+        folders = [i.to_dict() for i in Folder.all()]
+        note = note.to_dict()
+    except Exception as e:
+        msg = str(e)
+        success = False
+
+    return {
+        "success": success,
+        "msg": msg,
+        "notes": notes,
+        "note": note,
+        "folders": folders,
+    }
+
+
+@current_app.post("/toggle_bookmark")
+def toggle_bookmark():
+    success = True
+    msg = ""
+    notes = []
+    folders = []
+    note = None
+
+    try:
+        note = Note(request.json.get("path"))
+        note.toggle_favorite()
+
+        notes = [
+            i.to_dict()
+            for i in Note.all(
+                filter=request.json.get("folder"), sort=request.json.get("sort")
+            )
+        ]
+        folders = [i.to_dict() for i in Folder.all()]
+        note = note.to_dict()
+    except Exception as e:
+        msg = str(e)
+        success = False
+
+    return {
+        "success": success,
+        "msg": msg,
+        "notes": notes,
+        "folders": folders,
+        "note": note,
+    }
+
+
+@current_app.post("/rename_folder")
+def rename_folder():
+    success = True
+    msg = ""
+    notes = []
+    folders = []
+
+    try:
+        folder = Folder(request.json.get("name"))
+        folder.rename(request.json.get("new_name"))
+
+        notes = [
+            i.to_dict()
+            for i in Note.all(
+                filter=request.json.get("folder"), sort=request.json.get("sort")
+            )
+        ]
+        folders = [i.to_dict() for i in Folder.all()]
+
+    except Exception as e:
+        msg = str(e)
+        success = False
+
+    return {
+        "success": success,
+        "msg": msg,
+        "notes": notes,
+        "folders": folders,
+    }
+
+
+@current_app.post("/add_folder")
+def add_folder():
+    success = True
+    msg = ""
+    notes = []
+    folders = []
+    folder = None
+
+    try:
+        folder = Folder.add(f"{datetime.datetime.now().strftime('%y%m%d')}, folder")
+
+        notes = [
+            i.to_dict()
+            for i in Note.all(filter=folder.name, sort=request.json.get("sort"))
+        ]
+        folders = [i.to_dict() for i in Folder.all()]
+        folder = folder.to_dict()
+    except Exception as e:
+        msg = str(e)
+        success = False
+
+    return {
+        "success": success,
+        "msg": msg,
+        "notes": notes,
+        "folders": folders,
+        "folder": folder,
+    }
+
+
+@current_app.post("/delete_folder")
+def delete_folder():
+    success = True
+    msg = ""
+    notes = []
+    folders = []
+
+    try:
+        folder = Folder(request.json.get("name"))
+        folder.delete()
+
+        notes = [
+            i.to_dict()
+            for i in Note.all(
+                filter=request.json.get("folder"), sort=request.json.get("sort")
+            )
+        ]
+        folders = [i.to_dict() for i in Folder.all()]
+
+    except Exception as e:
+        msg = str(e)
+        success = False
+
+    return {
+        "success": success,
+        "msg": msg,
+        "notes": notes,
+        "folders": folders,
+    }

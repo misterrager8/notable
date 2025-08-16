@@ -1,203 +1,22 @@
 @import "./colors.css";
 
 body {
-  margin-left: 75px;
   background-color: var(--primary-bg);
   color: var(--primary-txt);
 }
 
-.nav-custom {
-  z-index: 100;
-  position: absolute;
-  padding: 1rem;
-  width: 75px;
-  top: 0;
-  left: 0;
-  height: 99vh;
-  background-color: var(--primary-bg);
-  border-right: 0.5px dotted var(--primary-txt);
-  overflow-y: auto;
-}
-
-.main-panel {
-  z-index: 100;
-  position: absolute;
-  padding: 0.25rem;
-  width: 91%;
-  opacity: 0;
-  visibility: hidden;
-  top: 0;
-  left: auto;
-  height: 99vh;
-  background-color: var(--primary-bg);
-  border-right: 0.5px dotted var(--primary-txt);
-  transition: opacity 0.3s;
-  overflow-y: auto;
-}
-
-.settings-panel {
-  z-index: 100;
-  position: absolute;
-  padding: 1rem;
-  width: 30%;
-  opacity: 0;
-  visibility: hidden;
-  top: 0;
-  left: auto;
-  height: 99vh;
-  background-color: var(--primary-bg);
-  border-right: 0.5px dotted var(--primary-txt);
-  transition: opacity 0.3s;
-  overflow-y: auto;
-}
-
-.main-panel.show {
-  opacity: 100%;
-  visibility: unset;
-}
-
-.settings-panel.show {
-  opacity: 100%;
-  visibility: unset;
-}
-
-.nav-custom.maximized {
-  width: 250px;
-}
-
-.bottom {
-  bottom: 0;
-  display: flex;
-  position: absolute;
-  left: 0;
-  width: 100%;
-  padding: 1rem;
-}
-
 .btn {
   background-color: transparent;
-  border-color: var(--btn-color);
   color: var(--btn-color);
+  border-color: var(--btn-color);
   letter-spacing: 1px;
 }
 
 .btn:hover,
 .btn.active {
   background-color: var(--btn-color);
+  color: var(--btn-hover-txt);
   border-color: transparent;
-  color: var(--btn-hover-text);
-}
-
-.border-end {
-  border-color: var(--btn-color) !important;
-  border-right-style: dotted !important;
-  border-width: 0.5px !important;
-}
-
-.form-control,
-.form-control:focus {
-  background-color: var(--primary-bg);
-  color: var(--primary-txt);
-  border: 0;
-  resize: none;
-}
-
-::placeholder {
-  color: var(--primary-txt) !important;
-  letter-spacing: 2px !important;
-  opacity: 50% !important;
-}
-
-.between {
-  display: flex;
-  justify-content: space-between;
-}
-
-.item {
-  cursor: pointer;
-}
-
-.selected {
-  background-color: var(--btn-color);
-  border-color: transparent;
-  color: var(--btn-hover-text);
-}
-
-.h1,
-.h2,
-.h3,
-.h4,
-.h5 {
-  color: var(--btn-color);
-  font-weight: lighter;
-  letter-spacing: 1px;
-}
-
-#reader code {
-  font-family: monospace;
-  color: var(--primary-txt);
-}
-
-#reader pre {
-  width: 100%;
-  margin: 20px auto;
-  padding: 20px;
-  border-radius: 10px;
-  background-color: var(--secondary-bg);
-}
-
-#reader a {
-  color: var(--btn-color);
-  font-style: italic;
-  text-decoration: underline;
-}
-
-#reader img {
-  max-width: 100%;
-}
-
-/* #reader, */
-#reader h1,
-#reader h2,
-#reader h3,
-#reader h4,
-#reader h5 {
-  font-weight: lighter;
-  letter-spacing: 1px;
-}
-
-/* #reader, */
-#reader mark {
-  background-color: unset;
-  color: var(--orange);
-  font-weight: bold;
-}
-
-.dropdown-menu,
-.dropdown-item {
-  background-color: var(--primary-bg);
-  color: var(--primary-txt);
-}
-
-.dropdown-item:hover,
-.dropdown-item.active {
-  background-color: var(--btn-color);
-  color: var(--btn-hover-text);
-}
-
-.dropdown-item.active .btn,
-.dropdown-item:hover .btn {
-  color: var(--btn-hover-text);
-}
-
-.dropdown-menu {
-  border-color: var(--btn-color);
-  font-size: small;
-}
-
-textarea {
-  border: 0 !important;
-  font-style: italic;
 }
 
 a,
@@ -207,141 +26,190 @@ a:hover {
   cursor: pointer;
 }
 
+.between {
+  display: flex;
+  justify-content: space-between;
+}
+
+.top-nav {
+  height: 60px;
+  border-bottom: 0.5px solid var(--secondary-color);
+  padding: 10px;
+  display: flex;
+  z-index: 12;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  background-color: var(--primary-bg);
+}
+
+.side-nav {
+  margin-top: 60px;
+  height: 91%;
+  border-right: 0.5px solid var(--secondary-color);
+  z-index: 10;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 350px;
+  background-color: var(--primary-bg);
+  transition: transform 0.5s;
+}
+
+.side-nav.minimized {
+  transform: translate(-350px);
+}
+
+.dropdown-item,
+.dropdown-menu {
+  background-color: var(--primary-bg);
+  color: var(--primary-txt);
+}
+
+.dropdown-menu {
+  border-color: var(--btn-color);
+  padding: 1px;
+}
+
+.dropdown-item {
+  font-size: small;
+}
+
+.dropdown-item:hover,
+.dropdown-item.active {
+  background-color: var(--btn-color);
+  color: var(--btn-hover-txt);
+}
+
+body {
+  margin-top: 60px;
+}
+
+.note-item {
+  border-bottom: 0.5px solid var(--secondary-color);
+  border-top: 0.5px solid var(--secondary-color);
+  padding: 20px;
+  cursor: pointer;
+}
+
+.note-item.active {
+  background-color: var(--btn-color);
+  color: var(--btn-hover-txt);
+}
+
+.folder-item {
+  border-bottom: 0.5px solid var(--secondary-color);
+  border-top: 0.5px solid var(--secondary-color);
+  padding: 5px 20px;
+  cursor: pointer;
+}
+
+.folder-item.active {
+  background-color: var(--btn-color);
+  color: var(--btn-hover-txt);
+}
+
+.border-bottom {
+  border-bottom: 0.5px solid var(--secondary-color) !important;
+}
+
 .badge {
-  font-weight: inherit;
+  font-weight: unset;
+  border: 0.5px solid var(--btn-color);
   color: var(--btn-color);
-  border: 1px solid var(--btn-color);
-  border-radius: 10px;
+  border-radius: 20px;
 }
 
-#save-sm {
-  display: none;
-}
-
-.toolbar {
-  flex-wrap: wrap;
+.note-item.active > * > .badge {
+  border: 0.5px solid var(--btn-hover-txt);
+  color: var(--btn-hover-txt);
 }
 
 .red {
-  color: var(--red);
-  border-color: var(--red);
+  color: #9f4343;
 }
 
-.btn.red:hover,
-.btn.red.active {
-  color: var(--btn-hover-text);
-  background-color: var(--red);
+.btn.red {
+  border-color: #9f4343;
+  color: #9f4343;
+}
+
+.btn.red:hover {
   border-color: transparent;
+  color: var(--btn-hover-txt);
+  background-color: #9f4343;
 }
 
 .orange {
-  color: var(--orange);
-  border-color: var(--orange);
-}
-
-.btn.orange:hover,
-.btn.orange.active {
-  color: var(--btn-hover-text);
-  background-color: var(--orange);
-  border-color: transparent;
+  color: #c97f11;
 }
 
 .green {
-  color: var(--green);
-  border-color: var(--green);
+  color: #336833;
 }
 
-.btn.green:hover,
-.btn.green.active {
-  color: var(--btn-hover-text);
-  background-color: var(--green);
+.btn.green {
+  border-color: #336833;
+  color: #336833;
+}
+
+.btn.green:hover {
   border-color: transparent;
-}
-
-.blue {
-  color: var(--blue);
-  border-color: var(--blue);
-}
-
-.btn.blue:hover,
-.btn.blue.active {
-  color: var(--btn-hover-text);
-  background-color: var(--blue);
-  border-color: transparent;
-}
-
-.green {
-  color: var(--green);
-  border-color: var(--green);
-}
-
-.btn.green:hover,
-.btn.green.active {
-  color: var(--btn-hover-text);
-  background-color: var(--green);
-  border-color: transparent;
-}
-
-.purple {
-  color: var(--purple);
-  border-color: var(--purple);
-}
-
-.btn.purple:hover,
-.btn.purple.active {
-  color: var(--btn-hover-text);
-  background-color: var(--purple);
-  border-color: transparent;
+  color: var(--btn-hover-txt);
+  background-color: #336833;
 }
 
 ::-webkit-scrollbar {
   background-color: var(--primary-bg);
   width: 2px;
-  height: 1px;
+  height: 2px;
 }
 
 ::-webkit-scrollbar-thumb {
   background-color: var(--btn-color);
 }
 
-.item.selected > .between > .badge {
-  color: var(--btn-hover-text);
-  border-color: var(--btn-hover-text);
-}
-
-.item.selected .btn {
-  color: var(--btn-hover-text);
-  border-color: var(--btn-hover-text);
-}
-
-.col-2 {
-  width: 20%;
-}
-
-.col-10 {
-  width: 80%;
-}
-
-.col-5 {
-  width: 40%;
-}
-
-.non-btn,
-.non-btn:hover {
-  cursor: unset;
-  border: 0;
+.form-control,
+.form-control:focus {
   background-color: transparent;
-  color: inherit;
+  color: var(--primary-txt);
+  border: 0.5px solid var(--secondary-color);
 }
 
-.dropdown-menu {
-  max-height: 650px;
-  overflow-y: auto;
+::placeholder {
+  color: var(--primary-txt) !important;
+  letter-spacing: 2px !important;
+  opacity: 50% !important;
 }
 
-.hover {
-  background-color: var(--primary-bg);
-  border: 1px solid var(--primary-txt);
-  padding: 10px;
+#reader a {
+  color: var(--btn-color);
+  text-decoration: underline;
+  font-style: italic;
+}
+
+#reader pre {
+  width: 90%;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 25px;
+  border-left: 0.5px solid var(--secondary-color);
+  white-space: pre-wrap;
+  font-size: small;
+}
+
+#reader code {
+  color: var(--btn-color);
+  font-style: italic;
+}
+
+#reader img {
+  max-width: 100%;
+}
+
+#reader mark {
+  background-color: var(--btn-color);
+  color: var(--btn-hover-txt);
   border-radius: 5px;
+  font-size: small;
 }
