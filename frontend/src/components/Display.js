@@ -12,7 +12,9 @@ export default function Display() {
       <TopNav />
       <SideNav />
       <div onClick={() => multiCtx.setShowSide(false)} className="p-3">
-        {multiCtx.currentNote && <Editor />}
+        {multiCtx.currentNote && (
+          <Editor style={{ width: "70vw" }} className="mx-auto" />
+        )}
       </div>
     </>
   );

@@ -6,7 +6,7 @@ import Dropdown from "./Dropdown";
 import Icon from "./Icon";
 import markdownit from "markdown-it";
 
-export default function Editor({ className = "" }) {
+export default function Editor({ style = null, className = "" }) {
   const multiCtx = useContext(MultiContext);
 
   const [changed, setChanged] = useState(false);
@@ -28,7 +28,7 @@ export default function Editor({ className = "" }) {
   }, [content, multiCtx.currentNote]);
 
   return (
-    <div className={className}>
+    <div style={style} className={className}>
       <form
         className="input-group mb-3"
         onSubmit={(e) => multiCtx.renameNote(e, name)}>
