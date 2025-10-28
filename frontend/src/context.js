@@ -16,7 +16,12 @@ export default function MultiProvider({ children }) {
   const [currentFolder, setCurrentFolder] = useState(null);
   const [sort, setSort] = useState("favorited");
 
-  const [mode, setMode] = useState("split");
+  const [mode, setMode] = useState(
+    localStorage.getItem("notable-mode") || "split"
+  );
+  const [content, setContent] = useState("");
+
+  const [searchResults, setSearchResults] = useState([]);
 
   const getAll = () =>
     api("get_all", { folder: currentFolder, sort: sort }, (data) => {
@@ -123,6 +128,31 @@ export default function MultiProvider({ children }) {
     );
   };
 
+  const searchNotes = (e, query) => {
+    e.preventDefault();
+    api(
+      "search",
+      {
+        query: query,
+      },
+      (data) => {
+        setSearchResults(data.results);
+      }
+    );
+  };
+
+  const getNote = (path) => {
+    api(
+      "get_note",
+      {
+        path: path,
+      },
+      (data) => {
+        setCurrentNote(data.note);
+      }
+    );
+  };
+
   const addFolder = () => {
     api(
       "add_folder",
@@ -183,6 +213,10 @@ export default function MultiProvider({ children }) {
     localStorage.setItem("notable-last-opened", JSON.stringify(currentNote));
   }, [currentNote]);
 
+  useEffect(() => {
+    localStorage.setItem("notable-mode", mode);
+  }, [mode]);
+
   const contextValue = {
     loading: loading,
     setLoading: setLoading,
@@ -220,6 +254,15 @@ export default function MultiProvider({ children }) {
     addFolder: addFolder,
     renameFolder: renameFolder,
     deleteFolder: deleteFolder,
+
+    content: content,
+    setContent: setContent,
+
+    searchNotes: searchNotes,
+    searchResults: searchResults,
+    setSearchResults: setSearchResults,
+
+    getNote: getNote,
   };
 
   return (

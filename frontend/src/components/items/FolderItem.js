@@ -1,8 +1,7 @@
 import { useContext, useState } from "react";
 import { MultiContext } from "../../context";
-import ButtonGroup from "../ButtonGroup";
-import Button from "../Button";
-import Input from "../Input";
+import Button from "../atoms/Button";
+import Input from "../atoms/Input";
 
 export default function FolderItem({ item, className = "" }) {
   const multiCtx = useContext(MultiContext);
@@ -13,31 +12,27 @@ export default function FolderItem({ item, className = "" }) {
   const onChangeName = (e) => setName(e.target.value);
 
   return (
-    /* eslint-disable jsx-a11y/anchor-is-valid */
     <div
       className={
-        "folder-item between" +
+        className +
+        " folder-item" +
         (multiCtx.currentFolder === item.name ? " active" : "")
       }>
-      {!editing ? (
-        <a
-          onClick={() => multiCtx.setCurrentFolder(item.name)}
-          className="small my-auto w-100 between me-2">
-          <span className="fw-bold">{item.name}</span>
-          <span>{item.notes}</span>
-        </a>
-      ) : (
-        <form onSubmit={(e) => multiCtx.renameFolder(e, item.name, name)}>
-          <Input
-            className="p-0 fst-italic"
-            border={false}
-            value={name}
-            onChange={onChangeName}
-          />
-        </form>
-      )}
-      <div>
-        <ButtonGroup>
+      <div className="between">
+        {editing ? (
+          <form onSubmit={(e) => multiCtx.renameFolder(e, item.name, name)}>
+            <Input value={name} onChange={onChangeName} />
+          </form>
+        ) : (
+          <div
+            className="d-flex my-auto small"
+            onClick={() => multiCtx.setCurrentFolder(item.name)}>
+            <i className="bi bi-folder me-2"></i>
+            <div className="text-truncate">{item.name}</div>
+          </div>
+        )}
+        <div className="d-flex">
+          <div className="small my-auto mx-3">{item.notes}</div>
           <Button
             onClick={() => setEditing(!editing)}
             icon="pencil"
@@ -52,12 +47,12 @@ export default function FolderItem({ item, className = "" }) {
             />
           )}
           <Button
-            onClick={() => setDeleting(!deleting)}
             className="red"
+            onClick={() => setDeleting(!deleting)}
             icon="trash2"
             border={false}
           />
-        </ButtonGroup>
+        </div>
       </div>
     </div>
   );

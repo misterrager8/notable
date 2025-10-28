@@ -1,95 +1,116 @@
-import { useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { MultiContext } from "../context";
-import Input from "./Input";
-import Button from "./Button";
-import Dropdown from "./Dropdown";
-import Icon from "./Icon";
 import markdownit from "markdown-it";
+import Toolbar from "./Toolbar";
+import Dropdown from "./atoms/Dropdown";
 
-export default function Editor({ style = null, className = "" }) {
+export const ContentContext = createContext();
+
+export default function Editor({ className = "" }) {
   const multiCtx = useContext(MultiContext);
-
-  const [changed, setChanged] = useState(false);
-
-  const [content, setContent] = useState("");
-  const onChangeContent = (e) => setContent(e.target.value);
+  const onChangeContent = (e) => multiCtx.setContent(e.target.value);
 
   const [name, setName] = useState("");
   const onChangeName = (e) => setName(e.target.value);
 
+  const [selection, setSelection] = useState({
+    start: 0,
+    end: 0,
+    selected: "",
+  });
+
   useEffect(() => {
-    setContent(multiCtx.currentNote.content);
-    setName(multiCtx.currentNote.name);
+    setName(multiCtx.currentNote?.name);
+    multiCtx.setContent(multiCtx.currentNote?.content);
   }, [multiCtx.currentNote]);
 
-  useEffect(() => {
-    setChanged(content !== multiCtx.currentNote?.content);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content, multiCtx.currentNote]);
+  const getSelection = () => {
+    let elem = document.getElementById("editor");
+
+    let start = elem.selectionStart;
+    let end = elem.selectionEnd;
+    let selected = multiCtx.content.substring(start, end);
+
+    setSelection({ start: start, end: end, selected: selected });
+  };
 
   return (
-    <div style={style} className={className}>
+    <div className={className}>
       <form
-        className="input-group mb-3"
-        onSubmit={(e) => multiCtx.renameNote(e, name)}>
-        {["split", "write"].includes(multiCtx.mode) && (
-          <Button
-            onClick={() => multiCtx.editNote(content)}
-            className={changed ? "orange" : "green"}
-            border={false}
-            icon={changed ? "circle-fill" : "check-lg"}
-          />
-        )}
-        <Dropdown
-          target="change-folder"
-          showCaret={false}
-          icon="folder"
-          border={false}
-          text={multiCtx.currentNote.folder}>
-          {/* eslint-disable jsx-a11y/anchor-is-valid */}
-          <a
-            onClick={() => multiCtx.changeFolder(null)}
-            className="dropdown-item">
-            No Folder
-          </a>
-          {multiCtx.folders.map((x) => (
-            <a
-              onClick={() => multiCtx.changeFolder(x.name)}
-              className="dropdown-item">
-              {x.name}
-            </a>
-          ))}
-        </Dropdown>
-        <span className="my-auto">
-          <Icon name="slash-lg" />
-        </span>
-        <Input
-          className="fw-bold"
-          border={false}
+        onSubmit={(e) => multiCtx.renameNote(e, name)}
+        className="between mt-3">
+        <input
+          className="title-input w-75"
+          autoComplete="off"
           value={name}
           onChange={onChangeName}
         />
+        <div className="my-auto">
+          <Dropdown
+            border={false}
+            icon="folder"
+            text={multiCtx.currentNote?.folder}>
+            <a
+              className="dropdown-item"
+              onClick={() => multiCtx.changeFolder(null)}>
+              No Folder
+            </a>
+            {multiCtx.folders.map((x) => (
+              <>
+                {x.name !== multiCtx.currentNote?.folder && (
+                  <a
+                    className="dropdown-item"
+                    onClick={() => multiCtx.changeFolder(x.name)}>
+                    {x.name}
+                  </a>
+                )}
+              </>
+            ))}
+          </Dropdown>
+        </div>
       </form>
-      <div className={"row"}>
-        {["split", "write"].includes(multiCtx.mode) && (
-          <div className="col" style={{ height: "78vh" }}>
+      {multiCtx.mode !== "view" && (
+        <Toolbar selection={selection} className="" />
+      )}
+      <div
+        className="row mt-3"
+        style={{
+          height: multiCtx.mode === "view" ? "72vh" : "67vh",
+          overflowY: "hidden",
+        }}>
+        {["split", "edit"].includes(multiCtx.mode) && (
+          <div
+            className={"p-1 col" + (multiCtx.mode === "edit" ? "-12" : "-6")}>
             <textarea
-              style={{ resize: "none" }}
+              id="editor"
+              onMouseUp={() => getSelection()}
+              value={multiCtx.content}
               onChange={onChangeContent}
-              value={content}
-              className="form-control h-100 fst-italic"
-              placeholder="..."></textarea>
+              placeholder="..."
+              className="form-control fst-italic h-100"></textarea>
           </div>
         )}
-        {["split", "read"].includes(multiCtx.mode) && (
-          <div className="col overflow-auto" style={{ height: "78vh" }}>
+        {["split", "view"].includes(multiCtx.mode) && (
+          <div
+            className={"h-100 col" + (multiCtx.mode === "view" ? "-12" : "-6")}>
             <div
+              className="small overflow-y-auto h-100"
               id="reader"
               dangerouslySetInnerHTML={{
-                __html: markdownit({ html: true }).render(content),
+                __html: markdownit({ html: true }).render(multiCtx.content),
               }}></div>
           </div>
         )}
+      </div>
+      <div className="between small my-2 opacity-50 fst-italic">
+        <div>
+          <i className="bi bi-pencil me-2"></i>
+          <span>{multiCtx.currentNote?.last_modified}</span>
+        </div>
+        <div>
+          <i className="bi bi-plus-lg me-2"></i>
+          <span>{multiCtx.currentNote?.date_created}</span>
+        </div>
       </div>
     </div>
   );

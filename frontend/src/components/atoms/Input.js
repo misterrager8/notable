@@ -1,23 +1,20 @@
 export default function Input({
-  value,
   onChange,
-  type_ = "text",
+  required = false,
   placeholder,
+  value,
+  type_ = "text",
+  border,
+  size,
   className = "",
-  style,
-  border = true,
-  size = "sm",
-  required = true,
 }) {
   return (
     <input
       required={required}
+      value={value}
+      placeholder={placeholder}
       type={type_}
       onChange={onChange}
-      placeholder={placeholder}
-      style={style}
-      value={value}
-      autoComplete="off"
       className={
         className +
         " form-control" +

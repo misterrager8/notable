@@ -1,30 +1,26 @@
 export default function Button({
-  type_ = "button",
   onClick,
-  active = false,
-  border = true,
-  size = "sm",
   text,
   icon,
+  active,
+  border = true,
+  size = "sm",
+  type_ = "button",
   className = "",
-  children,
-  style,
 }) {
   return (
     <button
-      style={style}
       type={type_}
       onClick={onClick}
       className={
-        "btn " +
         className +
+        " btn" +
         (active ? " active" : "") +
         (border ? "" : " border-0") +
         (size ? ` btn-${size}` : "")
       }>
-      {icon && <i className={"bi bi-" + icon + (text ? " me-1" : "")}></i>}
+      {icon && <i className={"bi bi-" + icon + (text ? " me-2" : "")}></i>}
       {text && <span>{text}</span>}
-      {children}
     </button>
   );
 }

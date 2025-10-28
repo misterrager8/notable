@@ -1,6 +1,4 @@
 import { useContext } from "react";
-import Badge from "../Badge";
-import Icon from "../Icon";
 import { MultiContext } from "../../context";
 
 export default function NoteItem({ item, className = "" }) {
@@ -8,26 +6,36 @@ export default function NoteItem({ item, className = "" }) {
 
   return (
     <div
-      onClick={() => multiCtx.setCurrentNote(item)}
       className={
         className +
         " note-item" +
-        (multiCtx.currentNote?.name === item.name ? " active" : "")
-      }>
-      <div className="between mb-3">
-        <div className="fw-bold text-truncate">{item.name}</div>
-        {item.favorited && <Icon className="red" name="bookmark-fill" />}
-      </div>
-      <div className="between">
-        <div className="small text-truncate opacity-50">
-          <Icon name={multiCtx.sort === "date_created" ? "plus" : "pencil"} />
-          <span className="ms-1">
+        (multiCtx.currentNote?.path === item.path ? " active" : "")
+      }
+      onClick={() => multiCtx.setCurrentNote(item)}>
+      <div className="w-100">
+        <div className="between">
+          <div className="text-truncate">{item.name}</div>
+          {item.favorited && <i className="bi bi-pin-angle-fill red"></i>}
+        </div>
+
+        <div className="between mt-2">
+          <div className="small opacity-50 my-auto">
+            <i
+              className={
+                "me-2 bi bi-" +
+                (multiCtx.sort === "date_created" ? "plus-lg" : "pencil")
+              }></i>
             {multiCtx.sort === "date_created"
               ? item.date_created
               : item.last_modified}
-          </span>
+          </div>
+          {item.folder && (
+            <div className="badge-custom text-truncate">
+              <i className="me-2 bi bi-folder-fill"></i>
+              {item.folder}
+            </div>
+          )}
         </div>
-        {item.folder && <Badge icon="folder" text={item.folder} />}
       </div>
     </div>
   );

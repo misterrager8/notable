@@ -1,9 +1,7 @@
 *.env
 *.pyc
 notable.egg-info/
-Notes/
 *.db
-todos.json
 /frontend/node_modules
 /.pnp
 .pnp.js

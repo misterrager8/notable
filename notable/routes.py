@@ -66,6 +66,26 @@ def add_note():
     }
 
 
+@current_app.post("/get_note")
+def get_note():
+    success = True
+    msg = ""
+    note = None
+
+    try:
+        note = Note(request.json.get("path"))
+        note = note.to_dict()
+    except Exception as e:
+        msg = str(e)
+        success = False
+
+    return {
+        "success": success,
+        "msg": msg,
+        "note": note,
+    }
+
+
 @current_app.post("/edit_note")
 def edit_note():
     success = True
@@ -128,6 +148,25 @@ def rename_note():
         "notes": notes,
         "folders": folders,
         "note": note,
+    }
+
+
+@current_app.post("/search")
+def search():
+    success = True
+    msg = ""
+    results = []
+
+    try:
+        results = [i.to_dict() for i in Note.search(request.json.get("query"))]
+    except Exception as e:
+        msg = str(e)
+        success = False
+
+    return {
+        "success": success,
+        "msg": msg,
+        "results": results,
     }
 
 

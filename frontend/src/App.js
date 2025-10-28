@@ -1,10 +1,10 @@
 import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap/dist/js/bootstrap.js";
+import "bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 import "./App.css";
+import Display from "./Display";
 import MultiProvider from "./context";
-import Display from "./components/Display";
 
 function App() {
   return (
