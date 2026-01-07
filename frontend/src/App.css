@@ -105,7 +105,7 @@ a:hover {
 textarea {
   resize: none;
   border: 0 !important;
-  height: 76vh;
+  height: 73vh;
 }
 
 .note-item {
@@ -165,7 +165,7 @@ textarea {
 }
 
 .editor {
-  height: 76vh;
+  height: 73vh;
 }
 
 .nav-x {
@@ -241,6 +241,7 @@ textarea {
 
 .toolbar .btn {
   text-overflow: unset;
+  font-size: 1.1rem;
 }
 
 ::-webkit-slider-thumb {
@@ -273,10 +274,10 @@ textarea {
   }
 
   .editor {
-    height: 68vh;
+    height: 65vh;
   }
 
   textarea {
-    height: 68vh;
+    height: 65vh;
   }
 }
