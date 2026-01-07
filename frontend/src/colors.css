@@ -75,7 +75,7 @@ html[data-theme="jade"] {
 
   --secondary-color: hsl(43, 5%, 72%);
 
-  --btn-color: hsl(155 81 33);
+  --btn-color: hsl(155, 80%, 29%);
   --btn-hover-txt: #cccccc;
 }
 
