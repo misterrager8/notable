@@ -79,12 +79,11 @@ export default function Nav() {
               />
             </div>
             <Dropdown
-              text={theme}
               classNameBtn="text-capitalize"
               classNameMenu="text-center"
               target="themes"
-              icon="paint-bucket"
-              showCaret={false}>
+              showCaret={true}
+              icon="paint-bucket">
               {themes.map((x) => (
                 <a
                   onClick={() => setTheme(x)}
