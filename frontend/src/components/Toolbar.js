@@ -92,7 +92,7 @@ export default function Toolbar({ selection, className = "" }) {
     {
       icon: "link",
       label: "link",
-      format: `[](${selection.selected})`,
+      format: `[text](url) ${selection.selected}`,
     },
     {
       icon: "type",
