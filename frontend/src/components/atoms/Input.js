@@ -1,26 +1,21 @@
 export default function Input({
+  value,
   onChange,
+  type_ = "text",
   required = false,
   placeholder,
-  value,
-  type_ = "text",
-  border,
-  size,
+  border = true,
   className = "",
 }) {
   return (
     <input
-      required={required}
-      value={value}
       placeholder={placeholder}
+      required={required}
       type={type_}
+      autoComplete="off"
+      value={value}
       onChange={onChange}
-      className={
-        className +
-        " form-control" +
-        (border ? "" : " border-0") +
-        (size ? ` form-control-${size}` : "")
-      }
+      className={className + " form-control" + (border ? "" : " border-0")}
     />
   );
 }

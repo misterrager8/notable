@@ -1,26 +1,26 @@
 export default function Button({
-  onClick,
   text,
-  icon,
-  active,
-  border = true,
-  size = "sm",
-  type_ = "button",
+  onClick,
+  border = false,
+  active = false,
+  truncate = true,
   className = "",
+  type_ = "button",
+  icon,
 }) {
   return (
     <button
-      type={type_}
       onClick={onClick}
+      type={type_}
       className={
         className +
         " btn" +
+        (truncate ? " text-truncate" : "") +
         (active ? " active" : "") +
-        (border ? "" : " border-0") +
-        (size ? ` btn-${size}` : "")
+        (border ? "" : " border-0")
       }>
-      {icon && <i className={"bi bi-" + icon + (text ? " me-2" : "")}></i>}
-      {text && <span>{text}</span>}
+      {icon && <i className={"bi bi-" + icon + (text ? " me-1" : "")}></i>}
+      {text && <span className="">{text}</span>}
     </button>
   );
 }

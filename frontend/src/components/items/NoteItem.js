@@ -1,41 +1,47 @@
 import { useContext } from "react";
 import { MultiContext } from "../../context";
+import Icon from "../atoms/Icon";
+import Badge from "../atoms/Badge";
 
-export default function NoteItem({ item, className = "" }) {
+export default function NoteItem({ item }) {
   const multiCtx = useContext(MultiContext);
 
   return (
     <div
       className={
-        className +
-        " note-item" +
+        "note-item" +
         (multiCtx.currentNote?.path === item.path ? " active" : "")
       }
-      onClick={() => multiCtx.setCurrentNote(item)}>
-      <div className="w-100">
-        <div className="between">
-          <div className="text-truncate">{item.name}</div>
-          {item.favorited && <i className="bi bi-pin-angle-fill red"></i>}
+      onClick={() =>
+        multiCtx.setCurrentNote(
+          multiCtx.currentNote?.path === item.path ? null : item
+        )
+      }>
+      <div className="between">
+        <div title={item.name} className="text-truncate">
+          {item.name}
         </div>
-
-        <div className="between mt-2">
-          <div className="small opacity-50 my-auto">
-            <i
-              className={
-                "me-2 bi bi-" +
-                (multiCtx.sort === "date_created" ? "plus-lg" : "pencil")
-              }></i>
+        {item.favorited && <Icon name="bookmark-fill" />}
+      </div>
+      <div className="between mt-3">
+        <div className="small opacity-50 d-flex me-3">
+          <Icon
+            className="me-1"
+            name={multiCtx.sort === "date_created" ? "plus-lg" : "pencil"}
+          />
+          <span
+            title={
+              multiCtx.sort === "date_created"
+                ? item.date_created
+                : item.last_modified
+            }
+            className="text-truncate">
             {multiCtx.sort === "date_created"
               ? item.date_created
               : item.last_modified}
-          </div>
-          {item.folder && (
-            <div className="badge-custom text-truncate">
-              <i className="me-2 bi bi-folder-fill"></i>
-              {item.folder}
-            </div>
-          )}
+          </span>
         </div>
+        {item.folder && <Badge text={item.folder} icon="folder" />}
       </div>
     </div>
   );

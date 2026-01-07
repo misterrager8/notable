@@ -1,28 +1,26 @@
 export default function Dropdown({
-  size = "sm",
   text,
   icon,
-  children,
+  classNameMenu = "",
+  classNameBtn = "",
   target,
   showCaret = true,
-  classNameBtn,
-  classNameMenu,
-  border = true,
+  border = false,
+  children,
 }) {
   return (
-    /* eslint-disable jsx-a11y/anchor-is-valid */
     <>
       <a
+        style={{ maxWidth: "135px" }}
+        data-bs-target={"#" + target}
+        data-bs-toggle="dropdown"
         className={
           classNameBtn +
-          " btn" +
-          (size ? ` btn-${size}` : "") +
-          (showCaret ? " dropdown-toggle" : "") +
-          (border ? "" : " border-0")
-        }
-        data-bs-toggle="dropdown"
-        data-bs-target={"#" + target}>
-        <i className={"bi bi-" + icon + (text ? " me-1" : "")}></i>
+          " btn text-truncate" +
+          (border ? "" : " border-0") +
+          (showCaret ? " dropdown-toggle" : "")
+        }>
+        {icon && <i className={"bi bi-" + icon + (text ? " me-2" : "")}></i>}
         {text && <span>{text}</span>}
       </a>
       <div className={classNameMenu + " dropdown-menu"}>{children}</div>

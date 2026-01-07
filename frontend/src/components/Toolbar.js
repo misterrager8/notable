@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { MultiContext } from "../context";
 import Button from "./atoms/Button";
 
-export default function Toolbar({ selection, className }) {
+export default function Toolbar({ selection, className = "" }) {
   const multiCtx = useContext(MultiContext);
 
   const monthNames = [
@@ -178,20 +178,16 @@ export default function Toolbar({ selection, className }) {
   };
 
   return (
-    <div className={className + " d-flex"}>
-      {/* <div className="my-auto small opacity-50 text-truncate text-center w-25">
-        "{selection.selected}"
-      </div> */}
-      <div className="toolbar">
-        {formats.map((x) => (
-          <Button
-            className="m-1"
-            icon={x.icon}
-            text={x.text}
-            onClick={() => copyFormat(x.label)}
-          />
-        ))}
-      </div>
+    <div className={className + " toolbar"}>
+      {formats.map((x) => (
+        <Button
+          truncate={false}
+          className="m-1"
+          icon={x.icon}
+          text={x.text}
+          onClick={() => copyFormat(x.label)}
+        />
+      ))}
     </div>
   );
 }
