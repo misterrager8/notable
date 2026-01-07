@@ -112,7 +112,9 @@ export default function Nav() {
                 onClick={() => setShowFolders(!showFolders)}
                 icon="folder"
                 text={
-                  multiCtx.currentFolder ? multiCtx.currentFolder : "All Notes"
+                  multiCtx.currentFolder
+                    ? multiCtx.currentFolder
+                    : `All Notes (${multiCtx.notes.length})`
                 }
               />
             </div>
@@ -177,7 +179,9 @@ export default function Nav() {
           )}
           <Dropdown
             showCaret={false}
-            text={multiCtx.currentFolder || "All Notes"}
+            text={
+              multiCtx.currentFolder || `All Notes (${multiCtx.notes.length})`
+            }
             target="folders">
             {multiCtx.folders.map((x) => (
               <a
