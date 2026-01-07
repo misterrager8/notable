@@ -10,15 +10,19 @@ export default function Editor() {
   const multiCtx = useContext(MultiContext);
 
   const [name, setName] = useState("");
-  // const [content, setContent] = useState("");
   const [mode, setMode] = useState(
     localStorage.getItem("notable-mode") || "split"
   );
 
   const [deleting, setDeleting] = useState(false);
+  const [fontSize, setFontSize] = useState(
+    localStorage.getItem("notable-font-size") || 0.875
+  );
 
+  const onChangeFontSize = (e) => setFontSize(e.target.value);
   const onChangeName = (e) => setName(e.target.value);
   const onChangeContent = (e) => multiCtx.setContent(e.target.value);
+  const [sizeChanged, setSizeChanged] = useState(false);
 
   const [selection, setSelection] = useState({
     start: 0,
@@ -35,6 +39,15 @@ export default function Editor() {
 
     setSelection({ start: start, end: end, selected: selected });
   };
+
+  const saveFontSize = () => {
+    localStorage.setItem("notable-font-size", fontSize);
+    setSizeChanged(false);
+  };
+
+  useEffect(() => {
+    setSizeChanged(localStorage.getItem("notable-font-size") !== fontSize);
+  }, [fontSize]);
 
   useEffect(() => {
     setName(multiCtx.currentNote?.name);
@@ -127,9 +140,11 @@ export default function Editor() {
         </div>
       </div>
       {["split", "write"].includes(mode) && <Toolbar selection={selection} />}
+
       <div className="d-flex editor mt-3">
         {["split", "write"].includes(mode) && (
           <textarea
+            style={{ fontSize: `${fontSize}rem` }}
             onMouseUp={() => getSelection()}
             id="editor"
             autoComplete="off"
@@ -140,12 +155,38 @@ export default function Editor() {
         {mode === "split" && <div className="divider-y"></div>}
         {["split", "read"].includes(mode) && (
           <div
+            style={{ fontSize: `${fontSize}rem` }}
             className="col overflow-auto"
             id="reader"
             dangerouslySetInnerHTML={{
               __html: markdownit({ html: true }).render(multiCtx.content),
             }}></div>
         )}
+      </div>
+      <div className="between mt-2">
+        <div className="" style={{ width: "20%" }}>
+          <Button
+            icon={sizeChanged ? "floppy2" : "check-lg"}
+            className="w-25"
+            onClick={() => saveFontSize()}
+          />
+          <Button
+            disabled={fontSize === 0.875}
+            className="w-75"
+            text={`${fontSize} rem`}
+            onClick={() => setFontSize(0.875)}
+          />
+        </div>
+        <input
+          style={{ width: "80%" }}
+          step={0.025}
+          min={0.875}
+          max={10}
+          className="form-range my-auto"
+          type="range"
+          value={fontSize}
+          onChange={onChangeFontSize}
+        />
       </div>
     </form>
   );

@@ -3,6 +3,7 @@ export default function Button({
   onClick,
   border = false,
   active = false,
+  disabled = false,
   truncate = true,
   className = "",
   type_ = "button",
@@ -10,6 +11,7 @@ export default function Button({
 }) {
   return (
     <button
+      disabled={disabled}
       onClick={onClick}
       type={type_}
       className={

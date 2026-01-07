@@ -105,7 +105,7 @@ a:hover {
 textarea {
   resize: none;
   border: 0 !important;
-  height: 81vh;
+  height: 76vh;
 }
 
 .note-item {
@@ -165,7 +165,7 @@ textarea {
 }
 
 .editor {
-  height: 81vh;
+  height: 76vh;
 }
 
 .nav-x {
@@ -243,6 +243,15 @@ textarea {
   text-overflow: unset;
 }
 
+::-webkit-slider-thumb {
+  background-color: var(--btn-color) !important;
+}
+
+::-webkit-slider-runnable-track {
+  background-color: transparent !important;
+  border: 0.5px solid var(--btn-color) !important;
+}
+
 @media screen and (max-width: 1050px) {
   .body {
     margin-left: unset;
@@ -264,10 +273,10 @@ textarea {
   }
 
   .editor {
-    height: 73vh;
+    height: 68vh;
   }
 
   textarea {
-    height: 74vh;
+    height: 68vh;
   }
 }
