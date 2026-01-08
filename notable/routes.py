@@ -1,5 +1,8 @@
 import datetime
+from pathlib import Path
 from flask import current_app, render_template, request, send_from_directory
+
+from notable import config
 
 from .models import Folder, Note
 
@@ -15,6 +18,9 @@ def get_all():
     msg = ""
     notes = []
     folders = []
+
+    # This is duct tape code, don't keep this here! (2025-01-08)
+    config.HOME_DIR = Path(request.json.get("path"))
 
     try:
         notes = [

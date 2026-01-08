@@ -90,10 +90,15 @@ a:hover {
 }
 
 .form-control,
+.form-control:disabled,
 .form-control:focus {
   background-color: transparent;
   color: var(--primary-txt);
   border-color: var(--primary-txt);
+}
+
+.form-control:disabled {
+  opacity: 50%;
 }
 
 ::placeholder {
@@ -105,7 +110,7 @@ a:hover {
 textarea {
   resize: none;
   border: 0 !important;
-  height: 81vh;
+  height: 77vh;
 }
 
 .note-item {
@@ -165,7 +170,7 @@ textarea {
 }
 
 .editor {
-  height: 81vh;
+  height: 77vh;
 }
 
 .nav-x {
@@ -282,11 +287,11 @@ textarea {
   }
 
   .editor {
-    height: 73vh;
+    height: 69vh;
   }
 
   textarea {
-    height: 73vh;
+    height: 69vh;
   }
 
   .popup {

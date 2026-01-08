@@ -5,10 +5,12 @@ export default function Input({
   required = false,
   placeholder,
   border = true,
+  disabled = false,
   className = "",
 }) {
   return (
     <input
+      disabled={disabled}
       placeholder={placeholder}
       required={required}
       type={type_}

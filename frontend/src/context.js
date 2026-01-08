@@ -22,12 +22,19 @@ export default function MultiProvider({ children }) {
   const [content, setContent] = useState("");
 
   const [searchResults, setSearchResults] = useState([]);
+  const [homeDir, setHomeDir] = useState(
+    localStorage.getItem("notable-home-dir")
+  );
 
   const getAll = () =>
-    api("get_all", { folder: currentFolder, sort: sort }, (data) => {
-      setNotes(data.notes);
-      setFolders(data.folders);
-    });
+    api(
+      "get_all",
+      { path: homeDir, folder: currentFolder, sort: sort },
+      (data) => {
+        setNotes(data.notes);
+        setFolders(data.folders);
+      }
+    );
 
   const createNote = () => {
     api(
@@ -201,7 +208,7 @@ export default function MultiProvider({ children }) {
   };
 
   useEffect(() => {
-    getAll();
+    homeDir && getAll();
     /* eslint-disable react-hooks/exhaustive-deps */
   }, [currentFolder, sort]);
 
@@ -263,6 +270,9 @@ export default function MultiProvider({ children }) {
     setSearchResults: setSearchResults,
 
     getNote: getNote,
+
+    homeDir: homeDir,
+    setHomeDir: setHomeDir,
   };
 
   return (
