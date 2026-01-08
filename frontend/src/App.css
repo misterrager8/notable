@@ -229,6 +229,15 @@ textarea {
   color: var(--btn-color);
 }
 
+#reader pre {
+  background-color: var(--secondary-color);
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+  border-radius: 5px;
+}
+
 #reader mark {
   background-color: var(--btn-color);
   color: var(--btn-hover-txt);
