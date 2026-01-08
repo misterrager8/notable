@@ -8,6 +8,7 @@ import Icon from "./atoms/Icon";
 import Badge from "./atoms/Badge";
 import FolderItem from "./items/FolderItem";
 import Spinner from "./atoms/Spinner";
+import { v4 as uuidv4 } from "uuid";
 
 export const FolderContext = createContext();
 
@@ -91,6 +92,7 @@ export default function Nav() {
             icon="paint-bucket">
             {themes.map((x) => (
               <a
+                key={uuidv4()}
                 onClick={() => setTheme(x)}
                 className={
                   (theme === x ? "active" : "") +
@@ -128,6 +130,7 @@ export default function Nav() {
             text={sorts.find((x) => x.value === multiCtx.sort)?.label}>
             {sorts.map((x) => (
               <a
+                key={uuidv4()}
                 className={
                   "dropdown-item" + (x.value === multiCtx.sort ? " active" : "")
                 }
@@ -151,13 +154,13 @@ export default function Nav() {
                 setShowFolders: setShowFolders,
               }}>
               {multiCtx.folders.map((x) => (
-                <FolderItem item={x} />
+                <FolderItem key={uuidv4()} item={x} />
               ))}
             </FolderContext.Provider>
           ) : (
             <>
               {multiCtx.notes.map((x) => (
-                <NoteItem item={x} />
+                <NoteItem key={uuidv4()} item={x} />
               ))}
             </>
           )}
@@ -193,6 +196,7 @@ export default function Nav() {
             target="folders">
             {multiCtx.folders.map((x) => (
               <a
+                key={uuidv4()}
                 onClick={() => multiCtx.setCurrentFolder(x.name)}
                 className={
                   "dropdown-item between" +
@@ -224,6 +228,7 @@ export default function Nav() {
               }}>
               {multiCtx.notes.map((x) => (
                 <a
+                  key={uuidv4()}
                   title={x.name}
                   onClick={() => multiCtx.setCurrentNote(x)}
                   className={
@@ -258,6 +263,7 @@ export default function Nav() {
             showCaret={true}>
             {themes.map((x) => (
               <a
+                key={uuidv4()}
                 onClick={() => setTheme(x)}
                 className={
                   (theme === x ? "active" : "") +

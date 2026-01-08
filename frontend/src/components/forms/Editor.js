@@ -5,6 +5,7 @@ import markdownit from "markdown-it";
 import Button from "../atoms/Button";
 import Dropdown from "../atoms/Dropdown";
 import Toolbar from "../Toolbar";
+import { v4 as uuidv4 } from "uuid";
 
 export default function Editor() {
   const multiCtx = useContext(MultiContext);
@@ -100,6 +101,7 @@ export default function Editor() {
             </a>
             {multiCtx.folders.map((x) => (
               <a
+                key={uuidv4()}
                 onClick={() => multiCtx.changeFolder(x.name)}
                 className={
                   "dropdown-item" +

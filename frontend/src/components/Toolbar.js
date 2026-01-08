@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { MultiContext } from "../context";
 import Button from "./atoms/Button";
+import { v4 as uuidv4 } from "uuid";
 
 export default function Toolbar({ selection, className = "" }) {
   const multiCtx = useContext(MultiContext);
@@ -181,6 +182,7 @@ export default function Toolbar({ selection, className = "" }) {
     <div className={className + " toolbar"}>
       {formats.map((x) => (
         <Button
+          key={uuidv4()}
           truncate={false}
           className="m-1"
           icon={x.icon}
