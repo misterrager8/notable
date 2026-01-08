@@ -7,6 +7,7 @@ import NoteItem from "./items/NoteItem";
 import Icon from "./atoms/Icon";
 import Badge from "./atoms/Badge";
 import FolderItem from "./items/FolderItem";
+import Spinner from "./atoms/Spinner";
 
 export const FolderContext = createContext();
 
@@ -64,9 +65,13 @@ export default function Nav() {
   return (
     <>
       <div className="nav-y">
-        <div>
-          <div className="between">
-            <div>
+        <div className="between">
+          <div className="d-flex">
+            {multiCtx.loading ? (
+              <div className="my-auto">
+                <Spinner />
+              </div>
+            ) : (
               <Button
                 onClick={() => {
                   showFolders ? multiCtx.addFolder() : multiCtx.createNote();
@@ -76,98 +81,103 @@ export default function Nav() {
                 text={"New " + (showFolders ? "Folder" : "Note")}
                 icon="plus-lg"
               />
-            </div>
-            <Dropdown
-              classNameBtn="text-capitalize"
-              classNameMenu="text-center"
-              target="themes"
-              showCaret={true}
-              icon="paint-bucket">
-              {themes.map((x) => (
-                <a
-                  onClick={() => setTheme(x)}
-                  className={
-                    (theme === x ? "active" : "") +
-                    " dropdown-item text-capitalize"
-                  }>
-                  {x}
-                </a>
-              ))}
-            </Dropdown>
-          </div>
-          {/* <Search className="mt-3" /> */}
-          <div className="between mt-3">
-            <div>
-              {multiCtx.currentFolder && (
-                <Button
-                  className="px-1"
-                  onClick={() => multiCtx.setCurrentFolder(null)}
-                  icon="chevron-compact-left"
-                />
-              )}
-              <Button
-                active={showFolders || multiCtx.currentFolder}
-                onClick={() => setShowFolders(!showFolders)}
-                icon="folder"
-                text={
-                  multiCtx.currentFolder
-                    ? multiCtx.currentFolder
-                    : `All Notes (${multiCtx.notes.length})`
-                }
-              />
-            </div>
-            <Dropdown
-              target="sort-notes"
-              icon={sorts.find((x) => x.value === multiCtx.sort)?.icon}
-              text={sorts.find((x) => x.value === multiCtx.sort)?.label}>
-              {sorts.map((x) => (
-                <a
-                  className={
-                    "dropdown-item" +
-                    (x.value === multiCtx.sort ? " active" : "")
-                  }
-                  onClick={() => multiCtx.setSort(x.value)}>
-                  <Icon name={x.icon} className="me-2" />
-                  {x.label}
-                </a>
-              ))}
-            </Dropdown>
-          </div>
-          <div
-            className="mt-3"
-            style={{
-              height: "85vh",
-              overflowY: "auto",
-            }}>
-            {showFolders ? (
-              <FolderContext.Provider
-                value={{
-                  showFolders: showFolders,
-                  setShowFolders: setShowFolders,
-                }}>
-                {multiCtx.folders.map((x) => (
-                  <FolderItem item={x} />
-                ))}
-              </FolderContext.Provider>
-            ) : (
-              <>
-                {multiCtx.notes.map((x) => (
-                  <NoteItem item={x} />
-                ))}
-              </>
             )}
           </div>
+          <Dropdown
+            classNameBtn="text-capitalize"
+            classNameMenu="text-center"
+            target="themes"
+            showCaret={true}
+            icon="paint-bucket">
+            {themes.map((x) => (
+              <a
+                onClick={() => setTheme(x)}
+                className={
+                  (theme === x ? "active" : "") +
+                  " dropdown-item text-capitalize"
+                }>
+                {x}
+              </a>
+            ))}
+          </Dropdown>
+        </div>
+        {/* <Search className="mt-3" /> */}
+        <div className="between mt-3">
+          <div>
+            {multiCtx.currentFolder && (
+              <Button
+                className="px-1"
+                onClick={() => multiCtx.setCurrentFolder(null)}
+                icon="chevron-compact-left"
+              />
+            )}
+            <Button
+              active={showFolders || multiCtx.currentFolder}
+              onClick={() => setShowFolders(!showFolders)}
+              icon="folder"
+              text={
+                multiCtx.currentFolder
+                  ? multiCtx.currentFolder
+                  : `All Notes (${multiCtx.notes.length})`
+              }
+            />
+          </div>
+          <Dropdown
+            target="sort-notes"
+            icon={sorts.find((x) => x.value === multiCtx.sort)?.icon}
+            text={sorts.find((x) => x.value === multiCtx.sort)?.label}>
+            {sorts.map((x) => (
+              <a
+                className={
+                  "dropdown-item" + (x.value === multiCtx.sort ? " active" : "")
+                }
+                onClick={() => multiCtx.setSort(x.value)}>
+                <Icon name={x.icon} className="me-2" />
+                {x.label}
+              </a>
+            ))}
+          </Dropdown>
+        </div>
+        <div
+          className="mt-3"
+          style={{
+            height: "85vh",
+            overflowY: "auto",
+          }}>
+          {showFolders ? (
+            <FolderContext.Provider
+              value={{
+                showFolders: showFolders,
+                setShowFolders: setShowFolders,
+              }}>
+              {multiCtx.folders.map((x) => (
+                <FolderItem item={x} />
+              ))}
+            </FolderContext.Provider>
+          ) : (
+            <>
+              {multiCtx.notes.map((x) => (
+                <NoteItem item={x} />
+              ))}
+            </>
+          )}
         </div>
       </div>
       <div className="nav-x">
         <div className="d-flex">
-          <Button
-            onClick={() => multiCtx.createNote()}
-            border={true}
-            className="green me-3"
-            text="New Note"
-            icon="plus-lg"
-          />
+          {multiCtx.loading ? (
+            <div className="my-auto me-3">
+              <Spinner />
+            </div>
+          ) : (
+            <Button
+              onClick={() => multiCtx.createNote()}
+              border={true}
+              className="green me-3"
+              text="New Note"
+              icon="plus-lg"
+            />
+          )}
           {multiCtx.currentFolder && (
             <Button
               onClick={() => multiCtx.setCurrentFolder(null)}

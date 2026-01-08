@@ -28,17 +28,21 @@ export default function MultiProvider({ children }) {
     localStorage.getItem("notable-home-dir")
   );
 
-  const getAll = () =>
+  const getAll = () => {
+    setLoading(true);
     api(
       "get_all",
       { path: homeDir, folder: currentFolder, sort: sort },
       (data) => {
         setNotes(data.notes);
         setFolders(data.folders);
+        setLoading(false);
       }
     );
+  };
 
   const createNote = () => {
+    setLoading(true);
     api(
       "add_note",
       {
@@ -49,11 +53,13 @@ export default function MultiProvider({ children }) {
         setNotes(data.notes);
         setCurrentNote(data.note);
         setFolders(data.folders);
+        setLoading(false);
       }
     );
   };
 
   const editNote = (content) => {
+    setLoading(true);
     api(
       "edit_note",
       {
@@ -66,11 +72,13 @@ export default function MultiProvider({ children }) {
         setNotes(data.notes);
         setCurrentNote(data.note);
         setFolders(data.folders);
+        setLoading(false);
       }
     );
   };
 
   const deleteNote = () => {
+    setLoading(true);
     api(
       "delete_note",
       {
@@ -82,11 +90,13 @@ export default function MultiProvider({ children }) {
         setNotes(data.notes);
         setCurrentNote(null);
         setFolders(data.folders);
+        setLoading(false);
       }
     );
   };
 
   const toggleBookmark = () => {
+    setLoading(true);
     api(
       "toggle_bookmark",
       {
@@ -98,11 +108,13 @@ export default function MultiProvider({ children }) {
         setNotes(data.notes);
         setCurrentNote(data.note);
         setFolders(data.folders);
+        setLoading(false);
       }
     );
   };
 
   const changeFolder = (newFolder) => {
+    setLoading(true);
     api(
       "change_folder",
       {
@@ -115,11 +127,13 @@ export default function MultiProvider({ children }) {
         setNotes(data.notes);
         setCurrentNote(data.note);
         setFolders(data.folders);
+        setLoading(false);
       }
     );
   };
 
   const renameNote = (e, newName) => {
+    setLoading(true);
     e.preventDefault();
     api(
       "rename_note",
@@ -133,11 +147,13 @@ export default function MultiProvider({ children }) {
         setNotes(data.notes);
         setCurrentNote(data.note);
         setFolders(data.folders);
+        setLoading(false);
       }
     );
   };
 
   const searchNotes = (e, query) => {
+    setLoading(true);
     e.preventDefault();
     api(
       "search",
@@ -146,11 +162,13 @@ export default function MultiProvider({ children }) {
       },
       (data) => {
         setSearchResults(data.results);
+        setLoading(false);
       }
     );
   };
 
   const getNote = (path) => {
+    setLoading(true);
     api(
       "get_note",
       {
@@ -158,11 +176,13 @@ export default function MultiProvider({ children }) {
       },
       (data) => {
         setCurrentNote(data.note);
+        setLoading(false);
       }
     );
   };
 
   const addFolder = () => {
+    setLoading(true);
     api(
       "add_folder",
       {
@@ -173,11 +193,13 @@ export default function MultiProvider({ children }) {
         setNotes(data.notes);
         setFolders(data.folders);
         setCurrentFolder(data.folder.name);
+        setLoading(false);
       }
     );
   };
 
   const renameFolder = (e, folder, newName) => {
+    setLoading(true);
     e.preventDefault();
     api(
       "rename_folder",
@@ -190,11 +212,13 @@ export default function MultiProvider({ children }) {
       (data) => {
         setNotes(data.notes);
         setFolders(data.folders);
+        setLoading(false);
       }
     );
   };
 
   const deleteFolder = (name) => {
+    setLoading(true);
     api(
       "delete_folder",
       {
@@ -205,6 +229,7 @@ export default function MultiProvider({ children }) {
       (data) => {
         setNotes(data.notes);
         setFolders(data.folders);
+        setLoading(false);
       }
     );
   };

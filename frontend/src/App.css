@@ -275,6 +275,10 @@ textarea {
   overflow-x: auto;
 }
 
+.spinner-border {
+  color: var(--btn-color);
+}
+
 @media screen and (max-width: 1050px) {
   .body {
     margin-left: unset;
