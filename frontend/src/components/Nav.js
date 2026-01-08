@@ -245,7 +245,7 @@ export default function Nav() {
             classNameMenu="text-center"
             target="themes"
             icon="paint-bucket"
-            showCaret={false}>
+            showCaret={true}>
             {themes.map((x) => (
               <a
                 onClick={() => setTheme(x)}

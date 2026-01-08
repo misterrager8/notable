@@ -105,7 +105,7 @@ a:hover {
 textarea {
   resize: none;
   border: 0 !important;
-  height: 73vh;
+  height: 81vh;
 }
 
 .note-item {
@@ -165,7 +165,7 @@ textarea {
 }
 
 .editor {
-  height: 73vh;
+  height: 81vh;
 }
 
 .nav-x {
@@ -234,11 +234,6 @@ textarea {
   max-width: 99%;
 }
 
-.toolbar {
-  display: flex;
-  overflow-x: auto;
-}
-
 .toolbar .btn {
   text-overflow: unset;
   font-size: 1.1rem;
@@ -251,6 +246,19 @@ textarea {
 ::-webkit-slider-runnable-track {
   background-color: transparent !important;
   border: 0.5px solid var(--btn-color) !important;
+}
+
+.popup {
+  position: absolute;
+  z-index: 1000;
+  width: 75%;
+  /* width: 350px; */
+  height: 115px;
+  border: 0.5px solid var(--btn-color);
+  border-radius: 5px;
+  background-color: var(--primary-bg);
+  padding: 10px;
+  overflow-x: auto;
 }
 
 @media screen and (max-width: 1050px) {
@@ -274,10 +282,15 @@ textarea {
   }
 
   .editor {
-    height: 65vh;
+    height: 73vh;
   }
 
   textarea {
-    height: 65vh;
+    height: 73vh;
+  }
+
+  .popup {
+    width: 95%;
+    height: 210px;
   }
 }

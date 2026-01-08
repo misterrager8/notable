@@ -19,6 +19,9 @@ export default function Editor() {
     localStorage.getItem("notable-font-size") || 0.875
   );
 
+  const [mouseX, setMouseX] = useState(null);
+  const [mouseY, setMouseY] = useState(null);
+
   const onChangeFontSize = (e) => setFontSize(e.target.value);
   const onChangeName = (e) => setName(e.target.value);
   const onChangeContent = (e) => multiCtx.setContent(e.target.value);
@@ -139,18 +142,32 @@ export default function Editor() {
           />
         </div>
       </div>
-      {["split", "write"].includes(mode) && <Toolbar selection={selection} />}
-
       <div className="d-flex editor mt-3">
         {["split", "write"].includes(mode) && (
-          <textarea
-            style={{ fontSize: `${fontSize}rem` }}
-            onMouseUp={() => getSelection()}
-            id="editor"
-            autoComplete="off"
-            className="form-control font-monospace col"
-            value={multiCtx.content}
-            onChange={onChangeContent}></textarea>
+          <>
+            <textarea
+              onClick={(e) => {
+                setMouseX(e.clientX);
+                setMouseY(e.clientY);
+              }}
+              style={{ fontSize: `${fontSize}rem` }}
+              onMouseUp={() => getSelection()}
+              id="editor"
+              autoComplete="off"
+              className="form-control font-monospace col"
+              value={multiCtx.content}
+              onChange={onChangeContent}></textarea>
+            {selection.selected.length > 0 && (
+              <div
+                className="popup"
+                style={{
+                  top: `${mouseY + 20}px`,
+                  // left: `${mouseX}px`,
+                }}>
+                <Toolbar selection={selection} />
+              </div>
+            )}
+          </>
         )}
         {mode === "split" && <div className="divider-y"></div>}
         {["split", "read"].includes(mode) && (
