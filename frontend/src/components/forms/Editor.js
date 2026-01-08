@@ -184,7 +184,7 @@ export default function Editor() {
         <div className="" style={{ width: "20%" }}>
           <Button
             icon={sizeChanged ? "floppy2" : "check-lg"}
-            className="w-25"
+            className={"w-25" + (sizeChanged ? " orange" : "")}
             onClick={() => saveFontSize()}
           />
           <Button
