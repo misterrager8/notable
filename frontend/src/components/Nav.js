@@ -48,7 +48,6 @@ export default function Nav() {
 
   const themes = [
     "light",
-    "strawberry",
     "raspberry",
     "lavender",
     "sky",
@@ -59,7 +58,7 @@ export default function Nav() {
     "plum",
     "walnut",
     "aqua",
-    "olive",
+    "azul",
   ];
 
   return (

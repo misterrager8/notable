@@ -5,17 +5,7 @@ html[data-theme="light"] {
 
   --secondary-color: hsl(283, 4%, 69%);
 
-  --btn-color: hsl(59 3 35);
-  --btn-hover-txt: #cccccc;
-}
-
-html[data-theme="strawberry"] {
-  --primary-bg: hsl(95 32 80);
-  --primary-txt: #1a1a1a;
-
-  --secondary-color: hsl(96, 17%, 67%);
-
-  --btn-color: hsl(2 85 34);
+  --btn-color: hsl(60, 3%, 30%);
   --btn-hover-txt: #cccccc;
 }
 
@@ -30,12 +20,12 @@ html[data-theme="lavender"] {
 }
 
 html[data-theme="raspberry"] {
-  --primary-bg: hsl(191 29 80);
+  --primary-bg: hsl(275 25 80);
   --primary-txt: #1a1a1a;
 
-  --secondary-color: hsl(192, 17%, 70%);
+  --secondary-color: hsl(275, 16%, 70%);
 
-  --btn-color: hsl(315 46 34);
+  --btn-color: hsl(357 67 24);
   --btn-hover-txt: #cccccc;
 }
 
@@ -55,7 +45,7 @@ html[data-theme="sepia"] {
 
   --secondary-color: hsl(22, 54%, 72%);
 
-  --btn-color: hsl(238 0 35);
+  --btn-color: hsl(0, 1%, 29%);
   --btn-hover-txt: #cccccc;
 }
 
@@ -105,26 +95,26 @@ html[data-theme="walnut"] {
 
   --secondary-color: hsl(102, 25%, 13%);
 
-  --btn-color: hsl(34 53 42);
+  --btn-color: hsl(34, 39%, 48%);
   --btn-hover-txt: #1a1a1a;
 }
 
 html[data-theme="aqua"] {
-  --primary-bg: hsl(324 13 10);
+  --primary-bg: hsl(2 5 10);
   --primary-txt: #cccccc;
 
-  --secondary-color: hsl(327, 14%, 15%);
+  --secondary-color: hsl(0, 6%, 15%);
 
-  --btn-color: hsl(162 84 50);
+  --btn-color: hsl(155 27 48);
   --btn-hover-txt: #1a1a1a;
 }
 
-html[data-theme="olive"] {
-  --primary-bg: hsl(284 3 10);
+html[data-theme="azul"] {
+  --primary-bg: hsl(237 8 10);
   --primary-txt: #cccccc;
 
-  --secondary-color: hsl(300, 1%, 14%);
+  --secondary-color: hsl(225, 10%, 15%);
 
-  --btn-color: hsl(66 43 45);
+  --btn-color: hsl(230, 61%, 66%);
   --btn-hover-txt: #1a1a1a;
 }
