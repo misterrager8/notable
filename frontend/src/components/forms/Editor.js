@@ -66,6 +66,11 @@ export default function Editor() {
       <div className="d-flex">
         <div className="d-flex my-auto">
           <Button
+            onClick={() => multiCtx.setCurrentNote(null)}
+            className="px-1"
+            icon="x"
+          />
+          <Button
             onClick={() => multiCtx.editNote(multiCtx.content)}
             className={
               "px-1" +
