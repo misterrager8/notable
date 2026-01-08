@@ -14,7 +14,9 @@ export default function MultiProvider({ children }) {
     JSON.parse(localStorage.getItem("notable-last-opened"))
   );
   const [currentFolder, setCurrentFolder] = useState(null);
-  const [sort, setSort] = useState("favorited");
+  const [sort, setSort] = useState(
+    localStorage.getItem("notable-sort") || "favorited"
+  );
 
   const [mode, setMode] = useState(
     localStorage.getItem("notable-mode") || "split"
@@ -211,6 +213,10 @@ export default function MultiProvider({ children }) {
     homeDir && getAll();
     /* eslint-disable react-hooks/exhaustive-deps */
   }, [currentFolder, sort]);
+
+  useEffect(() => {
+    localStorage.setItem("notable-sort", sort);
+  }, [sort]);
 
   useEffect(() => {
     !showSide && setShowFolders(false);
