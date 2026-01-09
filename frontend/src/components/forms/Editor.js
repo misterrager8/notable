@@ -12,12 +12,12 @@ export default function Editor() {
 
   const [name, setName] = useState("");
   const [mode, setMode] = useState(
-    localStorage.getItem("notable-mode") || "split"
+    localStorage.getItem("looseleaf-mode") || "split"
   );
 
   const [deleting, setDeleting] = useState(false);
   const [fontSize, setFontSize] = useState(
-    localStorage.getItem("notable-font-size") || 0.875
+    localStorage.getItem("looseleaf-font-size") || 0.875
   );
 
   const [mouseX, setMouseX] = useState(null);
@@ -45,12 +45,12 @@ export default function Editor() {
   };
 
   const saveFontSize = () => {
-    localStorage.setItem("notable-font-size", fontSize);
+    localStorage.setItem("looseleaf-font-size", fontSize);
     setSizeChanged(false);
   };
 
   useEffect(() => {
-    setSizeChanged(localStorage.getItem("notable-font-size") !== fontSize);
+    setSizeChanged(localStorage.getItem("looseleaf-font-size") !== fontSize);
   }, [fontSize]);
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export default function Editor() {
   }, [multiCtx.currentNote]);
 
   useEffect(() => {
-    localStorage.setItem("notable-mode", mode);
+    localStorage.setItem("looseleaf-mode", mode);
   }, [mode]);
 
   return (

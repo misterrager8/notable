@@ -16,7 +16,7 @@ export default function Display() {
 
   const changeHomeDir = (e) => {
     e.preventDefault();
-    localStorage.setItem("notable-home-dir", multiCtx.homeDir);
+    localStorage.setItem("looseleaf-home-dir", multiCtx.homeDir);
     multiCtx.getAll();
     multiCtx.setCurrentNote(null);
     setChangingDir(false);

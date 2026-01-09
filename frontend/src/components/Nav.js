@@ -16,12 +16,12 @@ export default function Nav() {
   const multiCtx = useContext(MultiContext);
 
   const [theme, setTheme] = useState(
-    localStorage.getItem("notable-theme") || "light"
+    localStorage.getItem("looseleaf-theme") || "light"
   );
   const [showFolders, setShowFolders] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("notable-theme", theme);
+    localStorage.setItem("looseleaf-theme", theme);
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 

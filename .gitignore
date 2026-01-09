@@ -1,6 +1,6 @@
 *.env
 *.pyc
-notable.egg-info/
+looseleaf.egg-info/
 *.db
 /frontend/node_modules
 /.pnp

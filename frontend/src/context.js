@@ -11,21 +11,21 @@ export default function MultiProvider({ children }) {
   const [notes, setNotes] = useState([]);
   const [folders, setFolders] = useState([]);
   const [currentNote, setCurrentNote] = useState(
-    JSON.parse(localStorage.getItem("notable-last-opened"))
+    JSON.parse(localStorage.getItem("looseleaf-last-opened"))
   );
   const [currentFolder, setCurrentFolder] = useState(null);
   const [sort, setSort] = useState(
-    localStorage.getItem("notable-sort") || "favorited"
+    localStorage.getItem("looseleaf-sort") || "favorited"
   );
 
   const [mode, setMode] = useState(
-    localStorage.getItem("notable-mode") || "split"
+    localStorage.getItem("looseleaf-mode") || "split"
   );
   const [content, setContent] = useState("");
 
   const [searchResults, setSearchResults] = useState([]);
   const [homeDir, setHomeDir] = useState(
-    localStorage.getItem("notable-home-dir")
+    localStorage.getItem("looseleaf-home-dir")
   );
 
   const getAll = () => {
@@ -240,7 +240,7 @@ export default function MultiProvider({ children }) {
   }, [currentFolder, sort]);
 
   useEffect(() => {
-    localStorage.setItem("notable-sort", sort);
+    localStorage.setItem("looseleaf-sort", sort);
   }, [sort]);
 
   useEffect(() => {
@@ -248,11 +248,11 @@ export default function MultiProvider({ children }) {
   }, [showSide]);
 
   useEffect(() => {
-    localStorage.setItem("notable-last-opened", JSON.stringify(currentNote));
+    localStorage.setItem("looseleaf-last-opened", JSON.stringify(currentNote));
   }, [currentNote]);
 
   useEffect(() => {
-    localStorage.setItem("notable-mode", mode);
+    localStorage.setItem("looseleaf-mode", mode);
   }, [mode]);
 
   const contextValue = {

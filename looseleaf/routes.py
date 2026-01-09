@@ -2,7 +2,7 @@ import datetime
 from pathlib import Path
 from flask import current_app, render_template, request, send_from_directory
 
-from notable import config
+from looseleaf import config
 
 from .models import Folder, Note
 

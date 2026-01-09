@@ -1,4 +1,4 @@
-# notable
+# looseleaf
 
 A simple and intuitive web application for creating, organizing, and managing your markdown notes efficiently.
 
@@ -22,7 +22,7 @@ A simple and intuitive web application for creating, organizing, and managing yo
 5. `npm run build`
 6. `cd -`
 7. `python3 setup.py develop`
-8. `notable --help`
+8. `looseleaf --help`
 
 ##### For Developers:
 
@@ -30,8 +30,8 @@ A simple and intuitive web application for creating, organizing, and managing yo
 
 ##### Configuration
 
-7. `notable set-config "port" [PORT]`
-8. `notable set-config "home_dir" [HOME_DIR]`
+7. `looseleaf set-config "port" [PORT]`
+8. `looseleaf set-config "home_dir" [HOME_DIR]`
 
 9. Run `--help` command for all options:
 

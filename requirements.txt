@@ -1,0 +1,6 @@
+Flask==3.1.2
+Flask_Cors==5.0.0
+Markdown==3.3.7
+pyperclip==1.8.2
+python_frontmatter==0.5.0
+setuptools==75.6.0

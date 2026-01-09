@@ -10,7 +10,7 @@ from .models import Note
 
 @click.group()
 def cli():
-    """Notable: A browser-based note-taking web app."""
+    """looseleaf: A browser-based note-taking web app."""
     pass
 
 
